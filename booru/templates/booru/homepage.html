@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {% include "booru/components/head.html" %}
+    {% load static %}
+</head>
+
+<body style="background: url('{% static '/layout/index_back.png' %}') repeat-x;">
+    <br>
+    <br>
+    <br>
+    <div id="static-index">
+        <h1 style="font-size: 4em;"><a href="/posts">Homebooru</a></h1>
+        <br>
+        <div class="space" id="links" style="margin-bottom: 10px;">
+            <a href="/posts" title="A paginated list of every post"><b>Posts</b></a>
+            <a href="/comments">Comments</a>
+            <a href="/account" title="Account options">My Account</a>
+            <a href="#" title="Other options">»</a>
+        </div>
+        <form action="/posts" method="get">
+            <input id="tags-search" name="tags" class="search_list-frontpage ui-autocomplete-input" type="text" placeholder="Ex: blue_sky cloud 1girl" autocomplete="off">
+            <input name="commit" class="secondary_search" type="submit" value="Search">
+            <br>
+            <br>
+        </form>
+        <div style="font-family: tahoma; font-size: 11px; color: #5a5a5a;">
+            Developed with hugs and kisses by <a href="https://github.com/gingerchicken">HowITsDone</a>
+            <br> Running Homebooru Re-written 0.0.1</div>
+        <br>
+        <div id="imagecounter">
+            {% for digit in digits %}
+                {% with 'layout/'|add:digit|add:'.gif' as digit_path %}
+                    <img src="{% static digit_path %}" border="{{ digit }}" alt="{{ digit }}">
+                {% endwith %}
+            {% endfor %}
+        </div>
+        <div style="text-align: center; color: #5a5a5a; font-family: tahoma;">
+            <small style="color: #aaa;">Booru software with <div style="display: inline-block; font-weight: bold;">self-hosting</div> in mind.</small>
+        </div>
+    </div>
+</body>
+
+</html>

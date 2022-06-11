@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Homebooru
-    'posts.apps.PostsConfig',
+    'booru.apps.BooruConfig',
 ]
 
 MIDDLEWARE = [

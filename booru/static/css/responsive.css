@@ -1,0 +1,762 @@
+/* Loading bar omg omg my css worked first time-ish holy heck */
+@keyframes blink {50% { background-color: transparent }}
+.loader .dot { animation: 2s blink infinite }
+.loader .dot:nth-child(2) { animation-delay: 500ms }
+.loader .dot:nth-child(3) { animation-delay: 1s }
+
+.loader .dot {
+  background-color: black;
+  width: 8px;
+  height: 16px;
+  display: inline-block;
+}
+
+
+.preview-warning {
+	background-color: #fcf8e3!important;
+}
+
+.preview-success {
+	background-color: #dff0d8!important;
+}
+
+.preview-fail {
+	background-color: #f2dede!important;
+}
+
+body {
+	padding: 0px;
+	margin: 0px;
+	color: #000;
+	font-family: verdana, sans-serif, helvetica;
+}
+
+/* .vertical-center {
+	margin: 0;
+	position: absolute;
+	top: 50%;
+	-ms-transform: translateY(-50%);
+	transform: translateY(-50%);
+} */
+
+.navbar-default .navbar-nav > .active2 > a,
+.navbar-default .navbar-nav > .active2 > a:hover,
+.navbar-default .navbar-nav > .active2 > a:focus {
+  color: #006ffa;
+  background-color: #edf5ff;
+}
+
+.navbar-default .navbar-nav > .warningHeader > a,
+.navbar-default .navbar-nav > .warningHeader > a:hover,
+.navbar-default .navbar-nav > .warningHeader > a:focus {
+  color: #fff;
+  background-color: #cc0000;
+}
+
+a.forum-top-button
+{
+	background:#fff;
+	padding: 7px;
+}
+
+div#static-index > * > a {
+	color: #006FFA !important;
+}
+
+div#static-index > * > a:hover {
+	color: #33CFFF !important;
+}
+
+div#static-index > * > input.search_list-frontpage {
+	width: 400px;
+	border: 1px solid #e0e0e0;
+	padding: 4px 5px 4px 5px;
+}
+
+div#static-index > * > input.secondary_search {
+	width: 100px !important;
+	border-radius: 4px;
+}
+
+#tags-search {
+	border: 1px solid #e0e0e0;
+}
+
+div#static-index > h1 {
+	display: inline !important;
+}
+
+div#static-index {
+  	text-align: center;
+}
+
+div#static-index > div#links > a {
+	font-family: tahoma, verndana, sans-serif;
+	font-size: 12px;
+  	margin: 0px 5px;
+}
+
+div.accountHome {
+	border: 1px solid #f0f0f0;
+	width: 400px;
+	float: left;
+	padding: 10px 20px 0px 20px;
+}
+
+div.commentBox {
+	display: block;/* display: inline-block; */
+	width: 100%;
+	max-width: 700px;
+	background: #fefefe;
+	padding: 15px;
+	border: 1px solid #f0f0f0;
+	margin: 5px 0px 5px 0px;
+	word-wrap: break-word;
+}
+
+.spoiler {
+  	color: black;
+  	background: black;
+  	cursor: text;
+}
+
+.spoiler a{
+  	color: black;
+  	background: black;
+}
+
+.spoiler:hover {
+  	color: white;
+}
+
+.navbar {
+	border: 0 !important;
+	margin-bottom: 0px !important;
+	background: linear-gradient(#328dfe, #0773fb);
+}
+
+.padding15 {
+	padding: 0px 15px 0px 15px;
+}
+
+.navbar-brand {
+	padding: 15px 15px !important;
+	background: url("/layout/booru-logo.png") center no-repeat;
+	background-size: 40px 40px;
+	height: 50px;
+	min-width: 60px;
+	margin-left: 15px;
+}
+
+#submenu {
+	background: #444 !important;
+	padding-left: 25px;
+}
+
+.strong {
+	font-weight: bold;
+}
+
+.navbar-header > button {
+	margin-right: 10px;
+}
+
+#submenu > button {
+	margin-right: 10px;
+}
+
+.navbar-header > button:hover, .navbar-header > button:focus {
+	background: #33CFFF !important;
+}
+
+.navbar-header > button:active {
+	background: transparent !important;
+}
+
+span.additional-search {
+	float: right; 
+	margin-top: 4px;
+}
+
+.secondary_search {
+	color: #fff;
+	font-weight: bold;
+	width: 180px;
+	border: 0px;
+	padding: 5px;
+	background: #0773fb;
+}
+
+.new_secondary_search:hover {
+	border: 0px;
+	background: #fbb307;
+}
+
+.new_secondary_search {
+	padding: 8px 15px 8px 15px;
+	width: 120px;
+	color: #fff;
+	font-weight: bold;
+	border: 0px;
+	background: #0773fb;
+}
+
+.secondary_search:hover {
+	width: 180px;
+	border: 0px;
+	background: #fbb307;
+}
+
+
+input.search_list {
+	width: calc(100% - 25px);
+	border: 1px solid #e0e0e0;
+	padding: 4px 5px 4px 5px;
+}
+
+
+.contain-push {
+	margin-left: 220px;
+}
+
+div#notice {
+	padding:0.25em;
+	position:fixed;
+	top:0.5em;
+	left:25%;
+	width:50%;
+	z-index:100
+	}
+
+div#notice:not(.ui-state-error) {
+	background-color:#FFFBBF;
+	border:1px solid #CCC999;
+	padding: 5px;
+	text-align: center;
+}
+
+div.quote {
+  	padding: 15px;
+	text-align: justify;
+	color: #444444;
+	font-style: italic;
+  	background: #fefefe url('/layout/quote.png') no-repeat top right;
+  	border: 1px solid #f0f0f0;
+}
+
+ul#tag-list {
+	position: absolute;
+	padding: 0px 10px 0px 10px;
+	margin: 0px;
+	width: 200px;
+	word-wrap: break-word;
+	border-right: 1px solid #f0f0f0;
+}
+
+ul#tag-list li {
+  	display: block;
+  	list-style-type: none;
+	line-height: 1.8em;
+}
+
+div#mobileTags > ul
+{
+	padding: 0px;
+	margin: 0px;
+	width: 90%;
+	word-wrap: break-word;
+}
+div#mobileTags > ul > li{
+  	display: inline;
+	margin-right: 10px;
+  	list-style-type: none;
+	line-height: 1.8em;
+	word-wrap: break-word;
+}
+
+.thumbnail-preview
+{
+	display: inline-block; 
+	background: #fff;
+	word-wrap: break-word;
+	margin: 0px 10px 20px 10px; 
+	max-height: 200px;
+	max-width: 200px;
+	border: 1px solid #f0f0f0;
+	padding: 5px;
+}
+
+.thumbnail-preview img {
+	max-height: 150px;
+	max-width: 150px;
+}
+
+div.thumbnail-placeholder {
+	height: 200px; 
+	width: 200px;
+}
+
+span.blacklisted-image {
+
+}
+span.thumb-space {
+  	display: inline-block;
+}
+
+.form > th, th {
+	vertical-align: top;
+	padding: 0px 15px !important;
+	 font-weight: normal !important;
+}
+
+tr.accountOptions {
+	border-bottom: 1px solid #bababa;
+}
+
+tr.accountOptions > td {
+	padding-bottom: 20px;
+}
+
+.blacklisted {
+	opacity: .2;
+	filter: blur(10px);
+}
+
+.flagged {
+  	border: 5px solid #F00 !important;
+	margin: -5px !important;
+}
+
+.webm {
+  	border: 5px solid #0000ff !important;
+	margin: -5px !important;
+}
+/*Pagination begins here*/
+
+div#paginator {
+  	display: block;
+  	padding: 0;
+  	font-size: 12px;
+  	text-align: center;
+  	font-weight: bold;
+  	clear: both;
+}
+
+div#paginator a {
+  	margin: 0 3px;
+  	padding: 8px 12px;
+  	font-weight: normal;
+  	border: 1px solid #EAEAEA;
+}
+
+div#paginator a.arrow {
+  	border: none;
+}
+
+div#paginator a.arrow:hover {
+  	background: white;
+  	color: #9093FF;
+}
+
+div#paginator a.current {
+  	border: 1px solid #AAA;
+}
+
+div#paginator a:hover {
+  	background: #006ffa;
+	color: #fff;
+}
+
+div#paginator span {
+  	margin: 0 3px;
+  	padding: 2px 6px;
+}
+
+div#paginater {
+  	display: inline-block;
+  	padding: 0;
+  	font-size: 12px;
+  	text-align: center;
+  	font-weight: bold;
+  	clear: both;
+}
+
+div#paginater a {
+  	margin: 0 3px;
+  	padding: 8px 12px;
+  	font-weight: normal;
+  	border: 1px solid #EAEAEA;
+}
+
+div#paginater a.arrow {
+  	border: none;
+}
+
+div#paginater a.arrow:hover {
+  	background: white;
+  	color: #9093FF;
+}
+
+div#paginater a.current {
+  	border: 1px solid #AAA;
+}
+
+div#paginater a:hover {
+  	background: #006ffa;
+	color: #fff;
+}
+
+div#paginater span {
+  	margin: 0 3px;
+  	padding: 2px 6px;
+}
+
+/* 
+	Post notes
+*/
+
+
+
+div#post-view > div#right-col > div > div#note-container {
+  	position: relative;
+
+}
+
+div#post-view > div#right-col > div > div#note-container > div.note-body {
+  	background: #FFE;
+  	border: 1px solid black;
+  	display: none;	
+	z-index: 50;
+  	max-width: 300px;
+  	min-width: 140px;
+  	min-height: 10px;
+  	position: absolute;
+  	padding: 5px;
+  	cursor: pointer;
+  	overflow: auto;
+}
+
+div#post-view > div#right-col > div > div#note-container > div.note-body > p.tn {
+  	font-size: 0.8em;
+  	color: gray;
+}
+tn {
+  	font-size: 0.8em;
+  	color: gray;
+}
+
+div#post-view > div#right-col > div > div#note-container > div.note-box {
+  	position: absolute;
+  	border: 1px solid black;
+  	width: 150px;
+  	height: 150px;
+  	cursor: move;
+  	background: transparent;
+}
+
+div#post-view > div#right-col > div > div#note-container > div.note-box > div.note-corner {
+  	background: black;
+  	width: 7px;
+  	height: 7px;
+  	position: absolute;
+  	bottom: 0;
+  	right: 0;
+  	cursor: se-resize;
+}
+
+div.note-box-inner-border {
+      border: 1px solid #ff0;
+      background: #FFE;
+ }
+
+div#post-view > div#right-col > div > div#note-container > div.unsaved {
+  	background: #FFF;
+  	border: 1px solid red;
+}
+
+div#post-view > div#right-col > div > div#note-container > div.unsaved > div.note-corner {
+  	background: red;
+}
+
+div#post-view > div#right-col > div > img {
+  	margin-right: 15px;
+}
+
+div#post-view > div#right-col > div#edit {
+  	margin-bottom: 2em;
+  	padding: 1em;
+}
+
+
+
+/*Forum CSS*/
+
+div.forum-main-userbar {
+	background: #0773fb;
+	padding: 10px;
+	color: #fff;
+}
+
+div.forum-list-mainbar {
+	background: #0773fb;
+	padding: 15px;
+	color: #fff !important;
+	font-weight: bold;
+}
+
+div.forum-main-title {
+	background: #fafafa;
+	padding: 10px;
+	font-size: 0.8em;
+	color: #666666;
+}
+
+div.forum-list-space {
+	font-size:1.2em;
+	border-bottom: 3px solid #f5f5f5;
+}
+
+@media only screen and (max-width:1024px) {
+}
+
+@media only screen and (max-width:767px) {
+
+  #submenu {
+	clear:both;
+	position:absolute;
+	top: 0px;
+	width: 50%;
+	z-index: 100;
+	padding-right: 15px;
+	margin-left: 80px;
+  }
+  .navbar-header {
+	  padding-right: 15px;
+  }
+
+.thumbnail-preview
+{
+	max-height: 120px !important;
+	max-width: 120px !important;
+
+}
+
+.thumbnail-preview img {
+	max-height: 100px;
+	max-width: 100px;
+}
+
+.contain-push {
+	margin-left: 0px;
+}
+
+.secondary_search {
+	width: 100%;
+	border: 0px;
+}
+
+.secondary_search:hover {
+	width: 100% !important;
+	border: 0px;
+}
+
+input.search_list {
+	padding: 3px 5px 3px 5px !important;
+}
+
+
+.alert {
+	float: left !important;
+	width: 100% !important;
+	
+}
+ul#tag-list {
+	position: relative !important;
+	float: left !important;
+	padding: 0px 10px 0px 10px;
+	margin: 0px;
+	width: 100% !important;
+	border-right: 1px solid #f0f0f0;
+}
+
+ul#tag-list li {
+	display: block !important;
+	margin-right: 25px;
+  	list-style-type: none !important;
+
+
+
+}
+
+ul#tag-list li a {
+	font-size: 1em !important;
+}
+
+}
+
+/*
+	Account profile
+*/
+
+	.profileSectionTitle {
+			font-size: 24px; 
+			font-weight: normal;
+	}
+	
+	.profileThumbnailPadding {
+		display: inline-block; 
+		padding: 5px;
+	}
+	
+	.profileOptionSelect {
+		text-align:center;
+		margin: 5px 5px 0px 5px;
+		color: #fff;
+		background: #2183fc;
+		padding: 5px 10px;
+		white-space: nowrap;
+	}
+	
+	.profileRemoveAvatar {
+		background: #ff0000 !important;
+	}
+	
+	.profileBanUser {
+		background: #ffffff !important;
+		color: #ff0000 !important;
+	}
+
+	.profileUsernameDisplay {
+		color: #fff;
+		padding-left: 160px;
+	}
+	
+	.profileUserDisplay {
+		background: #2183fc;
+		padding: 10px;
+		font-size: 18px;
+		font-weight: bold;
+		margin-top: 5px;
+		white-space: nowrap;
+		overflow: hidden;
+	}
+	
+	.profileStatSeparator {
+		padding: 6px 0px;
+		border-bottom: 1px solid #e0e0e0;
+	}
+	
+	.profileToggleStats {
+		font-size: 10px;
+		margin-top: 5px;
+	}
+	
+	.profileStatisticsBoxTitle {
+		font-size: 18px;
+		font-weight: bold;
+		padding-bottom: 6px;
+	}
+	
+	.profileStatisticsBox {
+		color: #222;
+		padding: 0px 20px;
+		font-size: 14px;
+		font-weight: normal;
+	}
+	
+	.profileStatisticsBoxContainer {
+		 position: absolute;
+		 right: 0;
+		 display: inline-block;
+		 background: #fff;
+		 width: 250px;
+		 z-index: 100;
+	}
+	
+	.profileAvatar {
+		position: absolute;
+		z-index: 100;
+		border-radius: 50%;
+		border: 3px solid #fff;
+		left: 2%;
+		top: 65%;
+		height: 140px;
+		width: 140px;
+	}
+	
+	.profileBackgroundSize {
+		 height: 230px;
+	}
+	
+	.profileTrollFriends {
+		text-align: center;
+		color:#6c6c6c;
+		font-size: 12px;
+	}
+	
+	.profileRewardsTitle {
+		color: #fff;
+		font-weight: bold;
+	}
+	
+	.profileAchievementContainer {
+		position: absolute;
+		margin-left: 170px;
+		margin-top: 1px;
+	}
+	
+	.profileAchievementItem {
+		display: inline-block;
+		width: 100px;
+		text-align: center;
+		vertical-align: top;
+	}
+	
+	.accountOptionsContainer {
+		padding: 0px 15px;
+		border: 1px solid #f0f0f0;
+		margin: 0px 15px;
+	}
+	
+	.accountOptionsPadding {
+		padding: 15px
+	}
+	
+	/*Media size mobile/tablets for profile*/
+	
+	@media only screen and (max-width:767px) {
+		.profileBackgroundSize {
+			 height: 100px !important;
+		}
+	.profileAvatar {
+		position: absolute;
+		z-index: 100;
+		border-radius: 50%;
+		border: 3px solid #fff;
+		left: 2%;
+		top: 65%;
+		height: 100px;
+		width: 100px;
+	}
+	}
+
+
+
+
+/*# verdana, sans-serif;
+links 006FFA
+33CFFF hover
+*/
+
+.blinking{
+    animation:blinkingText 2s infinite;
+}
+@keyframes blinkingText{
+    30%{         }
+    50%{    color: transparent; }
+    100%{     }
+}
+
+.accountHome {
+	font-size: 11px; color: #5a5a5a; font-family: tahoma, arial, sans-serif; width: 300px; float: left; border: 1px solid #f0f0f0; padding: 10px 30px 0px 20px;
+}

@@ -18,5 +18,5 @@ from django.urls import include, path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('posts.urls')) # This makes the posts page the homepage
+    path('', include('booru.urls')) # This makes the posts page the homepage
 ]
