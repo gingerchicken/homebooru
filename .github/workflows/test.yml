@@ -8,7 +8,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: "Create .env file"
         run: |
-          echo "UNIT_TEST=True" > .env
+          echo -e "\nUNIT_TEST=True" >> .env
       - name: "Build docker-compose stack"
         run: docker-compose up -d --build
       - name: "Attach to test container"
