@@ -19,7 +19,7 @@ services:
       - POSTGRES_NAME=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - DEBUG=True
+      - DEBUG=${DEBUG}
       - UNIT_TEST=${UNIT_TEST}
     depends_on:
       - db
