@@ -1,3 +1,5 @@
+name: Python Unit Tests CI
+
 on: [push]
 
 jobs:
