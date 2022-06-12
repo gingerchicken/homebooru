@@ -9,4 +9,6 @@ jobs:
       - uses: isbang/compose-action@v1.1.0
         with:
           compose-file: "./docker-compose.yml"
-          up-flags: "--build -d"
+          up-flags: |
+            - "--build"
+            - "-d"
