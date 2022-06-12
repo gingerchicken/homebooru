@@ -7,7 +7,7 @@ class Post(models.Model):
     # Unique ID for each post
     id = models.AutoField(primary_key=True)
 
-    # Array of tags for each post (by default, it is an empty array)
+    # Array of tags for each post, these will be foreign keys to the Tag model
     tags = ArrayField(models.CharField(max_length=100), default=list)
 
     # SFW Rating (either safe, questionable, or explicit) (not null, default safe)
@@ -17,7 +17,7 @@ class Post(models.Model):
     score = models.IntegerField(default=0)
 
     # Post md5 checksum
-    md5 = models.CharField(max_length=32)
+    md5 = models.CharField(max_length=32, unique=True)
 
     # Sample flag (i.e. true when there is a sample for the post - happens when the post is a large image)
     sample = models.BooleanField(default=False)
@@ -43,3 +43,20 @@ class Post(models.Model):
 
     # Source as a URL to the original post
     source = models.CharField(max_length=1000, blank=True, null=True)
+
+class TagType(models.Model):
+    # We will use the type name as the primary key
+    name = models.CharField(max_length=100, primary_key=True)
+
+    # Description of the tag type
+    description = models.CharField(max_length=1000, blank=True, null=True)
+
+class Tag(models.Model):
+    # We will use the tag name as the primary key
+    tag = models.CharField(max_length=100, primary_key=True)
+
+    # Number of times the tag has been used
+    count = models.IntegerField(default=0)
+
+    # Tag type as a foreign key to the TagType model
+    tag_type = models.ForeignKey(TagType, on_delete=models.CASCADE)
