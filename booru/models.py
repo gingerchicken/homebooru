@@ -59,4 +59,4 @@ class Tag(models.Model):
     count = models.IntegerField(default=0)
 
     # Tag type as a foreign key to the TagType model
-    tag_type = models.ForeignKey(TagType, on_delete=models.CASCADE)
+    tag_type = models.ForeignKey(TagType, on_delete=models.CASCADE, null=True, blank=True)
