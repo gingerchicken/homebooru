@@ -4,10 +4,11 @@ jobs:
   test-compose-action:
     runs-on: ubuntu-latest
     name: test compose action
-    env:
-      UNIT_TEST: True
     steps:
       - uses: actions/checkout@v3
+      - name: "Create .env file"
+        run: |
+          echo "UNIT_TEST=True" > .env
       - name: "Build docker-compose stack"
         run: docker-compose up -d --build
       - name: "Attach to test container"
