@@ -9,4 +9,4 @@ jobs:
       - name: "Build docker-compose stack"
         run: docker-compose up -d --build
       - name: "Attach to test container"
-        run: docker container attach homebooru-rewritten-web-1
+        run: docker container attach homebooru-rewritten_web_1
