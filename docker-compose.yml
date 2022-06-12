@@ -6,9 +6,9 @@ services:
     volumes:
       - ./data/db:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=booru
-      - POSTGRES_USER=homebooru
-      - POSTGRES_PASSWORD=H0meboOru!420
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
   web:
     build: .
     volumes:
@@ -16,9 +16,9 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - POSTGRES_NAME=booru
-      - POSTGRES_USER=homebooru
-      - POSTGRES_PASSWORD=H0meboOru!420
+      - POSTGRES_NAME=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
       - DEBUG=True
       - UNIT_TEST=${UNIT_TEST}
     depends_on:
