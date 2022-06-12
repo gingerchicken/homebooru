@@ -1,6 +1,7 @@
 # Homebooru
 <div align="center">
-    <img src="assets/cirno_smiling_touhou.png" width=500px \> <br>
+    <img src="assets/cirno_smiling_touhou.png" width=500px \>
+    <p><i><small>Artwork by <a href="https://twitter.com/nvi2762/status/1495867899881619456">Navi</a></small></i></p>
     <img src="https://img.shields.io/badge/-Python 3-3776AB?style=flat&logo=Python&logoColor=white" \>
     <img src="https://img.shields.io/badge/PostgreSQL-3776AB.svg?logo=postgreSQL&amp;logoColor=white" \>
     <img src="https://img.shields.io/badge/Docker-3776AB.svg?logo=docker&amp;logoColor=white" \>
