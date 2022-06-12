@@ -17,39 +17,23 @@ class PostTest(TestCase):
 
         # Check that the total
         self.assertEqual(Post.objects.count(), before_total_posts + 1)
-
+    
     def test_tag_array(self):
-        # Get the total posts
-        before_total_posts = Post.objects.count()
-
         p = Post(width=420, height=420, folder=0, md5='ca6ffc3babb6f0f58a7e5c0c6b61e7bf')
-        
-        # Make sure that the tags array is empty
-        self.assertEqual(p.tags, [])
-
-        # Add a tag
-        p.tags.append('tag1')
-        self.assertEqual(p.tags, ['tag1'])
-
-        # Add another tag
-        p.tags.append('tag2')
-        self.assertEqual(p.tags, ['tag1', 'tag2'])
-
-        # Save it
         p.save()
 
-        # Check that the total
-        self.assertEqual(Post.objects.count(), before_total_posts + 1)
-    
-    def test_tag_array_save(self):
-        p = Post(width=420, height=420, folder=0, md5='ca6ffc3babb6f0f58a7e5c0c6b61e7bf')
-        
         # Make sure that the tags array is empty
-        self.assertEqual(p.tags, [])
+        self.assertEqual(list(p.tags.all()), [])
+
+        first_tag = Tag(tag='tag1')
+        first_tag.save()
+
+        second_tag = Tag(tag='tag2')
+        second_tag.save()
 
         # Add a tag
-        p.tags.append('tag1')
-        p.tags.append('tag2')
+        p.tags.add(first_tag)
+        p.tags.add(second_tag)
 
         # Save it
         p.save()
@@ -58,7 +42,7 @@ class PostTest(TestCase):
         p = Post.objects.get(md5='ca6ffc3babb6f0f58a7e5c0c6b61e7bf')
 
         # Make sure that the tags array is empty
-        self.assertEqual(p.tags, ['tag1', 'tag2'])
+        self.assertEqual(list(p.tags.all()), [first_tag, second_tag])
     
     def test_md5_unique(self):
         p = Post(width=420, height=420, folder=0, md5='ca6ffc3babb6f0f58a7e5c0c6b61e7bf')
@@ -72,6 +56,49 @@ class PostTest(TestCase):
             b = Post(width=420, height=420, folder=1, md5='ca6ffc3babb6f0f58a7e5c0c6b61e7bf')
             b.save()
     
+    def test_tag_search(self):
+        # Create two posts with different tags
+        p1 = Post(width=420, height=420, folder=0, md5='ca6ffc3babb6f0f58a7e5c0c6b61e7bf')
+        p1.save()
+
+        tag1 = Tag(tag='tag1')
+        tag1.save()
+        tag2 = Tag(tag='tag2')
+        tag2.save()
+
+        p1.tags.add(tag1)
+        p1.tags.add(tag2)
+
+        p1.save()
+
+        p2 = Post(width=420, height=420, folder=0, md5='ca6ffc3b4bb6f0f58a7e5c0c6b61e7bf')
+        p2.save()
+
+        tag3 = Tag(tag='tag3')
+        tag3.save()
+        tag4 = Tag(tag='tag4')
+        tag4.save()
+
+        p2.tags.add(tag3)
+        p2.tags.add(tag4)
+
+        p2.save()
+
+        # Search for the tag 'tag1'
+        posts = Post.objects.filter(tags=tag1)
+
+        # Make sure that only one post was returned
+        self.assertEqual(len(posts), 1)
+
+        # Make sure that the post returned is the correct one
+        self.assertEqual(posts[0].md5, 'ca6ffc3babb6f0f58a7e5c0c6b61e7bf')
+
+        # Search for tags that contain 'tag1' and 'tag3' (only if they contain both)
+        posts = Post.objects.filter(tags=tag1).filter(tags=tag3)
+
+        # Make sure that no posts were returned
+        self.assertEqual(len(posts), 0)
+
     # Before each, clear the posts table
     def setUp(self):
         Post.objects.all().delete()
@@ -122,7 +149,7 @@ class TagTest(TestCase):
         tag = Tag.objects.get(tag='tag1')
 
         # Make sure the tag type is the default one
-        self.assertEqual(tag.count, 0)
+        self.assertEqual(tag.tag, 'tag1')
 
 # Pages
 # Test the index page
