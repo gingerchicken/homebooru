@@ -20,6 +20,7 @@ services:
       - POSTGRES_NAME=booru
       - POSTGRES_USER=homebooru
       - POSTGRES_PASSWORD=H0meboOru!420
+      - DEBUG=True
     depends_on:
       - db
 
