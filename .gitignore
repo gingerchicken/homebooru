@@ -138,3 +138,4 @@ GitHub.sublime-settings
 
 # Database
 *.sqlite3
+data/db
