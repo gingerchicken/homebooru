@@ -20,6 +20,7 @@ services:
       - POSTGRES_USER=homebooru
       - POSTGRES_PASSWORD=H0meboOru!420
       - DEBUG=True
+      - UNIT_TEST=${UNIT_TEST}
     depends_on:
       - db
 
