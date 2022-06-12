@@ -1,15 +1,14 @@
 from django.db import models
 
+from django.contrib.postgres.fields import ArrayField
+
 # Create your models here.
 class Post(models.Model):
     # Unique ID for each post
     id = models.AutoField(primary_key=True)
 
-    # Array of tags for each post
-    # from django.contrib.postgres.fields import ArrayField
-    # tags = ArrayField(models.CharField(max_length=100), blank=True, null=True)
-    # For now we will just store them as a string separated by spaces
-    tags = models.CharField(max_length=10000, blank=True, null=True)
+    # Array of tags for each post (by default, it is an empty array)
+    tags = ArrayField(models.CharField(max_length=100), default=list)
 
     # SFW Rating (either safe, questionable, or explicit) (not null, default safe)
     rating = models.CharField(max_length=10, default='safe')
