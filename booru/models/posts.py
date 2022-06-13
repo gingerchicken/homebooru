@@ -42,3 +42,80 @@ class Post(models.Model):
 
     # Source as a URL to the original post
     source = models.CharField(max_length=1000, blank=True, null=True)
+
+    @staticmethod
+    def search(search_phrase, wild_card="*"):
+        to_include = []
+        to_exclude = []
+
+        # Split the search phrase into words
+        words = search_phrase.split()
+
+        # For each word, check if it is a tag
+        for word in words:
+            # Strip the word of spaces
+            word = word.strip()
+
+            # If the word starts with a '-', it is an exclusion
+            should_exclude = word[0] == '-'
+
+            # If it is an exclusion, strip the '-'
+            if should_exclude:
+                word = word[1:]
+            
+            # Make sure that it isn't empty
+            if len(word) == 0:
+                continue
+
+            tags = None
+
+            # Handle wild cards
+            if wild_card in word:
+                r = word
+
+                # Regex escape the all of the characters, unless it is a wild card
+                escaped = ''
+                for c in r:
+                    if c == wild_card:
+                        escaped += c
+                        continue
+                    
+                    escaped += f"[{c}]"
+                
+                r = escaped.replace(wild_card, '.*')
+
+                # Get all of the tags where their names match the regex
+                tags = Tag.objects.filter(tag__regex=r)
+
+                # TODO we need to check that it includes at least one of these tags
+
+                # This is kinda bad because this could cause a lot of queries, maybe consider putting a limit on it or something
+            else:
+                # Get the tag by name or if it doesn't exist, make it none
+                tag = Tag.objects.filter(tag=word).first()
+
+                # If the tag doesn't exist, return an empty query set
+                if tag is None:
+                    return Post.objects.none()
+                
+                tags = [tag]
+
+            # If it is an exclusion, add the tag to the exclusion list
+            for tag in tags:
+                if should_exclude:
+                    to_exclude.append(tag)
+                    continue
+
+                # Otherwise, add it to the inclusion list
+                to_include.append(tag)
+        
+        # If both are empty, return all posts
+        if len(to_include) == 0 and len(to_exclude) == 0:
+            return Post.objects.all()
+        
+        posts = Post.objects.exclude(tags__in=to_exclude)
+
+        for tag in to_include:
+            posts = posts.filter(tags=tag)
+        
+        return posts
