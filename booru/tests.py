@@ -55,53 +55,89 @@ class PostTest(TestCase):
         with self.assertRaises(Exception):
             b = Post(width=420, height=420, folder=1, md5='ca6ffc3babb6f0f58a7e5c0c6b61e7bf')
             b.save()
-    
-    def test_tag_search(self):
-        # Create two posts with different tags
-        p1 = Post(width=420, height=420, folder=0, md5='ca6ffc3babb6f0f58a7e5c0c6b61e7bf')
-        p1.save()
-
-        tag1 = Tag(tag='tag1')
-        tag1.save()
-        tag2 = Tag(tag='tag2')
-        tag2.save()
-
-        p1.tags.add(tag1)
-        p1.tags.add(tag2)
-
-        p1.save()
-
-        p2 = Post(width=420, height=420, folder=0, md5='ca6ffc3b4bb6f0f58a7e5c0c6b61e7bf')
-        p2.save()
-
-        tag3 = Tag(tag='tag3')
-        tag3.save()
-        tag4 = Tag(tag='tag4')
-        tag4.save()
-
-        p2.tags.add(tag3)
-        p2.tags.add(tag4)
-
-        p2.save()
-
-        # Search for the tag 'tag1'
-        posts = Post.objects.filter(tags=tag1)
-
-        # Make sure that only one post was returned
-        self.assertEqual(len(posts), 1)
-
-        # Make sure that the post returned is the correct one
-        self.assertEqual(posts[0].md5, 'ca6ffc3babb6f0f58a7e5c0c6b61e7bf')
-
-        # Search for tags that contain 'tag1' and 'tag3' (only if they contain both)
-        posts = Post.objects.filter(tags=tag1).filter(tags=tag3)
-
-        # Make sure that no posts were returned
-        self.assertEqual(len(posts), 0)
 
     # Before each, clear the posts table
     def setUp(self):
         Post.objects.all().delete()
+
+class PostSearchTest(TestCase):
+    p1 = None
+    p2 = None
+    tag1 = None
+    tag2 = None
+    tag3 = None
+    tag4 = None
+
+    def setUp(self):
+        Post.objects.all().delete()
+
+        # Create two posts with different tags
+        self.p1 = Post(width=420, height=420, folder=0, md5='ca6ffc3babb6f0f58a7e5c0c6b61e7bf')
+        self.p1.save()
+
+        self.p2 = Post(width=420, height=420, folder=0, md5='ca6ffc3b4bb6f0f58a7e5c0c6b61e7bf')
+        self.p2.save()
+
+        self.tag1 = Tag(tag='tag1')
+        self.tag1.save()
+
+        self.tag2 = Tag(tag='tag2')
+        self.tag2.save()
+
+        self.tag3 = Tag(tag='tag3')
+        self.tag3.save()
+
+        self.tag4 = Tag(tag='tag4')
+        self.tag4.save()
+
+        # Add to the first post
+        self.p1.tags.add(self.tag1)
+        self.p1.tags.add(self.tag2)
+        self.p1.save()
+
+        # Add to the second post
+        self.p2.tags.add(self.tag3)
+        self.p2.tags.add(self.tag4)
+        self.p2.tags.add(self.tag1)
+
+        self.p2.save()
+    
+    def test_one_result(self):
+        # Search for all posts with tag1
+        tag2_only = Post.search('tag2')
+        self.assertEqual(len(tag2_only), 1)
+        self.assertEqual(tag2_only[0], self.p1)
+    
+    def test_multiple_results(self):
+        # Search for all posts with tag1
+        tag1_only = Post.search('tag1')
+        self.assertEqual(len(tag1_only), 2)
+        self.assertEqual(tag1_only[0], self.p1)
+        self.assertEqual(tag1_only[1], self.p2)
+    
+    def test_no_results_missing_tag(self):
+        # Search for all posts with tag1
+        nothing = Post.search('tag5')
+        self.assertEqual(len(nothing), 0)
+    
+    def test_all_results(self):
+        # Search for all posts with tag1
+        alls = Post.search('')
+        self.assertEqual(len(alls), 2)
+        self.assertEqual(alls[0], self.p1)
+        self.assertEqual(alls[1], self.p2)
+    
+    def test_wildcard(self):
+        # Search for all posts with tag1
+        wildcard = Post.search('*a*')
+        self.assertEqual(len(wildcard), 2)
+        self.assertEqual(wildcard[0], self.p1)
+        self.assertEqual(wildcard[1], self.p2)
+
+        wildcard = Post.search('*1')
+        self.assertEqual(len(wildcard), 1)
+        self.assertEqual(wildcard[0], self.p1)
+    
 
 # Tags
 from .models import TagType, Tag
