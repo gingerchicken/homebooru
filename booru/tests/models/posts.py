@@ -1,11 +1,7 @@
 from django.test import TestCase
 
-# Create your tests here.
+from ...models.posts import Post, Tag
 
-# Models
-
-# Posts
-from .models import Post
 class PostTest(TestCase):
     def test_inc_total(self):
         before_total_posts = Post.objects.count()
@@ -184,6 +180,32 @@ class PostSearchTest(TestCase):
         # The result should be the first post
         self.assertEqual(wildcard[0], self.p1)
     
+    def test_escape_regex_dot(self):
+        # This should only occur with wildcards
+        wildcard = Post.search('=.=*')
+
+        # There should be no results
+        self.assertEqual(wildcard.count(), 0)
+
+        # Add a tag that contains slashes
+        t = Tag(tag='=.=')
+        t.save()
+
+        # Add the tag to the first post
+        self.p1.tags.add(t)
+
+        phrases = [
+            '=.*', '*.=', '*.*', '=.='
+        ]
+
+        for phrase in phrases:
+            # Redo the search
+            wildcard = Post.search(phrase)
+            # There should be one result
+            self.assertEqual(wildcard.count(), 1)
+            # The result should be the first post
+            self.assertEqual(wildcard[0], self.p1)
+    
     def test_escape_regex_non_english(self):
         non_english = Tag(tag="金玉")
         non_english.save()
@@ -201,8 +223,6 @@ class PostSearchTest(TestCase):
         # The result should be the first post
         self.assertEqual(non_english_search[0], self.p1)
 
-# Tags
-from .models import TagType, Tag
 class TagTest(TestCase):
     def setUp(self):
         # Clear tables
@@ -285,19 +305,3 @@ class TagTest(TestCase):
         tag = Tag.objects.get(tag='tag1')
         self.assertEqual(tag.total_posts, 2)
         
-
-# Pages
-# Test the index page
-class IndexTest(TestCase):
-    def test_index(self):
-        response = self.client.get('/')
-        self.assertEqual(response.status_code, 200)
-
-    def test_index_imagecounter(self):
-        response = self.client.get('/')
-        self.assertContains(response, '<div id="imagecounter">')
-        self.assertContains(response, '<img src="/static/layout/')
-
-    def setUp(self):
-        # Clear tables
-        Post.objects.all().delete()
