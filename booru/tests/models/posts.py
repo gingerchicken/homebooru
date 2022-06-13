@@ -222,86 +222,39 @@ class PostSearchTest(TestCase):
         
         # The result should be the first post
         self.assertEqual(non_english_search[0], self.p1)
-
-class TagTest(TestCase):
-    def setUp(self):
-        # Clear tables
-        Tag.objects.all().delete()
-        TagType.objects.all().delete()
-        Post.objects.all().delete()
-
-        # Create a default tag type
-        artist = TagType(name='artist', description='Artist')
-        artist.save()
     
-    def test_reference_type(self):
-        # Get the default tag type
-        artist = TagType.objects.get(name='artist')
+    def test_get_search_tags(self):
+        results = Post.search('')
 
-        # Create a tag
-        tag = Tag(tag='tag1', tag_type=artist)
-        tag.save()
+        tags = Post.get_search_tags(results)
 
-        # Get the tag
-        tag = Tag.objects.get(tag='tag1')
+        self.assertEqual(len(tags), 4)
 
-        # Make sure the tag type is the default one
-        self.assertEqual(tag.tag_type, artist)
-    
-    def test_type_default_null(self):
-        # Create a tag
-        tag = Tag(tag='tag1')
-        tag.save()
+        # Get the list of tag names
+        tag_names = [tag.tag for tag in tags]
 
-        # Get the tag
-        tag = Tag.objects.get(tag='tag1')
+        # Make sure they're in the correct order
+        self.assertEqual(tag_names, ['tag1', 'tag2', 'tag3', 'tag4'])
 
-        # Make sure the tag type is the default one
-        self.assertEqual(tag.tag_type, None)
-    
-    def test_defaults_count_zero(self):
-        # Create a tag
-        tag = Tag(tag='tag1')
-        tag.save()
-
-        # Get the tag
-        tag = Tag.objects.get(tag='tag1')
-
-        # Make sure the tag type is the default one
-        self.assertEqual(tag.tag, 'tag1')
-
-    def test_total_posts(self):
-        # Create a tag
-        tag = Tag(tag='tag1')
-        tag.save()
-
-        # Create a post
-        post = Post(width=420, height=420, folder=0, md5='ca6ffc3b4bb643458a7e5c0c6b61e7bf')
-        post.save()
-
-        # Add the tag to the post
-        post.tags.add(tag)
-
-        # Get the tag
-        tag = Tag.objects.get(tag='tag1')
-        self.assertEqual(tag.total_posts, 1)
-
-        # Create a new post with a different md5
-        post = Post(width=420, height=420, folder=0, md5='ca6bfc3b4bb643458a7e5c0c6b61e7bf')
-        post.save()
-
-        # Add the tag to the post
-        post.tags.add(tag)
-
-        # Get the tag
-        tag = Tag.objects.get(tag='tag1')
-        self.assertEqual(tag.total_posts, 2)
-
-        # Create a new post that doesn't have the tag
-        post = Post(width=420, height=420, folder=0, md5='ca6bfc6b4bb643458a7e5c0c6b61e7bf')
-        post.save()
-
-        # Get the tag
-        tag = Tag.objects.get(tag='tag1')
-        self.assertEqual(tag.total_posts, 2)
+        # Make sure that their order changes
         
+        self.p1.tags.add(self.tag4)
+        self.p1.save()
+
+        tags = Post.get_search_tags(results)
+        tag_names = [tag.tag for tag in tags]
+
+        self.assertEqual(tag_names[:-2], ['tag1', 'tag4'])
+    
+    def test_get_search_tags_limits_to_depth(self):
+        results = Post.search('')
+
+        tags = Post.get_search_tags(results, depth=1) # Only return the first image's tags
+
+        self.assertEqual(len(tags), 2)
+
+        # Get the list of tag names
+        tag_names = [tag.tag for tag in tags]
+
+        # Make sure they're in the correct order
+        self.assertEqual(tag_names, ['tag1', 'tag2'])

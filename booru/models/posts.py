@@ -123,7 +123,7 @@ class Post(models.Model):
         return results
 
     @staticmethod
-    def get_search_tags(search_result = models.QuerySet()):
+    def get_search_tags(search_result = models.QuerySet(), depth = 512):
         """Get the tags from a search result"""
 
         # Search result should be a query set of posts
@@ -136,12 +136,15 @@ class Post(models.Model):
         # Create a new empty query set
         tags = {}
 
-        for post in search_result:
+        for post in search_result[:depth]:
             for tag in post.tags.all():
                 tags[tag.tag] = tag
 
         # Convert the tags to a list
         tags = list(tags.values())
+
+        # Sort tags by total posts
+        tags.sort(key=lambda tag: tag.total_posts, reverse=True)
 
         return tags
 
