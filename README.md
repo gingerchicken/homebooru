@@ -4,7 +4,8 @@
     <p><i><small>Artwork by <a href="https://twitter.com/nvi2762/status/1495867899881619456">Navi</a></small></i></p>
     <img src="https://img.shields.io/badge/-Python 3-3776AB?style=flat&logo=Python&logoColor=white" \>
     <img src="https://img.shields.io/badge/PostgreSQL-3776AB.svg?logo=postgreSQL&amp;logoColor=white" \>
-    <img src="https://img.shields.io/badge/Docker-3776AB.svg?logo=docker&amp;logoColor=white" \>
+    <img src="https://img.shields.io/badge/Docker-3776AB.svg?logo=docker&amp;logoColor=white" \><br>
+    <img src="https://github.com/gingerchicken/homebooru-rewritten/actions/workflows/test.yml/badge.svg" \>
     <p>A self-hosted <a href="https://www.yourdictionary.com/booru">Booru</a> written in <a href="https://www.djangoproject.com/">Python (Django)</a> for storing and sorting large media collections.</p>
 </div>
 
