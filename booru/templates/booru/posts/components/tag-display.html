@@ -1,0 +1,7 @@
+{% for tag in tags %}
+    <li class="tag-type-<%= tags['data'][tagName].types.split(' ').shift() %>">
+        <a href="/wiki#tag-{{ tag.tag }}" title="Wiki">?</a>
+        <a rel="nofollow" href="javascript:;" onclick="#" title="Add to search">+</a> <a rel="nofollow" href="javascript:;" onclick="#" title="Remove from search">-</a>
+        <a href="/browse?tags={{tag.tag}}" rel="nofollow">{{tag}}</a>  <span style="color: #a0a0a0;">{{tag.num_posts}}</span>
+    </li>
+{% endfor %}
