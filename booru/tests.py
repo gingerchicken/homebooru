@@ -184,6 +184,32 @@ class PostSearchTest(TestCase):
         # The result should be the first post
         self.assertEqual(wildcard[0], self.p1)
     
+    def test_escape_regex_dot(self):
+        # This should only occur with wildcards
+        wildcard = Post.search('=.=*')
+
+        # There should be no results
+        self.assertEqual(wildcard.count(), 0)
+
+        # Add a tag that contains slashes
+        t = Tag(tag='=.=')
+        t.save()
+
+        # Add the tag to the first post
+        self.p1.tags.add(t)
+
+        phrases = [
+            '=.*', '*.=', '*.*', '=.='
+        ]
+
+        for phrase in phrases:
+            # Redo the search
+            wildcard = Post.search(phrase)
+            # There should be one result
+            self.assertEqual(wildcard.count(), 1)
+            # The result should be the first post
+            self.assertEqual(wildcard[0], self.p1)
+    
     def test_escape_regex_non_english(self):
         non_english = Tag(tag="金玉")
         non_english.save()
