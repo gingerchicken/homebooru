@@ -4,6 +4,8 @@ from .tags import Tag
 
 # Create your models here.
 class Post(models.Model):
+    """A post is a picture or video that has been uploaded to the site."""
+
     # Unique ID for each post
     id = models.AutoField(primary_key=True)
 
@@ -92,11 +94,10 @@ class Post(models.Model):
                 # Get all of the tags where their names match the regex
                 tags = Tag.objects.filter(tag__regex=r)
 
-                # TODO we need to check that it includes at least one of these tags
-
+                # Add the search criteria
                 search_criteria.append(SearchCriteriaExcludeWildCardTags(tags) if should_exclude else SearchCriteriaWildCardTags(tags))
 
-                # This is kinda bad because this could cause a lot of queries, maybe consider putting a limit on it or something
+                # TODO This is kinda bad because this could cause a lot of queries, maybe consider putting a limit on it or something
             else:
                 # Get the tag by name or if it doesn't exist, make it none
                 tag = Tag.objects.filter(tag=word).first()

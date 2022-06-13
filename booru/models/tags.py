@@ -2,6 +2,8 @@ from django.db import models
 from django.apps import apps
 
 class TagType(models.Model):
+    """Describes what a tag's category is."""
+
     # We will use the type name as the primary key
     name = models.CharField(max_length=100, primary_key=True)
 
@@ -9,6 +11,8 @@ class TagType(models.Model):
     description = models.CharField(max_length=1000, blank=True, null=True)
 
 class Tag(models.Model):
+    """Used to tag posts."""
+
     # We will use the tag name as the primary key
     tag = models.CharField(max_length=100, primary_key=True)
 
