@@ -70,6 +70,7 @@ class PostSearchTest(TestCase):
 
     def setUp(self):
         Post.objects.all().delete()
+        Tag.objects.all().delete()
 
         # Create two posts with different tags
         self.p1 = Post(width=420, height=420, folder=0, md5='ca6ffc3babb6f0f58a7e5c0c6b61e7bf')
@@ -130,14 +131,75 @@ class PostSearchTest(TestCase):
     def test_wildcard(self):
         # Search for all posts with tag1
         wildcard = Post.search('*a*')
-        self.assertEqual(len(wildcard), 2)
+
+        self.assertEqual(wildcard.count(), 2)
         self.assertEqual(wildcard[0], self.p1)
         self.assertEqual(wildcard[1], self.p2)
 
-        wildcard = Post.search('*1')
-        self.assertEqual(len(wildcard), 1)
+        wildcard = Post.search('*2')
+        self.assertEqual(wildcard.count(), 1)
         self.assertEqual(wildcard[0], self.p1)
     
+    def test_exclude_wildcard(self):
+        wildcard = Post.search('-*a*')
+
+        self.assertEqual(wildcard.count(), 0)
+
+        # Create a bloke tag
+        bloke_tag = Tag(tag='bloke')
+        bloke_tag.save()
+
+        # Add the bloke tag to a new post
+        new_post = Post(width=420, height=420, folder=0, md5='ca6ffc3b4bb643458a7e5c0c6b61e7bf')
+        new_post.save()
+
+        new_post.tags.add(bloke_tag)
+
+        # Redo the search
+        wildcard = Post.search('-*a*')
+        
+        self.assertEqual(wildcard.count(), 1)
+        self.assertEqual(wildcard[0], new_post)
+    
+    def test_escape_regex_characters(self):
+        # This should only occur with wildcards
+        wildcard = Post.search('tag\\*')
+
+        # There should be no results
+        self.assertEqual(wildcard.count(), 0)
+
+        # Add a tag that contains slashes
+        tag_with_slashes = Tag(tag='tag\\5')
+        tag_with_slashes.save()
+
+        # Add the tag to the first post
+        self.p1.tags.add(tag_with_slashes)
+
+        # Redo the search
+        wildcard = Post.search('tag\\*')
+
+        # There should be one result
+        self.assertEqual(wildcard.count(), 1)
+
+        # The result should be the first post
+        self.assertEqual(wildcard[0], self.p1)
+    
+    def test_escape_regex_non_english(self):
+        non_english = Tag(tag="金玉")
+        non_english.save()
+
+        # Add the tag to the first post
+        self.p1.tags.add(non_english)
+        self.p1.save()
+
+        # Search for the tag
+        non_english_search = Post.search("金*")
+        
+        # There should be one result
+        self.assertEqual(non_english_search.count(), 1)
+        
+        # The result should be the first post
+        self.assertEqual(non_english_search[0], self.p1)
 
 # Tags
 from .models import TagType, Tag

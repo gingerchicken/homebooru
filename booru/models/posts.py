@@ -45,8 +45,9 @@ class Post(models.Model):
 
     @staticmethod
     def search(search_phrase, wild_card="*"):
-        to_include = []
-        to_exclude = []
+        """Search for posts that match a user entered search phrase"""
+
+        search_criteria = [] 
 
         # Split the search phrase into words
         words = search_phrase.split()
@@ -66,9 +67,7 @@ class Post(models.Model):
             # Make sure that it isn't empty
             if len(word) == 0:
                 continue
-
-            tags = None
-
+                
             # Handle wild cards
             if wild_card in word:
                 r = word
@@ -80,7 +79,13 @@ class Post(models.Model):
                         escaped += c
                         continue
                     
-                    escaped += f"[{c}]"
+                    # Escape the character but if it is a number don't make it the character code
+                    if c.isdigit() or c.isalpha():
+                        escaped += f"[{c}]"
+                        continue
+                        
+                    # Escape the character as a character code
+                    escaped += '\\' + c
                 
                 r = escaped.replace(wild_card, '.*')
 
@@ -88,6 +93,8 @@ class Post(models.Model):
                 tags = Tag.objects.filter(tag__regex=r)
 
                 # TODO we need to check that it includes at least one of these tags
+
+                search_criteria.append(SearchCriteriaExcludeWildCardTags(tags) if should_exclude else SearchCriteriaWildCardTags(tags))
 
                 # This is kinda bad because this could cause a lot of queries, maybe consider putting a limit on it or something
             else:
@@ -98,24 +105,66 @@ class Post(models.Model):
                 if tag is None:
                     return Post.objects.none()
                 
-                tags = [tag]
-
-            # If it is an exclusion, add the tag to the exclusion list
-            for tag in tags:
-                if should_exclude:
-                    to_exclude.append(tag)
-                    continue
-
-                # Otherwise, add it to the inclusion list
-                to_include.append(tag)
+                # Add the criteria to the list
+                search_criteria.append(SearchCriteriaExcludeTag(tag) if should_exclude else SearchCriteriaTag(tag))
         
-        # If both are empty, return all posts
-        if len(to_include) == 0 and len(to_exclude) == 0:
-            return Post.objects.all()
-        
-        posts = Post.objects.exclude(tags__in=to_exclude)
+        # These will be the results of the search
+        results = Post.objects.all()
 
-        for tag in to_include:
-            posts = posts.filter(tags=tag)
-        
-        return posts
+        # Go over each of the criteria filter the results
+        for criteria in search_criteria:
+            # If everything is gone then we can stop
+            if results.count() == 0:
+                return results
+            
+            results = criteria.search(results)
+
+        return results
+
+# Search criteria for the post search
+
+class SearchCriteria:
+    """Interface for creating search criteria"""
+
+    def __init__(self) -> None:
+        pass
+
+    def search(self, s) -> models.QuerySet:
+        return s
+
+class SearchCriteriaTag(SearchCriteria):
+    """Used to search for posts that contain a certain tag"""
+
+    def __init__(self, tag: Tag) -> None:
+        self.tag = tag
+
+    def search(self, s) -> models.QuerySet:
+        return s.filter(tags=self.tag)
+
+class SearchCriteriaExcludeTag(SearchCriteria):
+    """Used to exclude tags from a search"""
+
+    def __init__(self, tag: Tag) -> None:
+        self.tag = tag
+
+    def search(self, s) -> models.QuerySet:
+        return s.exclude(tags=self.tag)
+
+class SearchCriteriaWildCardTags(SearchCriteria):
+    """Used to search for posts that contain a certain tag"""
+
+    def __init__(self, tags: [Tag]) -> None:
+        self.tags = tags
+
+    def search(self, s) -> models.QuerySet:
+        # It must include at least one of the tags, without duplicates
+        return s.filter(tags__in=self.tags).distinct('id')
+
+class SearchCriteriaExcludeWildCardTags(SearchCriteria):
+    """Used to exclude tags from a search"""
+
+    def __init__(self, tags: [Tag]) -> None:
+        self.tags = tags
+
+    def search(self, s) -> models.QuerySet:
+        return s.exclude(tags__in=self.tags).distinct('id')
