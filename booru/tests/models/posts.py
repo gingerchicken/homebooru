@@ -1,11 +1,7 @@
 from django.test import TestCase
 
-# Create your tests here.
+from ...models.posts import Post, Tag
 
-# Models
-
-# Posts
-from .models import Post
 class PostTest(TestCase):
     def test_inc_total(self):
         before_total_posts = Post.objects.count()
@@ -227,8 +223,6 @@ class PostSearchTest(TestCase):
         # The result should be the first post
         self.assertEqual(non_english_search[0], self.p1)
 
-# Tags
-from .models import TagType, Tag
 class TagTest(TestCase):
     def setUp(self):
         # Clear tables
@@ -311,19 +305,3 @@ class TagTest(TestCase):
         tag = Tag.objects.get(tag='tag1')
         self.assertEqual(tag.total_posts, 2)
         
-
-# Pages
-# Test the index page
-class IndexTest(TestCase):
-    def test_index(self):
-        response = self.client.get('/')
-        self.assertEqual(response.status_code, 200)
-
-    def test_index_imagecounter(self):
-        response = self.client.get('/')
-        self.assertContains(response, '<div id="imagecounter">')
-        self.assertContains(response, '<img src="/static/layout/')
-
-    def setUp(self):
-        # Clear tables
-        Post.objects.all().delete()
