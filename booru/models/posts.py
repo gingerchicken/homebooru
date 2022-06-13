@@ -2,6 +2,10 @@ from django.db import models
 
 from .tags import Tag
 
+# Image processing
+import hashlib
+import math
+
 # Create your models here.
 class Post(models.Model):
     """A post is a picture or video that has been uploaded to the site."""
@@ -147,6 +151,17 @@ class Post(models.Model):
         tags.sort(key=lambda tag: tag.total_posts, reverse=True)
 
         return tags
+
+    @staticmethod
+    def get_next_folder(folder_size=256):
+        """Get the next folder to use for a post"""
+
+        # Get total posts
+        total_posts = Post.objects.count()
+
+        # Get the next folder
+        return math.ceil(float(total_posts + 1) / float(folder_size))
+        
 
 # Search criteria for the post search
 
