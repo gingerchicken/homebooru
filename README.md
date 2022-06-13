@@ -5,7 +5,7 @@
     <img src="https://img.shields.io/badge/-Python 3-3776AB?style=flat&logo=Python&logoColor=white" \>
     <img src="https://img.shields.io/badge/PostgreSQL-3776AB.svg?logo=postgreSQL&amp;logoColor=white" \>
     <img src="https://img.shields.io/badge/Docker-3776AB.svg?logo=docker&amp;logoColor=white" \><br>
-    <img src="https://github.com/gingerchicken/homebooru-rewritten/actions/workflows/test.yml/badge.svg" \>
+    <img src="https://github.com/gingerchicken/homebooru/actions/workflows/test.yml/badge.svg" \>
     <p>A self-hosted <a href="https://www.yourdictionary.com/booru">Booru</a> written in <a href="https://www.djangoproject.com/">Python (Django)</a> for storing and sorting large media collections.</p>
 </div>
 
@@ -20,7 +20,7 @@ $ docker-compose up --build
 By default, since the PostgreSQL database should be locked off from the rest of the network, the server will have a default username and password of `homebooru` and `H0meboOru!420`. You can change these by editing the `.env` file in the root directory.
 
 ## Contributions
-If you have any suggestions for improvements, please open an issue on the [GitHub repository](https://github.com/gingerchicken/homebooru-rewritten). If you have a bit of knowledge with Python and Django, feel free to fork the repository and submit a pull request for new features.
+If you have any suggestions for improvements, please open an issue on the [GitHub repository](https://github.com/gingerchicken/homebooru). If you have a bit of knowledge with Python and Django, feel free to fork the repository and submit a pull request for new features.
 
 ### Debug Environment
 
