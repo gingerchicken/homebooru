@@ -7,6 +7,10 @@ ENV PYTHONUNBUFFERED=1
 # Make the current working dir /code
 WORKDIR /code
 
+# Install ffmpeg
+RUN apt update
+RUN apt install -y ffmpeg
+
 # Copy across the requirements.txt file and install the requirements
 COPY requirements.txt .
 RUN pip install -r requirements.txt
