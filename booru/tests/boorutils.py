@@ -46,7 +46,7 @@ class GenerateThumbnailTest(TestCase):
         output_dims = get_content_dimensions(self.output_image)
         
         r = float(150) / float(original_dims[1])
-        expected_dims = (int(r * original_dims[0]), 150)
+        expected_dims = (round(r * original_dims[0]), 150)
 
         self.assertEqual(output_dims, expected_dims)
     
@@ -67,8 +67,93 @@ class GenerateThumbnailTest(TestCase):
         output_dims = get_content_dimensions(self.output_image)
 
         r = float(150) / float(original_dims[1])
-        expected_dims = (int(r * original_dims[0]), 150)
+        expected_dims = (round(r * original_dims[0]), 150)
+
+        self.assertEqual(output_dims, expected_dims)
+
+    def test_raises_an_error_if_the_file_does_not_exist(self):
+        with self.assertRaises(Exception):
+            generate_thumbnail("assets/TEST_DATA/content/does_not_exist.jpg", self.output_image)
+        
+        # Make sure that there was no output file
+        self.assertFalse(pathlib.Path(self.output_image).exists())
+
+    def test_raises_an_error_if_file_corrupted(self):
+        with self.assertRaises(Exception):
+            generate_thumbnail("assets/TEST_DATA/content/corrupted_image.jpg", self.output_image)
+
+        # Make sure that there was no output file
+        self.assertFalse(pathlib.Path(self.output_image).exists())
+
+class GenerateSampleTest(TestCase):
+    original_image = "assets/TEST_DATA/content/sampleable_image.jpg"
+    output_image   = "/tmp/sampled.png"
+
+    def setUp(self):
+        if pathlib.Path(self.output_image).exists():
+            # Delete it
+            pathlib.Path(self.output_image).unlink()
+    
+    def test_generates_a_file(self):
+        self.assertTrue(generate_sample(self.original_image, self.output_image))
+
+        # Check that the file exists
+        self.assertTrue(pathlib.Path(self.output_image).exists())
+    
+    def test_generates_a_file_with_the_correct_dimensions(self):
+        self.assertTrue(generate_sample(self.original_image, self.output_image))
+
+        # Check that the file exists
+        self.assertTrue(pathlib.Path(self.output_image).exists())
+
+        # Check that the file has the correct dimensions
+        original_dims = get_content_dimensions(self.original_image)
+        output_dims = get_content_dimensions(self.output_image)
+        
+        r = float(850) / float(original_dims[0])
+        expected_dims = (850, round(r * original_dims[1]))
 
         self.assertEqual(output_dims, expected_dims)
     
-    # TODO test for invalid/corrupt files
+    def test_generates_a_file_for_a_video(self):
+        self.assertTrue(generate_sample("assets/TEST_DATA/content/ana_cat.mp4", self.output_image))
+
+        # Check that the file exists
+        self.assertTrue(pathlib.Path(self.output_image).exists())
+    
+    def test_generates_a_file_for_a_video_with_the_correct_dimensions(self):
+        self.assertTrue(generate_sample("assets/TEST_DATA/content/ana_cat.mp4", self.output_image))
+
+        # Check that the file exists
+        self.assertTrue(pathlib.Path(self.output_image).exists())
+
+        # Check that the file has the correct dimensions
+        original_dims = get_content_dimensions("assets/TEST_DATA/content/ana_cat.mp4")
+        output_dims = get_content_dimensions(self.output_image)
+
+        r = float(850) / float(original_dims[0])
+        expected_dims = (850, round(r * original_dims[1]))
+
+        self.assertEqual(output_dims, expected_dims)
+
+    def test_raises_an_error_if_the_file_does_not_exist(self):
+        with self.assertRaises(Exception):
+            generate_sample("assets/TEST_DATA/content/does_not_exist.jpg", self.output_image)
+        
+        # Make sure that there was no output file
+        self.assertFalse(pathlib.Path(self.output_image).exists())
+    
+    def test_raises_an_error_if_file_corrupted(self):
+        with self.assertRaises(Exception):
+            generate_sample("assets/TEST_DATA/content/corrupted_image.jpg", self.output_image)
+
+        # Make sure that there was no output file
+        self.assertFalse(pathlib.Path(self.output_image).exists())
+
+    def test_returns_true_upon_applicable(self):
+        self.assertTrue(generate_sample(self.original_image, self.output_image))
+    
+    def test_returns_false_upon_inapplicable(self):
+        self.assertFalse(generate_sample("assets/TEST_DATA/content/felix.jpg", self.output_image))
+
+    # TODO test videos
