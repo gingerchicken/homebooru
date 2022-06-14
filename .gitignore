@@ -139,3 +139,6 @@ GitHub.sublime-settings
 # Database
 *.sqlite3
 data/db
+
+# Tests
+assets/TEST_DATA

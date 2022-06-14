@@ -9,6 +9,12 @@ python manage.py migrate --run-syncdb
 # Check for the unit test enviroment variable
 # If it is set and equal to "True" then run the unit tests
 if [ "$UNIT_TEST" = "True" ]; then
+    # Make sure that we extract the test data (assets/TEST_DATA.tar.gz into assets/TEST_DATA)
+    if [ ! -d "assets/TEST_DATA" ]; then
+        tar -xzf assets/TEST_DATA.tar.gz -C assets
+    fi
+
+    # Run the unit tests
     python manage.py test
 
     # Exit with the unit test exit code
