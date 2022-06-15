@@ -21,5 +21,11 @@ if [ "$UNIT_TEST" = "True" ]; then
     exit $?
 fi
 
+# Check if the debug enviroment variable is set and equal to "False"
+if [ "$DEBUG" = "False" ]; then
+    # Collect static files
+    echo "yes" | python manage.py collectstatic
+fi
+
 # Start the application
 python manage.py runserver 0.0.0.0:8000
