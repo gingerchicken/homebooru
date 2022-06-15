@@ -49,3 +49,34 @@ class Tag(models.Model):
         
         # Return the tag
         return t
+    
+    @staticmethod
+    def is_name_valid(name : str) -> bool:
+        """Checks if the name is valid."""
+
+        # Check if the name is valid
+        if len(name) > 100:
+            return False
+        
+        # Check that it is at least two characters long
+        if len(name) < 2:
+            return False
+        
+        # Check if it contains spaces
+        if ' ' in name:
+            return False
+        
+        # Check if it contains wildcards
+        if '*' in name:
+            return False
+        
+        # Check if it contains -
+        if '-' in name:
+            return False
+
+        # Check that it is lowercase
+        if name != name.lower():
+            return False
+        
+        # All checks passed
+        return True

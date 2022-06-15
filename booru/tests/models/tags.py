@@ -117,3 +117,15 @@ class TagTest(TestCase):
 
         # Make sure that a new tag was not created
         self.assertEqual(Tag.objects.count(), 1)
+    
+    def test_is_name_valid_with_valid(self):
+        valid_tags = ['1tag', 'funny_monkey', '=.=', ':=>']
+
+        for tag in valid_tags:
+            self.assertTrue(Tag.is_name_valid(tag))
+    
+    def test_is_name_valid_with_invalid(self):
+        invalid_tags = ['', '     ', 'e', 'funny-monkey', 'funny monkey', 'HeHehe', '*.*']
+
+        for tag in invalid_tags:
+            self.assertFalse(Tag.is_name_valid(tag))
