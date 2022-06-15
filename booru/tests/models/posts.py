@@ -226,6 +226,8 @@ class PostCreateFromFileTest(TestCase):
         # Check that the post was not created
         self.assertEqual(Post.objects.count(), 0)
 
+    # We should be testing for web accessibility but the way it works in production should be slightly different to the way it works in testing
+
 class PostSearchTest(TestCase):
     p1 = None
     p2 = None
