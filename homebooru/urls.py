@@ -16,7 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
+from django.conf.urls.static import static
+from homebooru import settings
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('booru.urls')) # This makes the posts page the homepage
-]
+] + static(settings.BOORU_STORAGE_URL, document_root=settings.BOORU_STORAGE_PATH)

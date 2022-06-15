@@ -27,7 +27,9 @@ SECRET_KEY = 'django-insecure--(39sq1mfklbeb!0nc@8^h($-%-z$=qn8#teheqy$&fu=51_=*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '*'
+]
 
 
 # Application definition
@@ -136,3 +138,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 BOORU_STORAGE_PATH = Path(os.environ.get("BOORU_STORAGE_PATH", "data/storage"))
 BOORU_ALLOWED_FILE_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "webm", "mp4", "webp"]
 BOORU_VIDEO_FILE_EXTENSIONS = ["webm", "mp4"]
+BOORU_STORAGE_URL = '/'
