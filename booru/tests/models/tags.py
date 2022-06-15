@@ -85,3 +85,35 @@ class TagTest(TestCase):
         tag = Tag.objects.get(tag='tag1')
         self.assertEqual(tag.total_posts, 2)
         
+    def test_create_or_get_creates(self):
+        before = Tag.objects.count()
+        # Create a tag
+        tag = Tag.create_or_get('tag1')
+
+        # Get the tag
+        tag = Tag.objects.get(tag='tag1')
+
+        # Make sure the tag type is the default one
+        self.assertEqual(tag.tag, 'tag1')
+
+        # Make sure that a new tag was created
+        self.assertEqual(Tag.objects.count(), before + 1)
+    
+    def test_create_or_get_gets(self):
+        # Create a tag type
+        artist = TagType(name='artist', description='Artist')
+        
+        # Create a tag
+        t = Tag(tag='tag1')
+        t.tag_type = artist
+        t.save()
+
+        # Get the tag
+        tag = Tag.create_or_get('tag1')
+
+        # Make sure the tag type is the default one
+        self.assertEqual(tag.tag, 'tag1')
+        self.assertEqual(tag.tag_type, artist)
+
+        # Make sure that a new tag was not created
+        self.assertEqual(Tag.objects.count(), 1)

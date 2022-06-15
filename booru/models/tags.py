@@ -30,3 +30,22 @@ class Tag(models.Model):
 
         # Return the count
         return posts.count()
+    
+    @staticmethod
+    def create_or_get(tag):
+        """Creates a tag if it doesn't exist, or returns the existing tag."""
+
+        # Store the tag
+        t = None
+
+        # Check if the tag exists
+        if Tag.objects.filter(tag=tag).exists():
+            # Get the tag
+            t = Tag.objects.get(tag=tag)
+        else:
+            # Create the tag
+            t = Tag(tag=tag)
+            t.save()
+        
+        # Return the tag
+        return t
