@@ -130,3 +130,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Homebooru settings
+
+BOORU_STORAGE_PATH = Path(os.environ.get("BOORU_STORAGE_PATH", "data/storage"))
+BOORU_ALLOWED_FILE_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "webm", "mp4", "webp"]
+BOORU_VIDEO_FILE_EXTENSIONS = ["webm", "mp4"]

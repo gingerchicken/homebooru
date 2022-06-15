@@ -3,7 +3,11 @@ from django.test import TestCase
 from ...models.posts import Post, Tag
 
 import hashlib
-from ...boorutils import hash_str
+import os
+import pathlib
+import shutil
+import booru.boorutils as boorutils
+import homebooru.settings
 
 class PostTest(TestCase):
     def test_inc_total(self):
@@ -58,6 +62,139 @@ class PostTest(TestCase):
     # Before each, clear the posts table
     def setUp(self):
         Post.objects.all().delete()
+
+class PostCreateFromFileTest(TestCase):
+    temp_storage_path = '/tmp/storage'
+    test_image_path = 'assets/TEST_DATA/content/felix.jpg'
+    test_sampleable_path = 'assets/TEST_DATA/content/sampleable_image.jpg'
+    test_video_path = 'assets/TEST_DATA/content/ana_cat.mp4'
+    test_corrupt_path = 'assets/TEST_DATA/content/corrupt_image.jpg'
+
+    og_path = homebooru.settings.BOORU_STORAGE_PATH
+
+    def setUp(self):
+        self.og_path = homebooru.settings.BOORU_STORAGE_PATH
+        homebooru.settings.BOORU_STORAGE_PATH = pathlib.Path(self.temp_storage_path)
+
+        Post.objects.all().delete()
+        Tag.objects.all().delete()
+
+        if os.path.exists(self.temp_storage_path):
+            shutil.rmtree(self.temp_storage_path)
+
+        # Create the temp storage path
+        os.mkdir(self.temp_storage_path)
+    
+    def tearDown(self):
+        # TODO make this a function of some sort without it being a test!
+        Post.objects.all().delete()
+        Tag.objects.all().delete()
+
+        if os.path.exists(self.temp_storage_path):
+            shutil.rmtree(self.temp_storage_path)
+        
+        # Restore the original path
+        homebooru.settings.BOORU_STORAGE_PATH = self.og_path
+    
+    def test_create_post(self):
+        # Create a post from a file
+        p = Post.create_from_file(self.test_image_path)
+        p.save()
+
+        # Check that the post was created
+        self.assertEqual(Post.objects.count(), 1)
+
+        # Check that the post was created with the correct attributes
+        self.assertEqual(p.width,  500)
+        self.assertEqual(p.height, 688)
+
+        # Check that the post was created with the correct md5
+        self.assertEqual(p.md5, '2dcd09f6c874b36355336112d17434e1')
+
+        # Check that the post was created with the correct folder
+        self.assertEqual(p.folder, 1)
+
+        # Make sure that the sample flag is false
+        self.assertEqual(p.sample, 0)
+
+        # Make sure that filename is correct
+        self.assertEqual(p.filename, '2dcd09f6c874b36355336112d17434e1.jpg')
+    
+        # Make sure that it isn't marked as a video
+        self.assertEqual(p.is_video, 0)
+
+    def test_files_exists(self):
+        # Create a post from a file
+        p = Post.create_from_file(self.test_image_path)
+        p.save()
+
+        # Check that the media file exists
+        self.assertTrue(os.path.exists(os.path.join(self.temp_storage_path, 'media', '1', '2dcd09f6c874b36355336112d17434e1.jpg')))
+
+        # Check that the thumbnail file exists
+        self.assertTrue(os.path.exists(os.path.join(self.temp_storage_path, 'thumbnails', '1', 'thumbnail_2dcd09f6c874b36355336112d17434e1.jpg')))
+
+        # Make sure that the sample file is not created
+        self.assertFalse(os.path.exists(os.path.join(self.temp_storage_path, 'samples', '1', 'sample_2dcd09f6c874b36355336112d17434e1.jpg')))
+
+    def test_thumbnail_smaller(self):
+        # Create a post from a file
+        p = Post.create_from_file(self.test_image_path)
+        p.save()
+
+        # Check that the thumbnail file exists
+        self.assertTrue(os.path.exists(os.path.join(self.temp_storage_path, 'thumbnails', '1', 'thumbnail_2dcd09f6c874b36355336112d17434e1.jpg')))
+
+        # Check that the thumbnail file is smaller than the image file
+        self.assertLess(os.path.getsize(os.path.join(self.temp_storage_path, 'thumbnails', '1', 'thumbnail_2dcd09f6c874b36355336112d17434e1.jpg')), os.path.getsize(os.path.join(self.temp_storage_path, 'media', '1', '2dcd09f6c874b36355336112d17434e1.jpg')))
+
+    def test_create_sample(self):
+        # Create a post from a file
+        p = Post.create_from_file(self.test_sampleable_path)
+        p.save()
+
+        # Check that the sample file exists
+        self.assertTrue(os.path.exists(os.path.join(self.temp_storage_path, 'samples', '1', 'sample_656bc10f9f3a6a8f7e017892c8aabcb8.jpg')))
+
+        # Check that the sample flag is true
+        self.assertEqual(p.sample, 1)
+    
+    def test_create_video(self):
+        # Create a post from a file
+        p = Post.create_from_file(self.test_video_path)
+        p.save()
+
+        # Check that the video flag is true
+        self.assertEqual(p.is_video, 1)
+
+        # Check that the video file exists
+        self.assertTrue(os.path.exists(os.path.join(self.temp_storage_path, 'media', '1', '11e0a9c6b20d54593b8fc8f134a25256.mp4')))
+
+        # Check that the thumbnail file exists
+        self.assertTrue(os.path.exists(os.path.join(self.temp_storage_path, 'thumbnails', '1', 'thumbnail_11e0a9c6b20d54593b8fc8f134a25256.jpg')))
+
+        # Make sure sampled is false (this video is technically sampleable but we don't want to sample videos)
+        self.assertEqual(p.sample, 0)
+
+    def test_rejects_corrupt_files(self):
+        # Create a post from a file
+
+        # Make sure that it throws
+        with self.assertRaises(Exception):
+            Post.create_from_file(self.test_corrupt_path)
+
+        # Check that the post was not created
+        self.assertEqual(Post.objects.count(), 0)
+
+        # List the directories in the storage path
+        dirs = os.listdir(os.path.join(self.temp_storage_path))
+
+        # Make sure that the directories are empty
+        self.assertEqual(len(dirs), 0)
+
+    # TODO check that the thumbnails and samples are always jpgs
+    # TODO check that it rejects directories
+    # TODO check that it rejects files that are not allowed
 
 class PostSearchTest(TestCase):
     p1 = None
@@ -272,7 +409,7 @@ class PostSearchTest(TestCase):
         new_posts = 500
 
         for i in range(new_posts):
-            md5 = hash_str(str(i))
+            md5 = boorutils.hash_str(str(i))
 
             post = Post(width=420, height=420, folder=Post.get_next_folder(), md5=md5)
             post.save()
@@ -287,7 +424,7 @@ class PostSearchTest(TestCase):
         new_posts = 500
 
         for i in range(new_posts):
-            md5 = hash_str(str(i))
+            md5 = boorutils.hash_str(str(i))
 
             post = Post(width=420, height=420, folder=Post.get_next_folder(), md5=md5)
             post.save()

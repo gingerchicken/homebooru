@@ -2,9 +2,12 @@ from django.db import models
 
 from .tags import Tag
 
-# Image processing
-import hashlib
+import homebooru.settings as settings
+import booru.boorutils as boorutils
+
 import math
+import pathlib
+import shutil
 
 # Create your models here.
 class Post(models.Model):
@@ -48,6 +51,9 @@ class Post(models.Model):
 
     # Source as a URL to the original post
     source = models.CharField(max_length=1000, blank=True, null=True)
+
+    # File name
+    filename = models.CharField(max_length=64)
 
     @staticmethod
     def search(search_phrase, wild_card="*"):
@@ -161,7 +167,85 @@ class Post(models.Model):
 
         # Get the next folder
         return math.ceil(float(total_posts + 1) / float(folder_size))
+    
+    @staticmethod
+    def create_from_file(file_path : str, owner=None):
+        """Create a post from a file"""
+
+        # Checking the file path
+        # Get the file as a path
+        file_path = pathlib.Path(file_path)
+
+        # Make sure that the file exists
+        if not file_path.exists():
+            raise Exception("File does not exist")
+
+        # Make sure that it is a file and not a directory
+        if not file_path.is_file():
+            raise Exception("File is not a file")
         
+        # Metadata
+        # Get the file extension (without the '.')
+        file_extension = file_path.suffix
+        if file_extension[0] == '.':
+            file_extension = file_extension[1:]
+
+        # Make sure that the file extension is valid
+        # TODO do deeper checks here
+        if file_extension not in settings.BOORU_ALLOWED_FILE_EXTENSIONS:
+            raise Exception("File extension is not valid")
+        
+        # TODO size check (i.e. dont kill the server with massive images - make this a setting)
+
+        # Check if the item is a video
+        is_video = file_extension in settings.BOORU_VIDEO_FILE_EXTENSIONS
+
+        # Get the file signature
+        md5 = boorutils.get_file_checksum(str(file_path))
+
+        # Get the content dimensions
+        (width, height) = boorutils.get_content_dimensions(str(file_path))
+
+        # Creating the post
+        # Get the folder to store the file in
+        folder = Post.get_next_folder()
+
+        # File paths
+        sample_path = settings.BOORU_STORAGE_PATH / f"samples/{folder}/sample_{md5}.jpg"
+        thumb_path  = settings.BOORU_STORAGE_PATH / f"thumbnails/{folder}/thumbnail_{md5}.jpg"
+        image_path  = settings.BOORU_STORAGE_PATH / f"media/{folder}/{md5}.{file_extension}"
+
+        # If these folders don't exist, create them
+        for p in [sample_path.parent, thumb_path.parent, image_path.parent]:
+            if p.exists(): continue
+            
+            p.mkdir(parents=True)
+
+        # Create the thumbnail
+        boorutils.generate_thumbnail(str(file_path), str(thumb_path))
+
+        # Create the sample
+        sampled = boorutils.generate_sample(str(file_path), str(sample_path)) if not is_video else False
+
+        # Copy the file to the image storage
+        try:
+            shutil.copy(str(file_path), str(image_path))
+        except Exception as e:
+            # Ignore if it is complaining about it already existing
+            pass
+
+        # Create the post
+        return Post(
+            md5=md5,
+            owner=owner,
+            width=width,
+            height=height,
+            folder=folder,
+            sample=sampled,
+            filename=f"{md5}.{file_extension}",
+            is_video=is_video
+        )
+
 
 # Search criteria for the post search
 
