@@ -68,6 +68,8 @@ class PostCreateFromFileTest(TestCase):
     test_image_path = 'assets/TEST_DATA/content/felix.jpg'
     test_sampleable_path = 'assets/TEST_DATA/content/sampleable_image.jpg'
     test_video_path = 'assets/TEST_DATA/content/ana_cat.mp4'
+    test_png_path = 'assets/TEST_DATA/content/gato.png'
+    test_text_path = 'assets/TEST_DATA/content/test.txt'
     test_corrupt_path = 'assets/TEST_DATA/content/corrupt_image.jpg'
 
     og_path = homebooru.settings.BOORU_STORAGE_PATH
@@ -192,9 +194,37 @@ class PostCreateFromFileTest(TestCase):
         # Make sure that the directories are empty
         self.assertEqual(len(dirs), 0)
 
-    # TODO check that the thumbnails and samples are always jpgs
-    # TODO check that it rejects directories
-    # TODO check that it rejects files that are not allowed
+    def test_jpg_thumbnails(self):
+        # Create a post from a file
+        p = Post.create_from_file(self.test_image_path)
+        p.save()
+
+        # Check that the thumbnail file exists (and is a jpg)
+        self.assertTrue(os.path.exists(os.path.join(self.temp_storage_path, 'thumbnails', '1', 'thumbnail_2dcd09f6c874b36355336112d17434e1.jpg')))
+    
+    def test_jpg_samples(self):
+        # Create a post from a file
+        p = Post.create_from_file(self.test_sampleable_path)
+        p.save()
+
+        # Check that the sample file exists (and is a jpg)
+        self.assertTrue(os.path.exists(os.path.join(self.temp_storage_path, 'samples', '1', 'sample_656bc10f9f3a6a8f7e017892c8aabcb8.jpg')))
+
+    def test_raises_against_directories(self):
+        # Create a post from a file
+        with self.assertRaises(Exception):
+            Post.create_from_file(self.test_directory_path)
+
+        # Check that the post was not created
+        self.assertEqual(Post.objects.count(), 0)
+
+    def test_raises_against_non_images(self):
+        # Create a post from a file
+        with self.assertRaises(Exception):
+            Post.create_from_file(self.test_text_path)
+
+        # Check that the post was not created
+        self.assertEqual(Post.objects.count(), 0)
 
 class PostSearchTest(TestCase):
     p1 = None
