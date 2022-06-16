@@ -14,6 +14,8 @@ import homebooru.settings
 
 class PostTest(TestCase):
     def test_inc_total(self):
+        """Increments the total posts counter"""
+
         before_total_posts = Post.objects.count()
 
         p = Post(width=420, height=420, folder=0, md5='ca6ffc3babb6f0f58a7e5c0c6b61e7bf')
@@ -25,6 +27,8 @@ class PostTest(TestCase):
         self.assertEqual(Post.objects.count(), before_total_posts + 1)
     
     def test_tag_array(self):
+        """Adds tags to a post correctly"""
+
         p = Post(width=420, height=420, folder=0, md5='ca6ffc3babb6f0f58a7e5c0c6b61e7bf')
         p.save()
 
@@ -51,6 +55,8 @@ class PostTest(TestCase):
         self.assertEqual(list(p.tags.all()), [first_tag, second_tag])
     
     def test_md5_unique(self):
+        """Verifies that the md5 is unique"""
+
         p = Post(width=420, height=420, folder=0, md5='ca6ffc3babb6f0f58a7e5c0c6b61e7bf')
         p.save()
 
@@ -83,6 +89,8 @@ class PostCreateFromFileTest(TestCase):
         self.temp_storage.tearDown()
     
     def test_create_post(self):
+        """Creates a post from a file"""
+
         # Create a post from a file
         p = Post.create_from_file(self.test_image_path)
         p.save()
@@ -110,6 +118,8 @@ class PostCreateFromFileTest(TestCase):
         self.assertEqual(p.is_video, 0)
 
     def test_files_exists(self):
+        """Creates files correctly"""
+
         # Create a post from a file
         p = Post.create_from_file(self.test_image_path)
         p.save()
@@ -124,6 +134,8 @@ class PostCreateFromFileTest(TestCase):
         self.assertFalse(os.path.exists(os.path.join(self.temp_storage.temp_storage_path, 'samples', '1', 'sample_2dcd09f6c874b36355336112d17434e1.jpg')))
 
     def test_thumbnail_smaller(self):
+        """Creates smaller thumbnail"""
+
         # Create a post from a file
         p = Post.create_from_file(self.test_image_path)
         p.save()
@@ -135,6 +147,8 @@ class PostCreateFromFileTest(TestCase):
         self.assertLess(os.path.getsize(os.path.join(self.temp_storage.temp_storage_path, 'thumbnails', '1', 'thumbnail_2dcd09f6c874b36355336112d17434e1.jpg')), os.path.getsize(os.path.join(self.temp_storage.temp_storage_path, 'media', '1', '2dcd09f6c874b36355336112d17434e1.jpg')))
 
     def test_create_sample(self):
+        """Creates a sample from a file"""
+
         # Create a post from a file
         p = Post.create_from_file(self.test_sampleable_path)
         p.save()
@@ -146,6 +160,8 @@ class PostCreateFromFileTest(TestCase):
         self.assertEqual(p.sample, 1)
     
     def test_create_video(self):
+        """Creates a video from a file"""
+
         # Create a post from a file
         p = Post.create_from_file(self.test_video_path)
         p.save()
@@ -163,6 +179,8 @@ class PostCreateFromFileTest(TestCase):
         self.assertEqual(p.sample, 0)
 
     def test_rejects_corrupt_files(self):
+        """Rejects corrupt files"""
+
         # Create a post from a file
 
         # Make sure that it throws
@@ -179,6 +197,7 @@ class PostCreateFromFileTest(TestCase):
         self.assertEqual(len(dirs), 0)
 
     def test_jpg_thumbnails(self):
+        """Creates a thumbnail from a jpg file"""
         # Create a post from a file
         p = Post.create_from_file(self.test_image_path)
         p.save()
@@ -187,6 +206,8 @@ class PostCreateFromFileTest(TestCase):
         self.assertTrue(os.path.exists(os.path.join(self.temp_storage.temp_storage_path, 'thumbnails', '1', 'thumbnail_2dcd09f6c874b36355336112d17434e1.jpg')))
     
     def test_jpg_samples(self):
+        """Creates samples as JPG files"""
+
         # Create a post from a file
         p = Post.create_from_file(self.test_sampleable_path)
         p.save()
@@ -195,6 +216,8 @@ class PostCreateFromFileTest(TestCase):
         self.assertTrue(os.path.exists(os.path.join(self.temp_storage.temp_storage_path, 'samples', '1', 'sample_656bc10f9f3a6a8f7e017892c8aabcb8.jpg')))
 
     def test_raises_against_directories(self):
+        """Raises an error when trying to create a post from a directory"""
+
         # Create a post from a file
         with self.assertRaises(Exception):
             Post.create_from_file(self.test_directory_path)
@@ -203,6 +226,8 @@ class PostCreateFromFileTest(TestCase):
         self.assertEqual(Post.objects.count(), 0)
 
     def test_raises_against_non_images(self):
+        """Raises an error when trying to create a post from a non-image file"""
+
         # Create a post from a file
         with self.assertRaises(Exception):
             Post.create_from_file(self.test_text_path)

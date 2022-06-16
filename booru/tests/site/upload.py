@@ -6,11 +6,15 @@ import booru.tests.testutils as testutils
 
 class UploadTest(TestCase):
     def test_page(self):
+        """Makes sure that the page can be GET'd"""
+
         response = self.client.get('/upload')
 
         self.assertEqual(response.status_code, 200)
     
     def test_form_visible(self):
+        """Makes sure that there is a form on the page"""
+
         # Make sure that it has an upload form
         response = self.client.get('/upload')
 
@@ -41,6 +45,8 @@ class UploadPOSTTest(TestCase):
         )
 
     def test_post_no_file(self):
+        """Rejects an empty post form"""
+
         response = self.client.post('/upload')
 
         self.assertEqual(response.status_code, 400)
@@ -49,6 +55,8 @@ class UploadPOSTTest(TestCase):
         self.assertEqual(Post.objects.count(), 0)
     
     def test_rating_valid(self):
+        """Accepts valid ratings"""
+
         ratings = ['s', 'q', 'e', 'explicit', 'safe', 'questionable']
         for rating in ratings:
             self.setUp()
@@ -64,6 +72,8 @@ class UploadPOSTTest(TestCase):
             self.tearDown()
 
     def test_rating_invalid(self):
+        """Rejects invalid ratings"""
+
         ratings = ['x', 'y', 'z', 'zoom']
 
         for rating in ratings:
@@ -75,6 +85,8 @@ class UploadPOSTTest(TestCase):
             self.assertEqual(Post.objects.count(), 0)
 
     def test_file_invalid(self):
+        """Rejects non-image types"""
+
         resp = self.make_post(testutils.NON_IMAGE_PATH, 'tag1 tag2 tag3', 'a title', 'https://example.com/', 'explicit')
 
         self.assertEqual(resp.status_code, 400)
@@ -89,6 +101,8 @@ class UploadPOSTTest(TestCase):
         # self.assertContains(resp.content, 'File type not allowed')
 
     def test_file_corrupted(self):
+        """Rejects corrupted files"""
+
         resp = self.make_post(testutils.CORRUPT_IMAGE_PATH, 'tag1 tag2 tag3', 'a title', 'https://example.com/', 'explicit')
 
         self.assertEqual(resp.status_code, 400)
@@ -102,6 +116,8 @@ class UploadPOSTTest(TestCase):
     # TODO test file too large
 
     def test_duplicate_post(self):
+        """Rejects posts that have duplicate files"""
+
         resp = self.make_post(self.test_path, 'tag1 tag2 tag3', 'a title', 'https://example.com/', 'explicit')
 
         # Make sure it was accepted
@@ -124,6 +140,8 @@ class UploadPOSTTest(TestCase):
 
 
     def test_post_video(self):
+        """Accepts video posts"""
+
         resp = self.make_post(testutils.VIDEO_PATH, 'tag1 tag2 tag3', 'a title', 'https://example.com/', 'explicit')
 
         self.assertEqual(resp.status_code, 201)
@@ -154,6 +172,8 @@ class UploadPOSTTest(TestCase):
         self.assertEqual(post.md5, boorutils.get_file_checksum(testutils.VIDEO_PATH))
 
     def test_tags_invalid(self):
+        """Rejects invalid tag sets"""
+
         invalid = [
             't a g', '**** *.*', '', '     '
         ]
@@ -170,6 +190,8 @@ class UploadPOSTTest(TestCase):
             self.assertEqual(Post.objects.count(), 0)
         
     def test_tags_duplicate(self):
+        """Processes duplicate tags correctly"""
+
         resp = self.make_post(testutils.FELIX_PATH, 'tag1 tag1', 'a title', 'https://example.com/', 'explicit')
 
         self.assertEqual(resp.status_code, 201)
@@ -185,6 +207,8 @@ class UploadPOSTTest(TestCase):
         self.assertEqual(post.tags.count(), 1)
 
     def test_post_valid(self):
+        """Accepts valid posts"""
+
         resp = self.make_post(self.test_path, 'tag1 tag2 tag3', 'a title', 'https://example.com/', 'explicit')
 
         self.assertEqual(resp.status_code, 201)

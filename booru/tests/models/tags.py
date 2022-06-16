@@ -15,6 +15,8 @@ class TagTest(TestCase):
         artist.save()
     
     def test_reference_type(self):
+        """Adds reference to a tag type correctly"""
+
         # Get the default tag type
         artist = TagType.objects.get(name='artist')
 
@@ -29,6 +31,8 @@ class TagTest(TestCase):
         self.assertEqual(tag.tag_type, artist)
     
     def test_type_default_null(self):
+        """Defaults the tag type to the default tag type"""
+
         # Create a tag
         tag = Tag(tag='tag1')
         tag.save()
@@ -40,6 +44,8 @@ class TagTest(TestCase):
         self.assertEqual(tag.tag_type, None)
     
     def test_defaults_count_zero(self):
+        """Defaults the count to zero"""
+
         # Create a tag
         tag = Tag(tag='tag1')
         tag.save()
@@ -51,6 +57,8 @@ class TagTest(TestCase):
         self.assertEqual(tag.tag, 'tag1')
 
     def test_total_posts(self):
+        """Gets correct total count"""
+
         # Create a tag
         tag = Tag(tag='tag1')
         tag.save()
@@ -86,6 +94,8 @@ class TagTest(TestCase):
         self.assertEqual(tag.total_posts, 2)
         
     def test_create_or_get_creates(self):
+        """Creates or gets if the tag isn't in the database"""
+
         before = Tag.objects.count()
         # Create a tag
         tag = Tag.create_or_get('tag1')
@@ -100,6 +110,8 @@ class TagTest(TestCase):
         self.assertEqual(Tag.objects.count(), before + 1)
     
     def test_create_or_get_gets(self):
+        """Gets the tag if it is in the database"""
+
         # Create a tag type
         artist = TagType(name='artist', description='Artist')
         
@@ -119,12 +131,16 @@ class TagTest(TestCase):
         self.assertEqual(Tag.objects.count(), 1)
     
     def test_is_name_valid_with_valid(self):
+        """Accepts valid tag names"""
+
         valid_tags = ['1tag', 'funny_monkey', '=.=', ':=>', ':3']
 
         for tag in valid_tags:
             self.assertTrue(Tag.is_name_valid(tag))
     
     def test_is_name_valid_with_invalid(self):
+        """Rejects invalid tag names"""
+
         invalid_tags = ['', '     ', 'e', 'funny-monkey', 'funny monkey', 'HeHehe', '*.*']
 
         for tag in invalid_tags:
