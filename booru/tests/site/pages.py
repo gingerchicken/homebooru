@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from ..models.posts import *
+from ...models.posts import *
 
 # Test the index page
 class IndexTest(TestCase):
