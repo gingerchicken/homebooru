@@ -6,7 +6,10 @@ import hashlib
 import os
 import pathlib
 import shutil
+
+import booru.tests.testutils as testutils
 import booru.boorutils as boorutils
+
 import homebooru.settings
 
 class PostTest(TestCase):
@@ -64,7 +67,6 @@ class PostTest(TestCase):
         Post.objects.all().delete()
 
 class PostCreateFromFileTest(TestCase):
-    temp_storage_path = '/tmp/storage'
     test_image_path = 'assets/TEST_DATA/content/felix.jpg'
     test_sampleable_path = 'assets/TEST_DATA/content/sampleable_image.jpg'
     test_video_path = 'assets/TEST_DATA/content/ana_cat.mp4'
@@ -72,31 +74,13 @@ class PostCreateFromFileTest(TestCase):
     test_text_path = 'assets/TEST_DATA/content/test.txt'
     test_corrupt_path = 'assets/TEST_DATA/content/corrupt_image.jpg'
 
-    og_path = homebooru.settings.BOORU_STORAGE_PATH
+    temp_storage = testutils.TempStorage()
 
     def setUp(self):
-        self.og_path = homebooru.settings.BOORU_STORAGE_PATH
-        homebooru.settings.BOORU_STORAGE_PATH = pathlib.Path(self.temp_storage_path)
-
-        Post.objects.all().delete()
-        Tag.objects.all().delete()
-
-        if os.path.exists(self.temp_storage_path):
-            shutil.rmtree(self.temp_storage_path)
-
-        # Create the temp storage path
-        os.mkdir(self.temp_storage_path)
+        self.temp_storage.setUp()
     
     def tearDown(self):
-        # TODO make this a function of some sort without it being a test!
-        Post.objects.all().delete()
-        Tag.objects.all().delete()
-
-        if os.path.exists(self.temp_storage_path):
-            shutil.rmtree(self.temp_storage_path)
-        
-        # Restore the original path
-        homebooru.settings.BOORU_STORAGE_PATH = self.og_path
+        self.temp_storage.tearDown()
     
     def test_create_post(self):
         # Create a post from a file
@@ -131,13 +115,13 @@ class PostCreateFromFileTest(TestCase):
         p.save()
 
         # Check that the media file exists
-        self.assertTrue(os.path.exists(os.path.join(self.temp_storage_path, 'media', '1', '2dcd09f6c874b36355336112d17434e1.jpg')))
+        self.assertTrue(os.path.exists(os.path.join(self.temp_storage.temp_storage_path, 'media', '1', '2dcd09f6c874b36355336112d17434e1.jpg')))
 
         # Check that the thumbnail file exists
-        self.assertTrue(os.path.exists(os.path.join(self.temp_storage_path, 'thumbnails', '1', 'thumbnail_2dcd09f6c874b36355336112d17434e1.jpg')))
+        self.assertTrue(os.path.exists(os.path.join(self.temp_storage.temp_storage_path, 'thumbnails', '1', 'thumbnail_2dcd09f6c874b36355336112d17434e1.jpg')))
 
         # Make sure that the sample file is not created
-        self.assertFalse(os.path.exists(os.path.join(self.temp_storage_path, 'samples', '1', 'sample_2dcd09f6c874b36355336112d17434e1.jpg')))
+        self.assertFalse(os.path.exists(os.path.join(self.temp_storage.temp_storage_path, 'samples', '1', 'sample_2dcd09f6c874b36355336112d17434e1.jpg')))
 
     def test_thumbnail_smaller(self):
         # Create a post from a file
@@ -145,10 +129,10 @@ class PostCreateFromFileTest(TestCase):
         p.save()
 
         # Check that the thumbnail file exists
-        self.assertTrue(os.path.exists(os.path.join(self.temp_storage_path, 'thumbnails', '1', 'thumbnail_2dcd09f6c874b36355336112d17434e1.jpg')))
+        self.assertTrue(os.path.exists(os.path.join(self.temp_storage.temp_storage_path, 'thumbnails', '1', 'thumbnail_2dcd09f6c874b36355336112d17434e1.jpg')))
 
         # Check that the thumbnail file is smaller than the image file
-        self.assertLess(os.path.getsize(os.path.join(self.temp_storage_path, 'thumbnails', '1', 'thumbnail_2dcd09f6c874b36355336112d17434e1.jpg')), os.path.getsize(os.path.join(self.temp_storage_path, 'media', '1', '2dcd09f6c874b36355336112d17434e1.jpg')))
+        self.assertLess(os.path.getsize(os.path.join(self.temp_storage.temp_storage_path, 'thumbnails', '1', 'thumbnail_2dcd09f6c874b36355336112d17434e1.jpg')), os.path.getsize(os.path.join(self.temp_storage.temp_storage_path, 'media', '1', '2dcd09f6c874b36355336112d17434e1.jpg')))
 
     def test_create_sample(self):
         # Create a post from a file
@@ -156,7 +140,7 @@ class PostCreateFromFileTest(TestCase):
         p.save()
 
         # Check that the sample file exists
-        self.assertTrue(os.path.exists(os.path.join(self.temp_storage_path, 'samples', '1', 'sample_656bc10f9f3a6a8f7e017892c8aabcb8.jpg')))
+        self.assertTrue(os.path.exists(os.path.join(self.temp_storage.temp_storage_path, 'samples', '1', 'sample_656bc10f9f3a6a8f7e017892c8aabcb8.jpg')))
 
         # Check that the sample flag is true
         self.assertEqual(p.sample, 1)
@@ -170,10 +154,10 @@ class PostCreateFromFileTest(TestCase):
         self.assertEqual(p.is_video, 1)
 
         # Check that the video file exists
-        self.assertTrue(os.path.exists(os.path.join(self.temp_storage_path, 'media', '1', '11e0a9c6b20d54593b8fc8f134a25256.mp4')))
+        self.assertTrue(os.path.exists(os.path.join(self.temp_storage.temp_storage_path, 'media', '1', '11e0a9c6b20d54593b8fc8f134a25256.mp4')))
 
         # Check that the thumbnail file exists
-        self.assertTrue(os.path.exists(os.path.join(self.temp_storage_path, 'thumbnails', '1', 'thumbnail_11e0a9c6b20d54593b8fc8f134a25256.jpg')))
+        self.assertTrue(os.path.exists(os.path.join(self.temp_storage.temp_storage_path, 'thumbnails', '1', 'thumbnail_11e0a9c6b20d54593b8fc8f134a25256.jpg')))
 
         # Make sure sampled is false (this video is technically sampleable but we don't want to sample videos)
         self.assertEqual(p.sample, 0)
@@ -189,7 +173,7 @@ class PostCreateFromFileTest(TestCase):
         self.assertEqual(Post.objects.count(), 0)
 
         # List the directories in the storage path
-        dirs = os.listdir(os.path.join(self.temp_storage_path))
+        dirs = os.listdir(os.path.join(self.temp_storage.temp_storage_path))
 
         # Make sure that the directories are empty
         self.assertEqual(len(dirs), 0)
@@ -200,7 +184,7 @@ class PostCreateFromFileTest(TestCase):
         p.save()
 
         # Check that the thumbnail file exists (and is a jpg)
-        self.assertTrue(os.path.exists(os.path.join(self.temp_storage_path, 'thumbnails', '1', 'thumbnail_2dcd09f6c874b36355336112d17434e1.jpg')))
+        self.assertTrue(os.path.exists(os.path.join(self.temp_storage.temp_storage_path, 'thumbnails', '1', 'thumbnail_2dcd09f6c874b36355336112d17434e1.jpg')))
     
     def test_jpg_samples(self):
         # Create a post from a file
@@ -208,7 +192,7 @@ class PostCreateFromFileTest(TestCase):
         p.save()
 
         # Check that the sample file exists (and is a jpg)
-        self.assertTrue(os.path.exists(os.path.join(self.temp_storage_path, 'samples', '1', 'sample_656bc10f9f3a6a8f7e017892c8aabcb8.jpg')))
+        self.assertTrue(os.path.exists(os.path.join(self.temp_storage.temp_storage_path, 'samples', '1', 'sample_656bc10f9f3a6a8f7e017892c8aabcb8.jpg')))
 
     def test_raises_against_directories(self):
         # Create a post from a file

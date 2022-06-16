@@ -1,1 +1,2 @@
-from .pages import *
+from .homepage import *
+from .upload import *
