@@ -21,6 +21,7 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - DEBUG=${DEBUG}
       - UNIT_TEST=${UNIT_TEST}
+      - BOORU_SHOW_FFMPEG_OUTPUT=${BOORU_SHOW_FFMPEG_OUTPUT}
     depends_on:
       - db
 

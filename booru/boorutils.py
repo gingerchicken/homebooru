@@ -5,7 +5,7 @@ import ffmpegio
 import homebooru.settings
 
 # show log constant
-__SHOW_LOG = True if homebooru.settings.DEBUG else None
+__SHOW_LOG = True if homebooru.settings.BOORU_SHOW_FFMPEG_OUTPUT else None
 
 def hash_str(s):
     """Hashes a string using the md5 algorithm"""
