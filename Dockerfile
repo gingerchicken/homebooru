@@ -11,6 +11,9 @@ WORKDIR /code
 RUN apt update
 RUN apt install -y ffmpeg
 
+# Install magiclib
+RUN apt install -y libmagic1
+
 # Copy across the requirements.txt file and install the requirements
 COPY requirements.txt .
 RUN pip install -r requirements.txt

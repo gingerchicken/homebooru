@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head id="default-head">
+	<title>Homebooru | Upload</title>
+
+    {% include "booru/components/head.html" %}
+    {% load static %}
+</head>
+
+<body>
+	<img style="position:absolute;left:-10px;" src="{% static '/layout/homebooru-com-pix.bmp' %}">
+	<div class="container-fluid">
+		{% include "booru/components/nav-bar.html" %}
+		{% include "booru/posts/components/nav-bar.html" %}
+	</div>
+	<div class="alert alert-warning small" style="padding: 10px 15px 10px 15px; font-size: 11px; display: none;" id="motd"></div>
+
+	<div style="display: inline; padding: 0px 15px 0px 15px;" id="motdspacer">&nbsp;</div>
+
+    <div class="container">
+        <form method="post" action="/upload" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="postAdd">
+               <h2 style="margin: 0px;">Upload Tip</h2>
+               <p>Please bare in mind that the content that you upload is going to be saved on the Homebooru server, whoever is hosting the server will have full control over all content uploaded.</p>
+            </div>
+            <br>
+            File:<br>
+            <input type="file" name="upload" accept="video/*|image/*" size="35" onchange="loadFile(event)">
+            <img id="imgpreview" style="max-width: 100%; margin: 10px 0px; background: url('{% static '/layout/transparentVisualization.png' %}'); display:none;">
+            <video id="vidpreview" style="max-width: 100%; margin: 10px 0px; background: url({% static '/layout/transparentVisualization.png' %}); display:none;" controls="">
+                <source id="image-video-source" type="video/mp4">
+
+                Your browser does not support HTML5 video.
+            </video>
+            <script>
+                function loadFile(event) {
+                    // Get the two elements
+                    let imgpreview = document.getElementById('imgpreview');
+                    let videopreview = document.getElementById('vidpreview');
+
+                    // Set their src to be nothing
+                    imgpreview.src = videopreview.src = '';
+
+                    // Hide everyone
+                    $(imgpreview).hide();
+                    $(videopreview).hide();
+                    
+                    // Get the first (and only) file from the file list
+                    let f = event.target.files[0];
+
+                    // Get the element
+                    let selectedElement = f.type.startsWith('image') ? imgpreview : f.type.startsWith('video') ? videopreview : null;
+                
+                    // Show the image preview
+                    selectedElement.src = URL.createObjectURL(event.target.files[0]);
+                    $(selectedElement).show();
+                };
+           </script>
+           <br>
+           Source:<br>
+           <input type="text" name="source" value="" size="53" style="width: 100%;">
+           <br><br>
+           Title:<br>
+           <input type="text" name="title" value="" size="53" style="width: 100%;">
+           <br><br>
+           Tags:<br>
+           <textarea id="tags" class="tagBox ui-autocomplete-input" data-autocomplete="tag-query" name="tags" cols="60" rows="7" tabindex="3" style="width: 100%;" autocomplete="off"></textarea>
+           <br>
+           Separate tags with spaces. (ex: green_eyes purple green_hair)
+           <br><br>
+           Generally, the more specific you are in your tagging, the less you will have to tag. For instance, the tag chun-li will add the street_fighter and capcom tags automatically upon saving. Depending on how the administrator has configured things of course!
+           <br><br>
+           Rating:<br>
+           <input type="radio" name="rating" value="e">Explicit <input type="radio" name="rating" value="q">Questionable <input type="radio" name="rating" value="s" checked="checked">Safe
+           <br><br>
+           <input type="submit" name="submit" value="Upload">
+        </form>
+        <br><br><br><br>
+        <script type="text/javascript">
+           $(document).ready(
+               () => {
+                    $('input:submit').attr('disabled',true);
+                    $('input:file').change(
+                        () => {
+                            let e = $('input:file');
+                            if (e.val()) {
+                                $('input:submit').removeAttr('disabled'); 
+                                return;
+                            }
+
+                            $('input:submit').attr('disabled', true);
+                        }
+                    );
+
+                    // Add an onclick listener
+                    $('form').on('submit', (e) => {
+                        // Prevent the default action
+                        e.preventDefault();
+
+                        // Submit the form via fetch
+                        let form = $('form')[0];
+
+                        // Create a new FormData object
+                        let formData = new FormData(form);
+
+                        // Create a new fetch request
+                        let request = new Request(form.action, {
+                            method: form.method,
+                            body: formData,
+                            mode: 'cors',
+                            cache: 'default'
+                        });
+
+                        // Fetch the request
+                        fetch(request).then(
+                            (response) => {
+                                // Check if the response is successful
+                                if (!response.ok) {
+                                    // Throw an error if not
+                                    throw new Error(response.statusText);
+                                }
+
+                                // Return the response as JSON
+                                return response.json();
+                            }
+                        ).then(() => {
+                            // Go to the home page
+                            window.location.href = '/';
+                        });
+                    });
+               });
+        </script>
+    </div>
+    <br>
+    <br>
+    <div style="display:none">
+        <a href="#" id="blacklist-count"></a>
+        <a href="#" id="blacklisted-sidebar"></a>
+    </div>
+
+	<ul id="ui-id-1" tabindex="0" class="ui-menu ui-widget ui-widget-content ui-autocomplete ui-front" style="display: none;"></ul>
+	<div role="status" aria-live="assertive" aria-relevant="additions" class="ui-helper-hidden-accessible"></div>
+    {% include "booru/components/footer.html" %}
+</body>

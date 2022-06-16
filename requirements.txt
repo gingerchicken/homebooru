@@ -1,3 +1,10 @@
+# Django
 Django==4.0.5
+djangorestframework
+
+# Postgres
 psycopg2-binary
+
+# Data processing
 ffmpegio
+python-magic
