@@ -55,6 +55,9 @@ class Post(models.Model):
     # File name
     filename = models.CharField(max_length=64)
 
+    # Post title
+    title = models.CharField(max_length=512, blank=True, null=True)
+
     @staticmethod
     def search(search_phrase, wild_card="*"):
         """Search for posts that match a user entered search phrase"""
