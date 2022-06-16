@@ -45,7 +45,7 @@ def upload(request):
     if request.method == 'POST':
         # Make sure that the uploaded file is there
         if 'upload' not in request.FILES:
-            return Response('{"error": "No file uploaded"}', status=400, content_type='application/json')
+            return HttpResponse('{"error": "No file uploaded"}', status=400, content_type='application/json')
         
         # Get the image file
         uploaded_file = request.FILES['upload']
@@ -53,7 +53,7 @@ def upload(request):
         # Get the tags
         tags = request.POST.get('tags', '')
         if len(tags.strip()) < 3:
-            return Response('{"error": "Tags must be at least 3 characters long"}', status=400, content_type='application/json')
+            return HttpResponse('{"error": "Tags must be at least 3 characters long"}', status=400, content_type='application/json')
 
         # Get the post title
         title = request.POST.get('title', '')

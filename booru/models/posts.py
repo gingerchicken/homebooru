@@ -19,7 +19,7 @@ class Post(models.Model):
     tags = models.ManyToManyField(Tag, related_name='posts')
 
     # SFW Rating (either safe, questionable, or explicit) (not null, default safe)
-    rating = models.CharField(max_length=10, default='safe')
+    rating = models.CharField(max_length=64, default='safe')
 
     # Score (i.e. number of upvotes minus number of downvotes), not null, default 0
     score = models.IntegerField(default=0)
