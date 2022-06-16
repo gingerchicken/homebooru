@@ -7,6 +7,19 @@ import pathlib
 import shutil
 import os
 
+# Paths
+TEST_DATA_PATH = pathlib.Path('assets/TEST_DATA')
+CONTENT_PATH = TEST_DATA_PATH / 'content'
+
+# Expected
+FELIX_PATH = pathlib.Path(CONTENT_PATH / 'felix.jpg')
+GATO_PATH  = pathlib.Path(CONTENT_PATH / 'gato.png')
+VIDEO_PATH = pathlib.Path(CONTENT_PATH / 'ana_cat.mp4')
+SAMPLEABLE_PATH = pathlib.Path(CONTENT_PATH / 'sampleable_image.jpg')
+
+# Erroneous
+NON_IMAGE_PATH = pathlib.Path(CONTENT_PATH / 'test.txt')
+CORRUPT_IMAGE_PATH = pathlib.Path(CONTENT_PATH / 'corrupt_image.jpg')
 
 class TempStorage():
     og_path = None
