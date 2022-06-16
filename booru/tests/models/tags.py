@@ -119,7 +119,7 @@ class TagTest(TestCase):
         self.assertEqual(Tag.objects.count(), 1)
     
     def test_is_name_valid_with_valid(self):
-        valid_tags = ['1tag', 'funny_monkey', '=.=', ':=>']
+        valid_tags = ['1tag', 'funny_monkey', '=.=', ':=>', ':3']
 
         for tag in valid_tags:
             self.assertTrue(Tag.is_name_valid(tag))
