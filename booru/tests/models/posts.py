@@ -592,3 +592,34 @@ class PostSearchTest(TestCase):
 
         # Make sure it is the correct path
         testutils.assertPathsEqual(p.get_media_path(), (homebooru.settings.BOORU_STORAGE_PATH / f"media/{p.folder}/{p.md5}.png"))
+
+    # I don't really care that this doesn't work since this should never be used but whatever.    
+    # def test_multiple_posts_deleted(self):
+    #     """Triggers when using objects.all().delete()"""
+
+    #     # Create two posts
+    #     p = Post.create_from_file(testutils.SAMPLEABLE_PATH)
+    #     p.save()
+
+    #     p2 = Post.create_from_file(testutils.GATO_PATH)
+    #     p2.save()
+
+    #     # Make sure the files exist
+    #     paths = [
+    #         p.get_sample_path(),
+    #         p.get_thumbnail_path(),
+    #         p.get_media_path(),
+    #         p2.get_thumbnail_path(),
+    #         p2.get_media_path()
+    #     ]
+
+    #     # Remove all posts
+    #     Post.objects.all().delete()
+
+    #     # Alternatively - this should work too
+    #     # for post in Post.objects.all():
+    #     #     post.delete()
+
+    #     # Make sure the files don't exist
+    #     for path in paths:
+    #         self.assertFalse(path.exists())
