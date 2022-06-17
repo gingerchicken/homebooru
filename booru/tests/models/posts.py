@@ -1,6 +1,7 @@
 from django.test import TestCase
 
-from ...models.posts import Post, Tag
+from ...models.posts import Post
+from ...models.tags import Tag, TagType
 
 import hashlib
 import os
@@ -634,3 +635,83 @@ class PostDeleteTest(TestCase):
     #     # Make sure the files don't exist
     #     for path in paths:
     #         self.assertFalse(path.exists())
+
+class PostGetSortedTags(TestCase):
+    fixtures = ['booru/fixtures/tagtypes.json']
+    temp_storage = testutils.TempStorage()
+
+    def setUp(self):
+        self.temp_storage.setUp()
+        super().setUp()
+    
+    def tearDown(self):
+        self.temp_storage.tearDown()
+        super().tearDown()
+    
+    def test_get_sorted_tags(self):
+        """Returns a list of tags sorted by name"""
+
+        # Create a new post
+        p = Post.create_from_file(testutils.SAMPLEABLE_PATH)
+        p.save()
+
+        # Add some tags
+        tags_to_add = '1boy animal_ears brown_eyes brown_hair cat_ears felix_argyle flower hair_flower hair_ornament japanese_clothes re:zero_kara_hajimeru_isekai_seikatsu ribbon shake_sawa short_hair solo white_background wide_sleeves'
+
+        tags = []
+        for tag in tags_to_add.split():
+            p.tags.add(Tag.create_or_get(tag))
+        
+    
+        # Make felix_argyle tag a character tag
+        t = Tag.objects.get(tag='felix_argyle')
+        t.tag_type = TagType.objects.get(name='character')
+        t.save()
+
+        # Make shake_sawa tag an artist tag
+        t = Tag.objects.get(tag='shake_sawa')
+        t.tag_type = TagType.objects.get(name='artist')
+        t.save()
+
+        # Make re:zero_kara_hajimeru_isekai_seikatsu tag a copyright tag
+        t = Tag.objects.get(tag='re:zero_kara_hajimeru_isekai_seikatsu')
+        t.tag_type = TagType.objects.get(name='copyright')
+        t.save()
+
+        # Sort the tags
+        sorted_tags = p.get_sorted_tags()
+
+        for type_name in sorted_tags['types']:
+            for i in range(len(sorted_tags['types'][type_name])):
+                t = sorted_tags['types'][type_name][i]
+                sorted_tags['types'][type_name][i] = t.tag
+
+
+        # Check the order of the types
+        self.assertEqual(sorted_tags['type_orders'], ['artist', 'character', 'copyright', 'general'])
+
+        # Make sure that the tags are in the correct order
+        self.assertEqual(sorted_tags['types']['general'], [
+            "1boy",
+            "animal_ears",
+            "brown_eyes",
+            "brown_hair",
+            "cat_ears",
+            "flower",
+            "hair_flower",
+            "hair_ornament",
+            "japanese_clothes",
+            "ribbon",
+            "short_hair",
+            "solo",
+            "white_background",
+            "wide_sleeves"
+        ])
+
+        self.assertEqual(sorted_tags['types']['character'], [
+            "felix_argyle"
+        ])
+
+        self.assertEqual(sorted_tags['types']['artist'], [
+            "shake_sawa"
+        ])
