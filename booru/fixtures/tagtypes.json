@@ -1,0 +1,37 @@
+[
+    {
+        "model": "booru.tagtype",
+        "pk": "artist",
+        "fields": {
+            "description": "The original artist of the post"
+        }
+    },
+    {
+        "model": "booru.tagtype",
+        "pk": "character",
+        "fields": {
+            "description": "A specific character"
+        }
+    },
+    {
+        "model": "booru.tagtype",
+        "pk": "deprecated",
+        "fields": {
+            "description": "This tag maybe eventually removed"
+        }
+    },
+    {
+        "model": "booru.tagtype",
+        "pk": "general",
+        "fields": {
+            "description": "Just a generic tag"
+        }
+    },
+    {
+        "model": "booru.tagtype",
+        "pk": "metadata",
+        "fields": {
+            "description": "Something to do with the media format"
+        }
+    }
+]
