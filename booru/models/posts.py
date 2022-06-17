@@ -8,6 +8,7 @@ import booru.boorutils as boorutils
 import math
 import pathlib
 import shutil
+import re
 
 # Create your models here.
 class Post(models.Model):
@@ -57,6 +58,18 @@ class Post(models.Model):
 
     # Post title
     title = models.CharField(max_length=512, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        """Saves the post to the database."""
+
+        # Make sure that the md5 is lower case
+        self.md5 = self.md5.lower()
+
+        # Make sure that the md5 is a valid md5
+        if not re.match("^[0-9a-f]{32}$", self.md5):
+            raise ValueError("Invalid md5")
+
+        super(Post, self).save(*args, **kwargs)
 
     @staticmethod
     def search(search_phrase, wild_card="*"):

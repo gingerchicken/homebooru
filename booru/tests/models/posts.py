@@ -474,3 +474,22 @@ class PostSearchTest(TestCase):
         
         # Current folder should be ceil(502 / 50) = 11
         self.assertEqual(Post.get_next_folder(50), 11)
+    
+    def test_md5_ignore_case(self):
+        md5 = boorutils.hash_str('test')
+
+        # Make the md5 uppercase
+        md5 = md5.upper()
+
+        post = Post(width=420, height=420, folder=1, md5=md5)
+        post.save()
+
+        # Make sure that the md5 is lowercase
+        self.assertEqual(post.md5, md5.lower())
+    
+    def test_rejects_invalid_md5(self):
+        md5 = 'invalid'
+
+        post = Post(width=420, height=420, folder=1, md5=md5)
+        with self.assertRaises(ValueError):
+            post.save()
