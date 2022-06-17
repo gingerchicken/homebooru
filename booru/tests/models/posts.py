@@ -493,3 +493,102 @@ class PostSearchTest(TestCase):
         post = Post(width=420, height=420, folder=1, md5=md5)
         with self.assertRaises(ValueError):
             post.save()
+    
+    def test_deletes_files_on_delete(self):
+        """Deletes related files when deleting a post"""
+        # Create a new post
+        p = Post.create_from_file(testutils.SAMPLEABLE_PATH)
+        p.save()
+
+        # Make sure the files exist
+        paths = [
+            p.get_sample_path(),
+            p.get_thumbnail_path(),
+            p.get_media_path()
+        ]
+
+        for path in paths:
+            self.assertTrue(path.exists())
+        
+        # Delete the post
+        p.delete()
+
+        # Make sure the files don't exist
+        for path in paths:
+            self.assertFalse(path.exists())
+    
+    def test_leaves_other_posts_alone(self):
+        """Deletes related files when deleting a post"""
+
+        # Create a new post
+        p = Post.create_from_file(testutils.SAMPLEABLE_PATH)
+        p.save()
+
+        # Create a new post
+        p2 = Post.create_from_file(testutils.GATO_PATH)
+        p2.save()
+
+        # Make sure the files exist
+        paths = [
+            p.get_sample_path(),
+            p.get_thumbnail_path(),
+            p.get_media_path(),
+            p2.get_thumbnail_path(),
+            p2.get_media_path()
+        ]
+
+        for path in paths:
+            self.assertTrue(path.exists())
+        
+        # Delete the post
+        p.delete()
+
+        deleted_paths = paths[:2]
+        kept_paths = paths[3:]
+
+        # Make sure the files don't exist
+        for path in deleted_paths:
+            self.assertFalse(path.exists())
+        
+        # Make sure the files still exist
+        for path in kept_paths:
+            self.assertTrue(path.exists())
+
+    
+    def test_get_media_path(self):
+        """Returns expected path for media file"""
+
+        # Create a new post
+        p = Post.create_from_file(testutils.SAMPLEABLE_PATH)
+        p.save()
+
+        # Make sure it is the correct path
+        testutils.assertPathsEqual(p.get_media_path(), homebooru.settings.BOORU_STORAGE_PATH / f"media/{p.folder}/{p.md5}.jpg")
+    
+    def test_get_sample_path(self):
+        # Create a new post
+        p = Post.create_from_file(testutils.SAMPLEABLE_PATH)
+        p.save()
+
+        # Make sure it is the correct path
+        testutils.assertPathsEqual(p.get_sample_path(), homebooru.settings.BOORU_STORAGE_PATH / f"samples/{p.folder}/sample_{p.md5}.jpg")
+    
+    def test_get_thumbnail_path(self):
+        """Returns expected path for thumbnail"""
+
+        # Create a new post
+        p = Post.create_from_file(testutils.SAMPLEABLE_PATH)
+        p.save()
+
+        # Make sure it is the correct path
+        testutils.assertPathsEqual(p.get_thumbnail_path(), homebooru.settings.BOORU_STORAGE_PATH / f"thumbnails/{p.folder}/thumbnail_{p.md5}.jpg")
+
+    def test_get_media_path_non_jpg(self):
+        """Retains the original file extension"""
+
+        # Create a new post
+        p = Post.create_from_file(testutils.GATO_PATH)
+        p.save()
+
+        # Make sure it is the correct path
+        testutils.assertPathsEqual(p.get_media_path(), (homebooru.settings.BOORU_STORAGE_PATH / f"media/{p.folder}/{p.md5}.png"))

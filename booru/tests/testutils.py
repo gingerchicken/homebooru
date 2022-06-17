@@ -43,3 +43,10 @@ class TempStorage():
 
         if os.path.exists(self.temp_storage_path):
             shutil.rmtree(self.temp_storage_path)
+
+def assertPathsEqual(path1, path2):
+    # Resolve the paths
+    path1 = str(path1.absolute())
+    path2 = str(path2.absolute())
+
+    assert path1 == path2, f"{path1} != {path2}"

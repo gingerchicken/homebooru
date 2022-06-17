@@ -71,6 +71,26 @@ class Post(models.Model):
 
         super(Post, self).save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        """Deletes the post from the database."""
+
+        # Delete the post from the storage directory
+        paths = [
+            self.get_sample_path(),
+            self.get_thumbnail_path(),
+            self.get_media_path()
+        ]
+
+        for path in paths:
+            if not path.exists():
+                continue
+
+            # Delete the file
+            path.unlink()
+        
+        # Delete the post from the database
+        super(Post, self).delete(*args, **kwargs)
+
     @staticmethod
     def search(search_phrase, wild_card="*"):
         """Search for posts that match a user entered search phrase"""
@@ -183,7 +203,22 @@ class Post(models.Model):
 
         # Get the next folder
         return math.ceil(float(total_posts + 1) / float(folder_size))
+
+    def get_sample_path(self):
+        """Get the path to the sample image"""
+
+        return settings.BOORU_STORAGE_PATH / f"samples/{self.folder}/sample_{self.md5}.jpg"
     
+    def get_thumbnail_path(self):
+        """Get the path to the thumbnail image"""
+
+        return settings.BOORU_STORAGE_PATH / f"thumbnails/{self.folder}/thumbnail_{self.md5}.jpg"
+    
+    def get_media_path(self):
+        """Get the path to the media file"""
+
+        return settings.BOORU_STORAGE_PATH / f"media/{self.folder}/{self.filename}"
+
     @staticmethod
     def create_from_file(file_path : str, owner=None):
         """Create a post from a file"""
