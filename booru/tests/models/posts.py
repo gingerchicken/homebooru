@@ -13,6 +13,25 @@ import booru.boorutils as boorutils
 import homebooru.settings
 
 class PostTest(TestCase):
+    def test_md5_ignore_case(self):
+        md5 = boorutils.hash_str('test')
+
+        # Make the md5 uppercase
+        md5 = md5.upper()
+
+        post = Post(width=420, height=420, folder=1, md5=md5)
+        post.save()
+
+        # Make sure that the md5 is lowercase
+        self.assertEqual(post.md5, md5.lower())
+    
+    def test_rejects_invalid_md5(self):
+        md5 = 'invalid'
+
+        post = Post(width=420, height=420, folder=1, md5=md5)
+        with self.assertRaises(ValueError):
+            post.save()
+
     def test_inc_total(self):
         """Increments the total posts counter"""
 
@@ -67,6 +86,8 @@ class PostTest(TestCase):
         with self.assertRaises(Exception):
             b = Post(width=420, height=420, folder=1, md5='ca6ffc3babb6f0f58a7e5c0c6b61e7bf')
             b.save()
+
+    
 
     # Before each, clear the posts table
     def setUp(self):
@@ -474,26 +495,16 @@ class PostSearchTest(TestCase):
         
         # Current folder should be ceil(502 / 50) = 11
         self.assertEqual(Post.get_next_folder(50), 11)
+
+class PostDeleteTest(TestCase):
+    temp_storage = testutils.TempStorage()
+
+    def setUp(self):
+        self.temp_storage.setUp()
     
-    def test_md5_ignore_case(self):
-        md5 = boorutils.hash_str('test')
+    def tearDown(self):
+        self.temp_storage.tearDown()
 
-        # Make the md5 uppercase
-        md5 = md5.upper()
-
-        post = Post(width=420, height=420, folder=1, md5=md5)
-        post.save()
-
-        # Make sure that the md5 is lowercase
-        self.assertEqual(post.md5, md5.lower())
-    
-    def test_rejects_invalid_md5(self):
-        md5 = 'invalid'
-
-        post = Post(width=420, height=420, folder=1, md5=md5)
-        with self.assertRaises(ValueError):
-            post.save()
-    
     def test_deletes_files_on_delete(self):
         """Deletes related files when deleting a post"""
         # Create a new post
