@@ -3,16 +3,10 @@ from django.test import TestCase
 from ...models.tags import TagType, Tag
 from ...models.posts import Post
 
-class TagTest(TestCase):
-    def setUp(self):
-        # Clear tables
-        Tag.objects.all().delete()
-        TagType.objects.all().delete()
-        Post.objects.all().delete()
+import homebooru.settings
 
-        # Create a default tag type
-        artist = TagType(name='artist', description='Artist')
-        artist.save()
+class TagTest(TestCase):
+    fixtures = ['booru/fixtures/tagtypes.json']
     
     def test_reference_type(self):
         """Adds reference to a tag type correctly"""
@@ -30,7 +24,7 @@ class TagTest(TestCase):
         # Make sure the tag type is the default one
         self.assertEqual(tag.tag_type, artist)
     
-    def test_type_default_null(self):
+    def test_type_default(self):
         """Defaults the tag type to the default tag type"""
 
         # Create a tag
@@ -41,7 +35,7 @@ class TagTest(TestCase):
         tag = Tag.objects.get(tag='tag1')
 
         # Make sure the tag type is the default one
-        self.assertEqual(tag.tag_type, None)
+        self.assertEqual(tag.tag_type, TagType.objects.get(name=homebooru.settings.BOORU_DEFAULT_TAG_TYPE_PK))
     
     def test_defaults_count_zero(self):
         """Defaults the count to zero"""

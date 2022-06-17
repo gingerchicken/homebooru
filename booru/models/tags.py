@@ -1,6 +1,8 @@
 from django.db import models
 from django.apps import apps
 
+import homebooru.settings
+
 class TagType(models.Model):
     """Describes what a tag's category is."""
 
@@ -10,6 +12,15 @@ class TagType(models.Model):
     # Description of the tag type
     description = models.CharField(max_length=1000, blank=True, null=True)
 
+    @staticmethod
+    def get_default():
+        """Get the default tag type."""
+        try:
+            return TagType.objects.get(name=homebooru.settings.BOORU_DEFAULT_TAG_TYPE_PK)
+        except TagType.DoesNotExist:
+            # This should never happen unless the database is completely broken
+            return None
+
 class Tag(models.Model):
     """Used to tag posts."""
 
@@ -17,7 +28,16 @@ class Tag(models.Model):
     tag = models.CharField(max_length=100, primary_key=True)
 
     # Tag type as a foreign key to the TagType model
-    tag_type = models.ForeignKey(TagType, on_delete=models.CASCADE, null=True, blank=True)
+    tag_type = models.ForeignKey(TagType, on_delete=models.CASCADE, null=True)
+
+    def save(self, *args, **kwargs):
+        """Saves the tag."""
+
+        # If the tag type is not set, set it to the default
+        if not self.tag_type:
+            self.tag_type = TagType.get_default()
+        
+        super().save(*args, **kwargs)
 
     @property
     def total_posts(self):
