@@ -142,3 +142,8 @@ BOORU_STORAGE_URL = '/'
 BOORU_UPLOAD_FOLDER = Path('/tmp/uploads')
 
 BOORU_SHOW_FFMPEG_OUTPUT = os.environ.get("BOORU_SHOW_FFMPEG_OUTPUT", 'False').lower() == 'true' and DEBUG
+
+# Fixtures
+FIXTURE_DIRS = [
+    'booru/fixtures'
+]

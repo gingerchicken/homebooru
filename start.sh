@@ -21,6 +21,12 @@ if [ "$UNIT_TEST" = "True" ]; then
     exit $?
 fi
 
+# Chcek if the LOAD_FIXTURES variable is set and equal to "True"
+if [ "$LOAD_FIXTURES" = "True" ]; then
+    # Load the fixtures
+    python manage.py loaddata booru/fixtures/*.json
+fi
+
 # Check if the debug enviroment variable is set and equal to "False"
 if [ "$DEBUG" = "False" ]; then
     # Collect static files
