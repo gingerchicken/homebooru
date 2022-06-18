@@ -207,17 +207,29 @@ class Post(models.Model):
     def get_sample_path(self):
         """Get the path to the sample image"""
 
-        return settings.BOORU_STORAGE_PATH / f"samples/{self.folder}/sample_{self.md5}.jpg"
+        return settings.BOORU_STORAGE_PATH / self.sample_url
     
     def get_thumbnail_path(self):
         """Get the path to the thumbnail image"""
 
-        return settings.BOORU_STORAGE_PATH / f"thumbnails/{self.folder}/thumbnail_{self.md5}.jpg"
+        return settings.BOORU_STORAGE_PATH / self.thumbnail_url
     
     def get_media_path(self):
         """Get the path to the media file"""
 
-        return settings.BOORU_STORAGE_PATH / f"media/{self.folder}/{self.filename}"
+        return settings.BOORU_STORAGE_PATH / self.media_url
+
+    @property
+    def sample_url(self):
+        return f"samples/{self.folder}/sample_{self.md5}.jpg"
+    
+    @property
+    def thumbnail_url(self):
+        return f"thumbnails/{self.folder}/thumbnail_{self.md5}.jpg"
+    
+    @property
+    def media_url(self):
+        return f"media/{self.folder}/{self.filename}"
 
     @staticmethod
     def create_from_file(file_path : str, owner=None):
