@@ -13,7 +13,42 @@ import booru.boorutils as boorutils
 
 import homebooru.settings
 
-class PostTest(TestCase):
+class PostTest(TestCase): 
+    def test_get_next_folder(self):
+        # Current total posts = 2
+        # Current folder = 1
+
+        self.assertEqual(Post.get_next_folder(), 1)
+
+        # Create a more posts
+        new_posts = 500
+
+        for i in range(new_posts):
+            md5 = boorutils.hash_str(str(i))
+
+            post = Post(width=420, height=420, folder=Post.get_next_folder(), md5=md5)
+            post.save()
+
+        # Current total posts = 2 + 500
+        
+        # Current folder should be ceil(502 / 256) = 2
+        self.assertEqual(Post.get_next_folder(), 2)
+    
+    def test_get_next_folder_variable_size(self):
+        # Create a more posts
+        new_posts = 500
+
+        for i in range(new_posts):
+            md5 = boorutils.hash_str(str(i))
+
+            post = Post(width=420, height=420, folder=Post.get_next_folder(), md5=md5)
+            post.save()
+
+        # Current total posts = 2 + 500
+        
+        # Current folder should be ceil(502 / 50) = 11
+        self.assertEqual(Post.get_next_folder(50), 11)
+
     def test_md5_ignore_case(self):
         md5 = boorutils.hash_str('test')
 
@@ -475,41 +510,6 @@ class PostSearchTest(TestCase):
 
         # Make sure they're in the correct order
         self.assertEqual(tag_names, expected_names)
-    
-    def test_get_next_folder(self):
-        # Current total posts = 2
-        # Current folder = 1
-
-        self.assertEqual(Post.get_next_folder(), 1)
-
-        # Create a more posts
-        new_posts = 500
-
-        for i in range(new_posts):
-            md5 = boorutils.hash_str(str(i))
-
-            post = Post(width=420, height=420, folder=Post.get_next_folder(), md5=md5)
-            post.save()
-
-        # Current total posts = 2 + 500
-        
-        # Current folder should be ceil(502 / 256) = 2
-        self.assertEqual(Post.get_next_folder(), 2)
-    
-    def test_get_next_folder_variable_size(self):
-        # Create a more posts
-        new_posts = 500
-
-        for i in range(new_posts):
-            md5 = boorutils.hash_str(str(i))
-
-            post = Post(width=420, height=420, folder=Post.get_next_folder(), md5=md5)
-            post.save()
-
-        # Current total posts = 2 + 500
-        
-        # Current folder should be ceil(502 / 50) = 11
-        self.assertEqual(Post.get_next_folder(50), 11)
 
 class PostDeleteTest(TestCase):
     temp_storage = testutils.TempStorage()
