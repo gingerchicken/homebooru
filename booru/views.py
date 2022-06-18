@@ -50,6 +50,9 @@ def view(request):
     # Get the resize url parameter
     resize = request.GET.get('resize', '') == '1'
 
+    # Get search phrase url parameter
+    search_phrase = request.GET.get('tags', '')
+
     # Get the post
     post = None
     try:
@@ -62,7 +65,7 @@ def view(request):
     sorted_tags = post.get_sorted_tags()
     
     # Render the view.html template with the post
-    return render(request, 'booru/posts/view.html', {'post': post, 'tags': sorted_tags, 'resize': resize})
+    return render(request, 'booru/posts/view.html', {'post': post, 'tags': sorted_tags, 'resize': resize, 'search_param': search_phrase})
 
 def upload(request):
     # Check if it is a GET request
