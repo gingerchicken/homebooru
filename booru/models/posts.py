@@ -166,6 +166,9 @@ class Post(models.Model):
             
             results = criteria.search(results)
 
+        # Sort the results by their id in descending order
+        results = results.order_by('-id')
+
         return results
 
     @staticmethod
