@@ -67,8 +67,6 @@ def view(request):
     # Get proximate posts
     # TODO make sure this is correct after adding pagination
     proximate_posts = post.get_proximate_posts(Post.search(search_phrase))
-
-    print(proximate_posts)
     
     # Render the view.html template with the post
     return render(request, 'booru/posts/view.html', {
