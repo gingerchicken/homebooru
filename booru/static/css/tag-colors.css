@@ -1,9 +1,3 @@
-/* 'artist': {color: "#A00", hoverColor: "#9093FF"},
-'character': {color: "#0A0", hoverColor: "#9093FF"},
-'metadata': {color: "#A00", hoverColor: "#9093FF"},
-'deprecated': {color: "#c0c0c0;", hoverColor: "#c0c0c0", additional:"text-decoration: line-through;"},
-'copyright': {color: "#A0A", hoverColor: "#9093FF"} */
-
 /* Artist */
 .tag-type-artist > a {
     color: #A00;
