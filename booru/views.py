@@ -41,7 +41,7 @@ def browse(request):
     top_tags = Post.get_search_tags(posts)
 
     # Render the browse.html template with the posts
-    return render(request, 'booru/posts/browse.html', {'posts': posts, 'search_phrase': search_phrase, 'tags': top_tags})
+    return render(request, 'booru/posts/browse.html', {'posts': posts, 'search_param': search_phrase, 'tags': top_tags})
 
 def view(request):
     # Get the post id url parameter
