@@ -312,8 +312,10 @@ class PostSearchTest(TestCase):
         # Search for all posts with tag1
         tag1_only = Post.search('tag1')
         self.assertEqual(len(tag1_only), 2)
-        self.assertEqual(tag1_only[0], self.p1)
-        self.assertEqual(tag1_only[1], self.p2)
+
+        # Post 2 should be first as it was the latest uploaded
+        self.assertEqual(tag1_only[1], self.p1)
+        self.assertEqual(tag1_only[0], self.p2)
     
     def test_no_results_missing_tag(self):
         # Search for all posts with tag1
@@ -324,16 +326,17 @@ class PostSearchTest(TestCase):
         # Search for all posts with tag1
         alls = Post.search('')
         self.assertEqual(len(alls), 2)
-        self.assertEqual(alls[0], self.p1)
-        self.assertEqual(alls[1], self.p2)
+
+        self.assertEqual(alls[1], self.p1)
+        self.assertEqual(alls[0], self.p2)
     
     def test_wildcard(self):
         # Search for all posts with tag1
         wildcard = Post.search('*a*')
 
         self.assertEqual(wildcard.count(), 2)
-        self.assertEqual(wildcard[0], self.p1)
-        self.assertEqual(wildcard[1], self.p2)
+        self.assertEqual(wildcard[1], self.p1)
+        self.assertEqual(wildcard[0], self.p2)
 
         wildcard = Post.search('*2')
         self.assertEqual(wildcard.count(), 1)
