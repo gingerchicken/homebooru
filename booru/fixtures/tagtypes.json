@@ -33,5 +33,12 @@
         "fields": {
             "description": "Something to do with the media format"
         }
+    },
+    {
+        "model": "booru.tagtype",
+        "pk": "copyright",
+        "fields": {
+            "description": "The copyright holder of the character/artwork"
+        }
     }
 ]

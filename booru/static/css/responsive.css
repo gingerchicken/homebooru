@@ -760,3 +760,9 @@ links 006FFA
 .accountHome {
 	font-size: 11px; color: #5a5a5a; font-family: tahoma, arial, sans-serif; width: 300px; float: left; border: 1px solid #f0f0f0; padding: 10px 30px 0px 20px;
 }
+
+/* Tag display */
+.option-title {
+	font-weight: bold;
+	font-size: 12px;
+  }

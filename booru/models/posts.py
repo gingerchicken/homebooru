@@ -1,6 +1,6 @@
 from django.db import models
 
-from .tags import Tag
+from .tags import Tag, TagType
 
 import homebooru.settings as settings
 import booru.boorutils as boorutils
@@ -207,17 +207,29 @@ class Post(models.Model):
     def get_sample_path(self):
         """Get the path to the sample image"""
 
-        return settings.BOORU_STORAGE_PATH / f"samples/{self.folder}/sample_{self.md5}.jpg"
+        return settings.BOORU_STORAGE_PATH / self.sample_url
     
     def get_thumbnail_path(self):
         """Get the path to the thumbnail image"""
 
-        return settings.BOORU_STORAGE_PATH / f"thumbnails/{self.folder}/thumbnail_{self.md5}.jpg"
+        return settings.BOORU_STORAGE_PATH / self.thumbnail_url
     
     def get_media_path(self):
         """Get the path to the media file"""
 
-        return settings.BOORU_STORAGE_PATH / f"media/{self.folder}/{self.filename}"
+        return settings.BOORU_STORAGE_PATH / self.media_url
+
+    @property
+    def sample_url(self):
+        return f"samples/{self.folder}/sample_{self.md5}.jpg"
+    
+    @property
+    def thumbnail_url(self):
+        return f"thumbnails/{self.folder}/thumbnail_{self.md5}.jpg"
+    
+    @property
+    def media_url(self):
+        return f"media/{self.folder}/{self.filename}"
 
     @staticmethod
     def create_from_file(file_path : str, owner=None):
@@ -296,6 +308,53 @@ class Post(models.Model):
             filename=f"{md5}.{file_extension}",
             is_video=is_video
         )
+    
+    def get_sorted_tags(self):
+        """Gets the tags in a sorted manor"""
+
+        # Firstly, get the tags
+        all_tags = self.tags.all()
+
+        # Create an object to store the results
+        orders = {
+            'types': {},
+            'type_orders': []
+        }
+
+        # Get the default tag type
+        default_type = TagType.get_default()
+
+        # Collect the tag types
+        for tag in all_tags:
+            t = tag.tag_type
+
+            # Handle None as just the default
+            if t is None:
+                t = default_type
+            
+            # It might be still None if the database has no types so we will handle that
+            t = t.name if t is not None else 'general'
+
+            # Make sure that t is a string
+            t = str(t)
+
+            # Add the tag to the list
+            if t not in orders['types']:
+                orders['types'][t] = []
+            
+            # Add the tag to the list
+            orders['types'][t].append(tag)
+        
+        # After we have collected the tags, we can sort them
+        # We can sort them in their respective types
+        for type_name, tags in orders['types'].items():
+            orders['types'][type_name] = sorted(tags, key=lambda tag: tag.tag)
+        
+        # Now we can sort the types
+        orders['type_orders'] = sorted(orders['types'].keys())
+
+        # That is all we need to do
+        return orders
 
 
 # Search criteria for the post search

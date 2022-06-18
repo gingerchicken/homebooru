@@ -1,6 +1,7 @@
 from django.test import TestCase
 
-from ...models.posts import Post, Tag
+from ...models.posts import Post
+from ...models.tags import Tag, TagType
 
 import hashlib
 import os
@@ -13,6 +14,25 @@ import booru.boorutils as boorutils
 import homebooru.settings
 
 class PostTest(TestCase):
+    def test_md5_ignore_case(self):
+        md5 = boorutils.hash_str('test')
+
+        # Make the md5 uppercase
+        md5 = md5.upper()
+
+        post = Post(width=420, height=420, folder=1, md5=md5)
+        post.save()
+
+        # Make sure that the md5 is lowercase
+        self.assertEqual(post.md5, md5.lower())
+    
+    def test_rejects_invalid_md5(self):
+        md5 = 'invalid'
+
+        post = Post(width=420, height=420, folder=1, md5=md5)
+        with self.assertRaises(ValueError):
+            post.save()
+
     def test_inc_total(self):
         """Increments the total posts counter"""
 
@@ -67,6 +87,8 @@ class PostTest(TestCase):
         with self.assertRaises(Exception):
             b = Post(width=420, height=420, folder=1, md5='ca6ffc3babb6f0f58a7e5c0c6b61e7bf')
             b.save()
+
+    
 
     # Before each, clear the posts table
     def setUp(self):
@@ -474,26 +496,16 @@ class PostSearchTest(TestCase):
         
         # Current folder should be ceil(502 / 50) = 11
         self.assertEqual(Post.get_next_folder(50), 11)
+
+class PostDeleteTest(TestCase):
+    temp_storage = testutils.TempStorage()
+
+    def setUp(self):
+        self.temp_storage.setUp()
     
-    def test_md5_ignore_case(self):
-        md5 = boorutils.hash_str('test')
+    def tearDown(self):
+        self.temp_storage.tearDown()
 
-        # Make the md5 uppercase
-        md5 = md5.upper()
-
-        post = Post(width=420, height=420, folder=1, md5=md5)
-        post.save()
-
-        # Make sure that the md5 is lowercase
-        self.assertEqual(post.md5, md5.lower())
-    
-    def test_rejects_invalid_md5(self):
-        md5 = 'invalid'
-
-        post = Post(width=420, height=420, folder=1, md5=md5)
-        with self.assertRaises(ValueError):
-            post.save()
-    
     def test_deletes_files_on_delete(self):
         """Deletes related files when deleting a post"""
         # Create a new post
@@ -623,3 +635,86 @@ class PostSearchTest(TestCase):
     #     # Make sure the files don't exist
     #     for path in paths:
     #         self.assertFalse(path.exists())
+
+class PostGetSortedTags(TestCase):
+    fixtures = ['booru/fixtures/tagtypes.json']
+    temp_storage = testutils.TempStorage()
+
+    def setUp(self):
+        self.temp_storage.setUp()
+        super().setUp()
+    
+    def tearDown(self):
+        self.temp_storage.tearDown()
+        super().tearDown()
+    
+    def test_get_sorted_tags(self):
+        """Returns a list of tags sorted by name"""
+
+        # Create a new post
+        p = Post.create_from_file(testutils.SAMPLEABLE_PATH)
+        p.save()
+
+        # Add some tags
+        tags_to_add = '1boy animal_ears brown_eyes brown_hair cat_ears felix_argyle flower hair_flower hair_ornament japanese_clothes re:zero_kara_hajimeru_isekai_seikatsu ribbon shake_sawa short_hair solo white_background wide_sleeves'
+
+        tags = []
+        for tag in tags_to_add.split():
+            p.tags.add(Tag.create_or_get(tag))
+        
+    
+        # Make felix_argyle tag a character tag
+        t = Tag.objects.get(tag='felix_argyle')
+        t.tag_type = TagType.objects.get(name='character')
+        t.save()
+
+        # Make shake_sawa tag an artist tag
+        t = Tag.objects.get(tag='shake_sawa')
+        t.tag_type = TagType.objects.get(name='artist')
+        t.save()
+
+        # Make re:zero_kara_hajimeru_isekai_seikatsu tag a copyright tag
+        t = Tag.objects.get(tag='re:zero_kara_hajimeru_isekai_seikatsu')
+        t.tag_type = TagType.objects.get(name='copyright')
+        t.save()
+
+        # Sort the tags
+        sorted_tags = p.get_sorted_tags()
+
+        for type_name in sorted_tags['types']:
+            for i in range(len(sorted_tags['types'][type_name])):
+                t = sorted_tags['types'][type_name][i]
+                sorted_tags['types'][type_name][i] = t.tag
+
+
+        # Check the order of the types
+        self.assertEqual(sorted_tags['type_orders'], ['artist', 'character', 'copyright', 'general'])
+
+        # Make sure that the tags are in the correct order
+        self.assertEqual(sorted_tags['types']['general'], [
+            "1boy",
+            "animal_ears",
+            "brown_eyes",
+            "brown_hair",
+            "cat_ears",
+            "flower",
+            "hair_flower",
+            "hair_ornament",
+            "japanese_clothes",
+            "ribbon",
+            "short_hair",
+            "solo",
+            "white_background",
+            "wide_sleeves"
+        ])
+
+        self.assertEqual(sorted_tags['types']['character'], [
+            "felix_argyle"
+        ])
+
+        self.assertEqual(sorted_tags['types']['artist'], [
+            "shake_sawa"
+        ])
+    
+    # TODO test empty tags
+    # TODO test if the tag_type is None

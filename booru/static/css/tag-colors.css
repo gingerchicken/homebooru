@@ -1,0 +1,51 @@
+/* 'artist': {color: "#A00", hoverColor: "#9093FF"},
+'character': {color: "#0A0", hoverColor: "#9093FF"},
+'metadata': {color: "#A00", hoverColor: "#9093FF"},
+'deprecated': {color: "#c0c0c0;", hoverColor: "#c0c0c0", additional:"text-decoration: line-through;"},
+'copyright': {color: "#A0A", hoverColor: "#9093FF"} */
+
+/* Artist */
+.tag-type-artist > a {
+    color: #A00;
+}
+
+.tag-type-artist > a:hover {
+    color: #9093FF;
+}
+
+/* Character */
+.tag-type-character > a {
+    color: #0A0;
+}
+
+.tag-type-character > a:hover {
+    color: #9093FF;
+}
+
+/* Metadata */
+.tag-type-metadata > a {
+    color: #A00;
+}
+
+.tag-type-metadata > a:hover {
+    color: #9093FF;
+}
+
+/* Deprecated */
+.tag-type-deprecated > a {
+    color: #c0c0c0;
+    text-decoration: line-through;
+}
+
+.tag-type-deprecated > a:hover {
+    color: #c0c0c0;
+}
+
+/* Copyright */
+.tag-type-copyright > a {
+    color: #A0A;
+}
+
+.tag-type-copyright > a:hover {
+    color: #9093FF;
+}
