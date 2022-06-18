@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head id="default-head">
+	<title>Homebooru | {% if post.title %}{{ post.title }}{% else %}{% for tag in post.tags.all %}{{tag.tag}} {% endfor %}{% endif %}</title>
+
+    {% include "booru/components/head.html" %}
+    {% load static %}
+</head>
+
+<body>
+	<img style="position:absolute;left:-10px;" src="/layout/homebooru-com-pix.bmp">
+	<div class="container-fluid">
+        {% include "booru/components/nav-bar.html" %}
+		{% include "booru/posts/components/nav-bar.html" %}
+	</div>
+	<div class="alert alert-warning small" style="padding: 10px 15px 10px 15px; font-size: 11px; display: none;" id="motd"></div>
+
+	<div style="display: inline; padding: 0px 15px 0px 15px;" id="motdspacer">&nbsp;</div>
+	
+    <div class="padding15">
+		<div class="alert alert-info" id="pool-alert" style="display: none;"><a href="#">This post belongs to one or more pools</a></div>
+
+		<span class="hidden-sm hidden-md hidden-lg" style="text-align: center;"><a href="javascript:;" onclick="$('#tag-list').toggleClass('hidden-xs'); return false;"><b>Toggle Tags</b></a><br><br></span>
+		<ul id="tag-list" class='hidden-xs'>
+			{% include "booru/posts/components/search.html" %}
+            {% with tags as sorted_tags%}{% include "booru/posts/components/sorted-tags.html" %}{% endwith %}
+			<div id="searchTags"></div>
+			<div id="postStatistics">
+				<h3>Statistics</h3>
+				<li>Id: {{ post.id }}</li>
+				<li>Posted: {{post.timestamp}}<br> by <a href="#">{% if post.owner %}{{post.owner}}{% else %}Anonymous User{% endif %}</a></li>
+				<li>Size: {{ post.width }}x{{ post.height }}</li>
+				{% if post.source|length > 0 %}<li>Source: <a href="{{post.source}}" rel="nofollow">{{post.source}}</a></li>{% endif %}
+				<li>Rating: {{post.rating|title}}</li>
+				<li>Score: <span>{{post.score}}</span> 
+					(vote <a href="javascript:;" onclick="postVote('up');">Up</a>)
+				</li>
+				<li style="padding-top: 10px;"></li>
+			</div>
+			<div id="postOption">
+				<h3>Options</h3>
+                <li><a href="?id={{post.id}}&tags={{search_param}}&resize=1" onclick="Homebooru.Posts.setImageUrl('{{post.media_url}}'); $('#resized_notice').hide(); return false;">Resize</a></li>
+                <li><a href="{{post.media_url}}" target="_blank" style="font-weight: bold;">Original</a></li>
+                <li><a href="#" onclick="if(confirm('Are you sure you want to delete this post?')){ Homebooru.Posts.remove('<%= image.id %>'); } else return false;">Delete</a></li>
+                <li><div id="pfd"><a href="#" onclick="pflag({{post.id}}); return false;">Flag for deletion</a></div></li>
+                <li><a href="#" onclick="postVote('up'); addFav({{post.id}}); return false;">Add to favorites</a></li>
+                <li><a href="#" onclick="Homebooru.Pools.addImage({{post.id}}); return false;">Add to Pool</a></li>
+                <li><a href="#" onclick="Homebooru.Posts.lockPost(); return false;">Lock</a></li>
+			</div>
+		</ul><span id="nup"></span>
+	</div>
+	<div style="margin-left: 15px; margin-right: 15px;">
+		<div class="contain-push" style="height: 100%;">
+			{% if post.sample and not resize %}
+			<div class="alert alert-info" id="resized_notice">
+				This image has been resized. Click <a href="?id={{post.id}}&tags={{search_param}}&resize=1" onclick="Homebooru.Posts.setImageUrl('<%= originalUrl %>'); $('#resized_notice').hide(); return false;"><b>here</b></a> to view the original image.
+				<a href="#" onclick="Cookie.create('resize-original',1); Cookie.create('resize-notification',1); Homebooru.Posts.setImageUrl('<%= originalUrl %>'); $('#resized_notice').hide(); return false;"><b>Always view original</b></a> | <a href="#" onclick="Cookie.create('resize-notification',1); $('#resized_notice').hide(); return false;"><b>Do not show this message</b></a>.
+			</div>
+			{% endif %}
+			<div style="max-width: 728px; overflow: hidden;"></div>
+			{% comment %} <div class="alert alert-info" style="width: 728px;">
+				<a href="/view/?id=<%= previousImage %>&tags=<%= searchParam %>">Previous</a> <a href="/view/?id=<%= nextImage %>&tags=<%= searchParam %>" style="float:right;">Next</a>
+			</div> {% endcomment %}
+		
+			<div id="post-view">
+				<div id="right-col">
+					<div>
+						<div id="note-container"></div>
+						<div id="image-container">
+							{% if post.is_video == 1 %}
+								<video src="{{post.media_url}}" style="width:100%; max-width: 1000px;" controls>
+									<source id="image-video-source" type="video/mp4">
+	
+									Your browser does not support HTML5 video.
+								</video>
+							{% else %}
+								<img id="image" src="{% if post.sample and not resize %}{{post.sample_url}}{% else %}{{post.media_url}}{% endif %}" alt="{% for tag in post.tags.all %}{{tag.tag}} {% endfor %}" {% if post.sample %} data-original-width="{{post.width}}" data-original-height="{{post.height}}" {% endif %}>
+							{% endif %}
+						</div>
+						<br>
+						<div style="margin-bottom: 1em;">
+							<p id="note-count"></p>
+						</div>
+						<section id="notes" style="display: none;">
+						</section>
+		
+						{% comment %} <h4><a href="javascript:;" onclick="Homebooru.Posts.toggleCommentBox()" id="showCommentBox">Respond</a> | <a href="javascript:;" onclick="Homebooru.Posts.toggleEditForm()" id="showEditForm">Edit</a>
+						</h4>
+						<div id="edit-box" style="display: none;">
+							<form method="post" action="javascript:;" onsubmit="Homebooru.Posts.editPost(this, <%= image.id %>)" id="edit-form" name="edit_form">
+								<table>
+								   <tr>
+									   	Rating
+										<br>
+										<input type="radio" name="rating" value="explicit" <%= image.rating.toLowerCase().startsWith('e') ? 'checked' : 'unchecked' %>>Explicit
+										<input type="radio" name="rating" value="questionable" <%= image.rating.toLowerCase().startsWith('q') ? 'checked' : 'unchecked' %>>Questionable
+										<input type="radio" name="rating" value="safe" <%= image.rating.toLowerCase().startsWith('s') ? 'checked' : 'unchecked' %>>Safe
+								   </tr>
+								   <tr>
+									  <td>Title<br><input type="text" name="title" id="title" value="<%= image.title || ''%>"></td>
+								   </tr>
+								   <tr>
+									  <td>Source<br><input type="text" name="source" size="40" id="source" value="<%= image.source || '' %>"></td>
+								   </tr>
+								   <tr>
+									  <td>Tags<br><textarea cols="100" id="tags" name="tags" rows="8" tabindex="10"><%= image.tags %></textarea></td>
+								   </tr>
+								   <tr>
+									  <td><input type="submit" name="submit" value="Save changes"></td>
+								   </tr>
+								</table>
+							 </form>
+						</div>
+		
+						
+						<br>
+						<br>
+
+						<%= comments.length %> comment<a href="#" id="ci" onclick="Homebooru.UI.showHideIgnored(5062701,'ci'); return false;"> (0 hidden)</a>
+						<br>
+						<div id="comments">
+							<% comments.forEach(comment => { %>
+								<% let commentUser = commentsUserData[comment.userId];%>
+								<div id="c<%= comment.id %>" class="commentBox">
+									<img src="/avatars/avatar_anonymous.png" alt="avatar" style="max-height: 49px; max-width: 30px; margin-right: 10px;"><a href="<%= commentUser ? '/profile/'+comment.userId : 'javascript:;' %>"><%= commentUser ? commentUser.nicename : 'Anonymous' %></a> <span style="font-size: 11px; color: #8f8f8f;">&gt;&gt; #<%= comment.id %></span><br><b>Posted on <%= formatDate(comment.timestamp*1000) %> (<a id="rc2475041"></a><a href="#" id="rcl2475041" onclick="Javascript:cflag('2475041'); return false;">Report as spam</a>)  </b> Score: <b><span id="sc2475041">0</span></b> (Vote <a href="#" onclick="Javascript:vote('5054041', '2475041', 'up'); return false;">Up</a>)<br><%= comment.comment %><br>
+								</div>
+							<% }) %>
+						</div>
+
+						<br>
+						<br>
+						<div id="comment-box" style="display: none;">
+							<textarea name="comment" id="comment" rows="7" cols="60" form="comment-form"></textarea>
+							<form method="post" action="javascript:;" onsubmit="return Homebooru.Posts.postComment(this);" name="comment-form" id="comment-form">
+								<% if (session.data['user']) {%>
+									<br>Post as anonymous?	<input type="checkbox" name="post-anonymous">
+								<% } %>
+								<br><input type="submit" name="submit" value="Post comment">
+							 </form>
+						</div> {% endcomment %}
+						<br>
+						<br>
+						<br>
+						<br>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br>
+		<br>
+	</div>
+</body>
+</html>

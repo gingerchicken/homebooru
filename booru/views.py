@@ -1,8 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 
-from .models import Post
-
 import magic
 import os
 import time
@@ -10,7 +8,16 @@ import json
 
 import booru.boorutils as boorutils
 import homebooru.settings
+
 from .models.tags import Tag
+from .models import Post
+
+from django.template.defaulttags import register
+
+# Jinja trolling
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
 
 # Create your views here.
 def index(request):
@@ -35,6 +42,27 @@ def browse(request):
 
     # Render the browse.html template with the posts
     return render(request, 'booru/posts/browse.html', {'posts': posts, 'search_phrase': search_phrase, 'tags': top_tags})
+
+def view(request):
+    # Get the post id url parameter
+    post_id = request.GET.get('id', '')
+
+    # Get the resize url parameter
+    resize = request.GET.get('resize', '') == '1'
+
+    # Get the post
+    post = None
+    try:
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        # Send a 404
+        return HttpResponse(status=404)
+    
+    # Get the sorted tags
+    sorted_tags = post.get_sorted_tags()
+    
+    # Render the view.html template with the post
+    return render(request, 'booru/posts/view.html', {'post': post, 'tags': sorted_tags, 'resize': resize})
 
 def upload(request):
     # Check if it is a GET request

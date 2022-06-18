@@ -1,0 +1,12 @@
+{% comment %} {% for type, tags in sorted_tags.types.items %}
+<h4>{{ type|title }}</h4>
+{% include "booru/posts/components/tag-display.html" %}
+{% endfor %} {% endcomment %}
+{% for type in sorted_tags.type_orders %}
+    <span class="option-title">{{ type|title }}</span>
+    {% with sorted_tags.types|get_item:type as tags %}
+        {% include "booru/posts/components/tag-display.html" %}
+        <br>
+    {% endwith %}
+
+{% endfor %}

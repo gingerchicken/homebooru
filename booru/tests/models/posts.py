@@ -715,3 +715,6 @@ class PostGetSortedTags(TestCase):
         self.assertEqual(sorted_tags['types']['artist'], [
             "shake_sawa"
         ])
+    
+    # TODO test empty tags
+    # TODO test if the tag_type is None
