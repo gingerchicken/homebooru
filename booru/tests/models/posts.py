@@ -439,11 +439,19 @@ class PostSearchTest(TestCase):
         # Get the list of tag names
         tag_names = [tag.tag for tag in tags]
 
+        # We should expect a list of tags sorted by the total posts
+        expected_tags = [tag for tag in tags]
+        # Sort the tags by total_posts
+        expected_tags.sort(key=lambda tag: tag.total_posts, reverse=True)
+        expected_tags = [tag.tag for tag in expected_tags]
+
+        # Make sure it starts with tag1
+        self.assertEqual(tag_names[0], 'tag1')
+
         # Make sure they're in the correct order
-        self.assertEqual(tag_names, ['tag1', 'tag2', 'tag3', 'tag4'])
+        self.assertEqual(tag_names, expected_tags)
 
         # Make sure that their order changes
-        
         self.p1.tags.add(self.tag4)
         self.p1.save()
 
@@ -457,13 +465,16 @@ class PostSearchTest(TestCase):
 
         tags = Post.get_search_tags(results, depth=1) # Only return the first image's tags
 
-        self.assertEqual(len(tags), 2)
+        self.assertEqual(len(tags), 3)
 
         # Get the list of tag names
         tag_names = [tag.tag for tag in tags]
 
+        # The only tags that should be displayed are the tags from the second post
+        expected_names = [tag.tag for tag in self.p2.tags.all()]
+
         # Make sure they're in the correct order
-        self.assertEqual(tag_names, ['tag1', 'tag2'])
+        self.assertEqual(tag_names, expected_names)
     
     def test_get_next_folder(self):
         # Current total posts = 2
