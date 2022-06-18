@@ -732,3 +732,129 @@ class PostGetSortedTags(TestCase):
     
     # TODO test empty tags
     # TODO test if the tag_type is None
+
+class PostGetProximatePosts(TestCase):
+    fixtures = ['booru/fixtures/tagtypes.json']
+    temp_storage = testutils.TempStorage()
+
+    newest = None
+    middle = None
+    oldest = None
+    olderest = None
+
+    def setUp(self):
+        self.temp_storage.setUp()
+        super().setUp()
+
+        self.olderest = Post.create_from_file(testutils.VIDEO_PATH)
+        self.olderest.save()
+
+        self.oldest = Post.create_from_file(testutils.SAMPLEABLE_PATH)
+        self.oldest.save()
+
+        self.middle = Post.create_from_file(testutils.GATO_PATH)
+        self.middle.save()
+
+        self.newest = Post.create_from_file(testutils.FELIX_PATH)
+        self.newest.save()
+
+    def tearDown(self):
+        self.temp_storage.tearDown()
+        super().tearDown()
+    
+    def test_get_proximate_posts(self):
+        """Returns expected posts for middle"""
+        # Delete olderest
+        self.olderest.delete()
+        
+        # Search for all posts
+        results = Post.search('')
+    
+        # Get the posts
+        posts = self.middle.get_proximate_posts(results)
+
+        self.assertEqual(posts['newer'], self.newest)
+        self.assertEqual(posts['older'], self.oldest)
+    
+    def test_newest_edge_case(self):
+        """Returns expected posts for newest"""
+        # Delete olderest
+        self.olderest.delete()
+        
+        # Search for all posts
+        results = Post.search('')
+    
+        # Get the posts
+        posts = self.newest.get_proximate_posts(results)
+
+        self.assertEqual(posts['newer'], None)
+        self.assertEqual(posts['older'], self.middle)
+    
+    def test_oldest_edge_case(self):
+        """Returns expected posts for oldest"""
+        
+        # Delete olderest
+        self.olderest.delete()
+
+        # Search for all posts
+        results = Post.search('')
+    
+        # Get the posts
+        posts = self.oldest.get_proximate_posts(results)
+
+        self.assertEqual(posts['newer'], self.middle)
+        self.assertEqual(posts['older'], None)
+
+    most_newest = None
+    def set_up_most_newest(self):
+        # Delete olderest
+        self.olderest.delete()
+
+        # Add a new post
+        self.most_newest = Post.create_from_file(testutils.VIDEO_PATH)
+        self.most_newest.save()
+
+    def test_with_varying_results(self):
+        """Make sure that it respects the search query"""
+        self.set_up_most_newest()
+
+        # Add tags to all but the newest
+        self.oldest.tags.add(Tag.create_or_get('test'))
+        self.middle.tags.add(Tag.create_or_get('test'))
+
+        # Save the posts
+        self.oldest.save()
+        self.middle.save()
+
+        # Add tags to the new post
+        self.most_newest.tags.add(Tag.create_or_get('test'))
+        self.most_newest.save()
+
+        # Search for 'test' posts
+        results = Post.search('test')
+
+        # Get the posts
+        posts = self.middle.get_proximate_posts(results)
+
+        self.assertEqual(posts['newer'], self.most_newest)
+        self.assertEqual(posts['older'], self.oldest)
+
+    def test_biased_to_newest(self):
+        # Delete olderest
+        self.set_up_most_newest()
+
+        # Check bias
+        results = Post.search('')
+
+        posts = self.middle.get_proximate_posts(results)
+
+        self.assertEqual(posts['newer'], self.newest)
+        self.assertEqual(posts['older'], self.oldest)
+    
+    def test_biased_to_oldest(self):
+        # Check bias
+        results = Post.search('')
+
+        posts = self.middle.get_proximate_posts(results)
+        self.assertEqual(posts['newer'], self.newest)
+        self.assertEqual(posts['older'], self.oldest)

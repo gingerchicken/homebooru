@@ -359,6 +359,28 @@ class Post(models.Model):
         # That is all we need to do
         return orders
 
+    def get_proximate_posts(self, search_results : models.QuerySet):
+        """Get the posts that are proximate to this one"""
+
+        # Get the first result where the id is less than this one (i.e. it was added earlier)
+        older = None
+        try:
+            older = search_results.filter(id__lt=self.id).first()
+        except Post.DoesNotExist as e:
+            pass
+
+        # Get the second result where the id is greater than this one (i.e. it was added later)
+        newer = None
+        try:
+            newer = search_results.filter(id__gt=self.id).last()
+        except Post.DoesNotExist as e:
+            pass
+
+        # Return the results
+        return {
+            'older': older,
+            'newer': newer
+        }
 
 # Search criteria for the post search
 

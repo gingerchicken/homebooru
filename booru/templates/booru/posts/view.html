@@ -58,9 +58,9 @@
 			</div>
 			{% endif %}
 			<div style="max-width: 728px; overflow: hidden;"></div>
-			{% comment %} <div class="alert alert-info" style="width: 728px;">
-				<a href="/view/?id=<%= previousImage %>&tags=<%= searchParam %>">Previous</a> <a href="/view/?id=<%= nextImage %>&tags=<%= searchParam %>" style="float:right;">Next</a>
-			</div> {% endcomment %}
+			<div class="alert alert-info" style="width: 728px;">
+				<a href="{% if next %}/view?id={{next.id}}&tags={{search_param}}{% else %}#{% endif %}">Next</a> <a href="{% if previous %}/view?id={{previous.id}}&tags={{search_param}}{% else %}#{% endif %}" style="float:right;">Previous</a>
+			</div>
 		
 			<div id="post-view">
 				<div id="right-col">

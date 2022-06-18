@@ -41,7 +41,7 @@ def browse(request):
     top_tags = Post.get_search_tags(posts)
 
     # Render the browse.html template with the posts
-    return render(request, 'booru/posts/browse.html', {'posts': posts, 'search_phrase': search_phrase, 'tags': top_tags})
+    return render(request, 'booru/posts/browse.html', {'posts': posts, 'search_param': search_phrase, 'tags': top_tags})
 
 def view(request):
     # Get the post id url parameter
@@ -49,6 +49,9 @@ def view(request):
 
     # Get the resize url parameter
     resize = request.GET.get('resize', '') == '1'
+
+    # Get search phrase url parameter
+    search_phrase = request.GET.get('tags', '')
 
     # Get the post
     post = None
@@ -60,9 +63,22 @@ def view(request):
     
     # Get the sorted tags
     sorted_tags = post.get_sorted_tags()
+
+    # Get proximate posts
+    # TODO make sure this is correct after adding pagination
+    proximate_posts = post.get_proximate_posts(Post.search(search_phrase))
+
+    print(proximate_posts)
     
     # Render the view.html template with the post
-    return render(request, 'booru/posts/view.html', {'post': post, 'tags': sorted_tags, 'resize': resize})
+    return render(request, 'booru/posts/view.html', {
+        'post': post,
+        'tags': sorted_tags,
+        'resize': resize,
+        'search_param': search_phrase,
+        'next': proximate_posts['newer'],
+        'previous': proximate_posts['older']
+    })
 
 def upload(request):
     # Check if it is a GET request
