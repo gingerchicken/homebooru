@@ -11,6 +11,7 @@ import homebooru.settings
 
 from .models.tags import Tag
 from .models import Post
+from .pagination import Paginator
 
 from django.template.defaulttags import register
 
@@ -34,14 +35,33 @@ def browse(request):
     # Get the search phrase url parameter
     search_phrase = request.GET.get('tags', '')
 
+    # Get the page url parameter
+    page = request.GET.get('pid', '1')
+
+    # TODO validate the page parameter
+    page = int(page)
+
     # Search with the given search phrase
-    posts = Post.search(search_phrase)
+    posts, pagination = Post.search(
+        search_phrase,
+        paginate=True,
+        page=page,
+        per_page=10
+    )
+
+    # Configure the pagination
+    pagination.page_url = '/browse/?tags=' + search_phrase
 
     # Find the top tags
     top_tags = Post.get_search_tags(posts)
 
     # Render the browse.html template with the posts
-    return render(request, 'booru/posts/browse.html', {'posts': posts, 'search_param': search_phrase, 'tags': top_tags})
+    return render(request, 'booru/posts/browse.html', {
+        'posts': posts,
+        'search_param': search_phrase,
+        'tags': top_tags,
+        'paginator': pagination
+    })
 
 def view(request):
     # Get the post id url parameter
@@ -67,8 +87,6 @@ def view(request):
     # Get proximate posts
     # TODO make sure this is correct after adding pagination
     proximate_posts = post.get_proximate_posts(Post.search(search_phrase))
-
-    print(proximate_posts)
     
     # Render the view.html template with the post
     return render(request, 'booru/posts/view.html', {
