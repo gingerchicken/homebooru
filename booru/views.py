@@ -46,7 +46,7 @@ def browse(request):
         search_phrase,
         paginate=True,
         page=page,
-        per_page=10
+        per_page=homebooru.settings.BOORU_POSTS_PER_PAGE
     )
 
     # Configure the pagination
