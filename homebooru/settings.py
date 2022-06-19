@@ -139,6 +139,7 @@ BOORU_STORAGE_PATH = Path(os.environ.get("BOORU_STORAGE_PATH", "data/storage"))
 BOORU_ALLOWED_FILE_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "webm", "mp4", "webp"]
 BOORU_VIDEO_FILE_EXTENSIONS = ["webm", "mp4"]
 BOORU_STORAGE_URL = '/'
+BOORU_STORAGE_SUBFOLDERS = ['media', 'thumbnails', 'samples']
 BOORU_UPLOAD_FOLDER = Path('/tmp/uploads')
 BOORU_DEFAULT_TAG_TYPE_PK = 'general'
 

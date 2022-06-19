@@ -57,7 +57,7 @@ def browse(request):
     )
 
     # Configure the pagination
-    pagination.page_url = '/browse/?tags=' + search_phrase
+    pagination.page_url = '/browse?tags=' + search_phrase
 
     # Find the top tags
     top_tags = Post.get_search_tags(posts)
