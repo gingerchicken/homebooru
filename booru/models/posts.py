@@ -4,6 +4,7 @@ from .tags import Tag, TagType
 
 import homebooru.settings as settings
 import booru.boorutils as boorutils
+from booru.pagination import Paginator
 
 import math
 import pathlib
@@ -175,7 +176,7 @@ class Post(models.Model):
             offset = (page - 1) * per_page
 
             # Thanks to https://stackoverflow.com/a/53864585/8736749
-            results = results[offset : offset + limit]
+            return results[offset : offset + limit], Paginator(page, results.count(), per_page)
 
         return results
 

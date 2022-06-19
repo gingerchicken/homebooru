@@ -2,6 +2,7 @@ from django.test import TestCase
 
 from ...models.posts import Post
 from ...models.tags import Tag, TagType
+from ...pagination import Paginator
 
 import hashlib
 import os
@@ -523,7 +524,7 @@ class PostSearchTest(TestCase):
             ps.append(post)
         
         # Search for all posts
-        results = Post.search('', paginate=True, page=1, per_page=10)
+        results = Post.search('', paginate=True, page=1, per_page=10)[0]
 
         # There should be 10 results
         self.assertEqual(results.count(), 10)
@@ -537,8 +538,13 @@ class PostSearchTest(TestCase):
         max_pages = math.ceil(len(all_posts) / 10)
         
         for page in range(2, max_pages + 1):
+            all_results = Post.search('', paginate=True, page=page, per_page=10)
+
             # Search for the next page
-            results = Post.search('', paginate=True, page=page, per_page=10)
+            results = all_results[0]
+
+            # Make sure that the second part of the results is of the Paginator type
+            self.assertIsInstance(all_results[1], Paginator)
 
             total = len(all_posts) % 10 if page == max_pages else 10
 
