@@ -23,7 +23,7 @@
 		<span class="hidden-sm hidden-md hidden-lg" style="text-align: center;"><a href="javascript:;" onclick="$('#tag-list').toggleClass('hidden-xs'); return false;"><b>Toggle Tags</b></a><br><br></span>
 		<ul id="tag-list" class='hidden-xs'>
 			{% include "booru/posts/components/search.html" %}
-            {% with tags as sorted_tags%}{% include "booru/posts/components/sorted-tags.html" %}{% endwith %}
+            {% with tags as sorted_tags%}{% with "view?id="|concat:post.id as url %}{% include "booru/posts/components/sorted-tags.html" %}{% endwith %}{% endwith %}
 			<div id="searchTags"></div>
 			<div id="postStatistics">
 				<h3>Statistics</h3>

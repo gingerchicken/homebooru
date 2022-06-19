@@ -1,7 +1,7 @@
 {% for tag in tags %}
     <li class="tag-type-{{tag.tag_type.name}}">
         <a href="/wiki#tag-{{ tag.tag }}" title="Wiki">?</a>
-        <a rel="nofollow" href="javascript:;" onclick="#" title="Add to search">+</a> <a rel="nofollow" href="javascript:;" onclick="#" title="Remove from search">-</a>
+        <a rel="nofollow" href="{{url}}&tags={{search_param}} {{tag.tag}}" title="Add to search">+</a> <a rel="nofollow" href="{{url}}&tags={{search_param|remove:tag.tag}}" title="Remove from search">-</a>
         <a href="/browse?tags={{tag.tag}}" rel="nofollow">{{tag.tag|tag_view}}</a>  <span style="color: #a0a0a0;">{{tag.total_posts}}</span>
     </li>
 {% endfor %}

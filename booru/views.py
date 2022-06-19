@@ -25,6 +25,14 @@ def tag_view(tag_name):
     # Replace _ with spaces
     return tag_name.replace('_', ' ')
 
+@register.filter
+def remove(string, to_remove):
+    return string.replace(to_remove, '')
+
+@register.filter
+def concat(string, cat):
+    return string + str(cat)
+
 # Create your views here.
 def index(request):
     # Get the total posts
@@ -38,7 +46,7 @@ def index(request):
 
 def browse(request):
     # Get the search phrase url parameter
-    search_phrase = request.GET.get('tags', '')
+    search_phrase = request.GET.get('tags', '').strip()
 
     # Get the page url parameter
     page = request.GET.get('pid', '1')
@@ -83,7 +91,7 @@ def view(request):
     resize = request.GET.get('resize', '') == '1'
 
     # Get search phrase url parameter
-    search_phrase = request.GET.get('tags', '')
+    search_phrase = request.GET.get('tags', '').strip()
 
     # Get the post
     post = None

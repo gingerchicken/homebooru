@@ -50,7 +50,9 @@
 					</center>
 				</li>
 				<h4>Tags</h4>
-				{% include "booru/posts/components/tag-display.html" %}
+				{% with "/browse?" as url %}
+					{% include "booru/posts/components/tag-display.html" %}
+				{% endwith %}
 			</div>
 		</ul><span id="nup"></span>
 	</div>
