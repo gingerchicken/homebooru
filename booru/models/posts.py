@@ -4,6 +4,7 @@ from .tags import Tag, TagType
 
 import homebooru.settings as settings
 import booru.boorutils as boorutils
+from booru.pagination import Paginator
 
 import math
 import pathlib
@@ -92,7 +93,7 @@ class Post(models.Model):
         super(Post, self).delete(*args, **kwargs)
 
     @staticmethod
-    def search(search_phrase, wild_card="*"):
+    def search(search_phrase, wild_card="*", paginate=False, page=1, per_page=20):
         """Search for posts that match a user entered search phrase"""
 
         search_criteria = [] 
@@ -168,6 +169,14 @@ class Post(models.Model):
 
         # Sort the results by their id in descending order
         results = results.order_by('-id')
+
+        # If pagination is enabled, select the correct page
+        if paginate:
+            limit = per_page
+            offset = (page - 1) * per_page
+
+            # Thanks to https://stackoverflow.com/a/53864585/8736749
+            return results[offset : offset + limit], Paginator(page, results.count(), per_page)
 
         return results
 

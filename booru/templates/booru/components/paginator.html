@@ -1,4 +1,23 @@
-{% if total_pages > 0 %}
+{% if paginator.total_pages > 1 %}
     <div id="paginator">
+        <div class="pagination">
+            {% if paginator.display_arrows_left %}
+                <a href="{{paginator.page_url}}&pid=1" alt="first page">«</a>
+                <a href="{{paginator.page_url}}&pid={{paginator.pid}}" alt="previous page">‹</a>
+            {% endif %}
+            
+            {% for page_number in paginator.numbers %}
+                {% if page_number == paginator.page %}
+                    <b class="current">{{ page_number }}</b>
+                {% else %}
+                    <a href="{{paginator.page_url}}&pid={{page_number}}">{{page_number}}</a>
+                {% endif %}
+            {% endfor %}
+    
+            {% if paginator.display_arrows_right %}
+                <a href="{{paginator.page_url}}&pid={{paginator.pid}}" alt="next page">›</a>
+                <a href="{{paginator.page_url}}&pid={{paginator.total_pages}}" alt="last page">»</a>
+            {% endif %}
+        </div>
     </div>
 {% endif %}

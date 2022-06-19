@@ -2,18 +2,55 @@ from django.test import TestCase
 
 from ...models.posts import Post
 from ...models.tags import Tag, TagType
+from ...pagination import Paginator
 
 import hashlib
 import os
 import pathlib
 import shutil
+import math
 
 import booru.tests.testutils as testutils
 import booru.boorutils as boorutils
 
 import homebooru.settings
 
-class PostTest(TestCase):
+class PostTest(TestCase): 
+    def test_get_next_folder(self):
+        # Current total posts = 2
+        # Current folder = 1
+
+        self.assertEqual(Post.get_next_folder(), 1)
+
+        # Create a more posts
+        new_posts = 500
+
+        for i in range(new_posts):
+            md5 = boorutils.hash_str(str(i))
+
+            post = Post(width=420, height=420, folder=Post.get_next_folder(), md5=md5)
+            post.save()
+
+        # Current total posts = 2 + 500
+        
+        # Current folder should be ceil(502 / 256) = 2
+        self.assertEqual(Post.get_next_folder(), 2)
+    
+    def test_get_next_folder_variable_size(self):
+        # Create a more posts
+        new_posts = 500
+
+        for i in range(new_posts):
+            md5 = boorutils.hash_str(str(i))
+
+            post = Post(width=420, height=420, folder=Post.get_next_folder(), md5=md5)
+            post.save()
+
+        # Current total posts = 2 + 500
+        
+        # Current folder should be ceil(502 / 50) = 11
+        self.assertEqual(Post.get_next_folder(50), 11)
+
     def test_md5_ignore_case(self):
         md5 = boorutils.hash_str('test')
 
@@ -476,40 +513,50 @@ class PostSearchTest(TestCase):
         # Make sure they're in the correct order
         self.assertEqual(tag_names, expected_names)
     
-    def test_get_next_folder(self):
-        # Current total posts = 2
-        # Current folder = 1
+    def test_pagination(self):
+        ps = []
 
-        self.assertEqual(Post.get_next_folder(), 1)
-
-        # Create a more posts
-        new_posts = 500
-
-        for i in range(new_posts):
-            md5 = boorutils.hash_str(str(i))
-
-            post = Post(width=420, height=420, folder=Post.get_next_folder(), md5=md5)
+        # Create a bunch of posts
+        for i in range(0, 100):
+            post = Post(width=420, height=420, folder=0, md5=boorutils.hash_str(str(i)))
             post.save()
 
-        # Current total posts = 2 + 500
+            ps.append(post)
         
-        # Current folder should be ceil(502 / 256) = 2
-        self.assertEqual(Post.get_next_folder(), 2)
-    
-    def test_get_next_folder_variable_size(self):
-        # Create a more posts
-        new_posts = 500
+        # Search for all posts
+        results = Post.search('', paginate=True, page=1, per_page=10)[0]
 
-        for i in range(new_posts):
-            md5 = boorutils.hash_str(str(i))
-
-            post = Post(width=420, height=420, folder=Post.get_next_folder(), md5=md5)
-            post.save()
-
-        # Current total posts = 2 + 500
+        # There should be 10 results
+        self.assertEqual(results.count(), 10)
         
-        # Current folder should be ceil(502 / 50) = 11
-        self.assertEqual(Post.get_next_folder(50), 11)
+        all_posts = Post.objects.all()
+
+        # Results should be the last 10 posts
+        for i in range(0, 10):
+            self.assertEqual(results[i], all_posts[len(all_posts) - i - 1])
+
+        max_pages = math.ceil(len(all_posts) / 10)
+        
+        for page in range(2, max_pages + 1):
+            all_results = Post.search('', paginate=True, page=page, per_page=10)
+
+            # Search for the next page
+            results = all_results[0]
+
+            # Make sure that the second part of the results is of the Paginator type
+            self.assertIsInstance(all_results[1], Paginator)
+
+            total = len(all_posts) % 10 if page == max_pages else 10
+
+            # There should be 10 results
+            self.assertEqual(results.count(), total)
+
+            # Results should be the last 90-80 posts
+            for i in range(0, total):
+                self.assertEqual(
+                    results[i],
+                    all_posts[len(all_posts) - i - 1 - (page - 1) * 10]
+                )
 
 class PostDeleteTest(TestCase):
     temp_storage = testutils.TempStorage()

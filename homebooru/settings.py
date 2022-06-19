@@ -144,6 +144,8 @@ BOORU_DEFAULT_TAG_TYPE_PK = 'general'
 
 BOORU_SHOW_FFMPEG_OUTPUT = os.environ.get("BOORU_SHOW_FFMPEG_OUTPUT", 'False').lower() == 'true' and DEBUG
 
+BOORU_POSTS_PER_PAGE = 20
+
 # Fixtures
 FIXTURE_DIRS = [
     'booru/fixtures'
