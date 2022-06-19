@@ -38,8 +38,15 @@ def browse(request):
     # Get the page url parameter
     page = request.GET.get('pid', '1')
 
-    # TODO validate the page parameter
-    page = int(page)
+    # Make sure that page is an integer
+    try:
+        page = int(page)
+    except ValueError:
+        page = 1
+
+    # Make sure that page is greater than 0
+    if page < 1:
+        page = 1
 
     # Search with the given search phrase
     posts, pagination = Post.search(
