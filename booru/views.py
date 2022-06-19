@@ -20,6 +20,11 @@ from django.template.defaulttags import register
 def get_item(dictionary, key):
     return dictionary.get(key)
 
+@register.filter
+def tag_view(tag_name):
+    # Replace _ with spaces
+    return tag_name.replace('_', ' ')
+
 # Create your views here.
 def index(request):
     # Get the total posts
