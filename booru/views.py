@@ -121,7 +121,13 @@ def view(request):
 def upload(request):
     # Check if it is a GET request
     if request.method == 'GET':
-        return render(request, 'booru/posts/upload.html')
+        # Get all of the ratings
+        ratings = Rating.objects.all()
+
+        return render(request, 'booru/posts/upload.html', {
+            'ratings': ratings,
+            'default_rating': Rating.get_default()
+        })
     
     # Check if it is a POST request
     if request.method == 'POST':
