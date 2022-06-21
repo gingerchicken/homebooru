@@ -24,11 +24,17 @@ class UploadPOSTTest(TestCase):
     temp_storage = testutils.TempStorage()
     test_path = testutils.FELIX_PATH
 
+    fixtures = ['ratings.json']
+
     def setUp(self):
         self.temp_storage.setUp()
-    
+
+        super().setUp()
+
     def tearDown(self):
         self.temp_storage.tearDown()
+
+        super().tearDown()
     
     def post(self, body):
         return self.client.post('/upload', body)
@@ -57,17 +63,15 @@ class UploadPOSTTest(TestCase):
     def test_rating_valid(self):
         """Accepts valid ratings"""
 
-        ratings = ['s', 'q', 'e', 'explicit', 'safe', 'questionable']
+        ratings = ['explicit', 'safe', 'questionable']
         for rating in ratings:
             self.setUp()
 
             resp = self.make_post(self.test_path, 'tag1 tag2 tag3', 'a title', 'https://example.com/', rating)
 
-            self.assertEqual(resp.status_code, 201)
-
             # Get the post
             post = Post.objects.first()
-            self.assertTrue(post.rating.startswith(rating))
+            self.assertEqual(post.rating.name, rating)
 
             self.tearDown()
 
@@ -163,7 +167,7 @@ class UploadPOSTTest(TestCase):
         self.assertEqual(post.source, 'https://example.com/')
 
         # Check that the post has the correct rating
-        self.assertEqual(post.rating, 'explicit')
+        self.assertEqual(post.rating.name, 'explicit')
 
         # Make sure that the post is a video
         self.assertEqual(post.is_video, 1)
@@ -233,7 +237,7 @@ class UploadPOSTTest(TestCase):
         self.assertEqual(post.source, 'https://example.com/')
 
         # Check that the post has the correct rating
-        self.assertEqual(post.rating, 'explicit')
+        self.assertEqual(post.rating.name, 'explicit')
 
         # Check that the post has the right md5
         self.assertEqual(post.md5, boorutils.get_file_checksum(self.test_path))

@@ -141,7 +141,9 @@ BOORU_VIDEO_FILE_EXTENSIONS = ["webm", "mp4"]
 BOORU_STORAGE_URL = '/'
 BOORU_STORAGE_SUBFOLDERS = ['media', 'thumbnails', 'samples']
 BOORU_UPLOAD_FOLDER = Path('/tmp/uploads')
+
 BOORU_DEFAULT_TAG_TYPE_PK = 'general'
+BOORU_DEFAULT_RATING_PK = 'safe'
 
 BOORU_SHOW_FFMPEG_OUTPUT = os.environ.get("BOORU_SHOW_FFMPEG_OUTPUT", 'False').lower() == 'true' and DEBUG
 

@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from ...models.posts import Post
+from ...models.posts import Post, Rating
 from ...models.tags import Tag, TagType
 from ...pagination import Paginator
 
@@ -905,3 +905,38 @@ class PostGetProximatePosts(TestCase):
         posts = self.middle.get_proximate_posts(results)
         self.assertEqual(posts['newer'], self.newest)
         self.assertEqual(posts['older'], self.oldest)
+
+class RatingTest(TestCase):
+    fixtures = ['tagtypes.json', 'ratings.json']
+
+    def test_get_default(self):
+        """Test that the default rating is returned"""
+        r = Rating.get_default()
+
+        self.assertEqual(r.name, 'safe')
+    
+    og_pk = None
+
+    def setUp(self):
+        super().setUp()
+        self.og_pk = homebooru.settings.BOORU_DEFAULT_RATING_PK
+    
+    def tearDown(self):
+        homebooru.settings.BOORU_DEFAULT_RATING_PK = self.og_pk
+        super().tearDown()
+
+    def test_uses_booru_setting(self):
+        """Test that the default rating is returned"""
+
+        # Create a new rating
+        r = Rating()
+        r.name = "test"
+        r.save()
+
+        # Set the default rating to the new rating
+        homebooru.settings.BOORU_DEFAULT_RATING_PK = r.name
+
+        # Get the default rating
+        r = Rating.get_default()
+
+        self.assertEqual(r.name, "test")

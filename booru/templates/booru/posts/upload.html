@@ -55,7 +55,7 @@
                     // Show the image preview
                     selectedElement.src = URL.createObjectURL(event.target.files[0]);
                     $(selectedElement).show();
-                };
+                }
            </script>
            <br>
            Source:<br>
@@ -72,7 +72,7 @@
            Generally, the more specific you are in your tagging, the less you will have to tag. For instance, the tag chun-li will add the street_fighter and capcom tags automatically upon saving. Depending on how the administrator has configured things of course!
            <br><br>
            Rating:<br>
-           <input type="radio" name="rating" value="e">Explicit <input type="radio" name="rating" value="q">Questionable <input type="radio" name="rating" value="s" checked="checked">Safe
+           {% for rating in ratings %}<input type="radio" name="rating" value="{{ rating }}"{% if rating == default_rating %} checked="checked"{% endif %}>{{ rating|title }} {% endfor %}
            <br><br>
            <input type="submit" name="submit" value="Upload">
         </form>
