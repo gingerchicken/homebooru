@@ -1,0 +1,23 @@
+[
+    {
+        "model": "booru.rating",
+        "pk": "safe",
+        "fields": {
+            "description": "Safe for work"
+        }
+    },
+    {
+        "model": "booru.rating",
+        "pk": "questionable",
+        "fields": {
+            "description": "Questionable but somewhat safe"
+        }
+    },
+    {
+        "model": "booru.rating",
+        "pk": "explicit",
+        "fields": {
+            "description": "Not safe for work"
+        }
+    }
+]
