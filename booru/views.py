@@ -10,7 +10,7 @@ import booru.boorutils as boorutils
 import homebooru.settings
 
 from .models.tags import Tag
-from .models import Post
+from .models import Post, Rating
 from .pagination import Paginator
 
 from django.template.defaulttags import register
@@ -144,21 +144,16 @@ def upload(request):
         source = request.POST.get('source', '')
 
         # Get the post rating
-        rating = request.POST.get('rating', '')
+        rating_pk = request.POST.get('rating', '')
         # TODO check if the rating is valid (for now this is hardcoded)
-        if len(rating) < 1:
+        if len(rating_pk) < 1:
             # Default it to safe
-            rating = 's'
+            rating_pk = homebooru.settings.BOORU_DEFAULT_RATING_PK
 
-        rating = rating.lower()[0]
-
-        if rating == 's':
-            rating = 'safe'
-        elif rating == 'e':
-            rating = 'explicit'
-        elif rating == 'q':
-            rating = 'questionable'
-        else:
+        rating = None
+        try:
+            rating = Rating.objects.get(pk=rating_pk)
+        except Rating.DoesNotExist:
             return HttpResponse('{"error":"Invalid rating"}', status=400, content_type='application/json')
 
         # Create the upload folder if it doesn't exist

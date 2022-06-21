@@ -11,7 +11,25 @@ import pathlib
 import shutil
 import re
 
-# Create your models here.
+class Rating(models.Model):
+    # Name of the rating, this will be the primary key
+    name = models.CharField(max_length=20, primary_key=True)
+
+    # Description of the rating, this can be null and by default is blank
+    description = models.CharField(max_length=200, blank=True, null=True)
+
+    @staticmethod
+    def get_default():
+        """Gets the default rating"""
+        try:
+            return Rating.objects.get(name=settings.BOORU_DEFAULT_RATING_PK)
+        except Rating.DoesNotExist:
+            return None
+    
+    def __str__(self):
+        return self.name
+
+
 class Post(models.Model):
     """A post is a picture or video that has been uploaded to the site."""
 
@@ -20,8 +38,8 @@ class Post(models.Model):
 
     tags = models.ManyToManyField(Tag, related_name='posts')
 
-    # SFW Rating (either safe, questionable, or explicit) (not null, default safe)
-    rating = models.CharField(max_length=64, default='safe')
+    # Rating of the post
+    rating = models.ForeignKey(Rating, on_delete=models.CASCADE, null=True)
 
     # Score (i.e. number of upvotes minus number of downvotes), not null, default 0
     score = models.IntegerField(default=0)
@@ -69,6 +87,10 @@ class Post(models.Model):
         # Make sure that the md5 is a valid md5
         if not re.match("^[0-9a-f]{32}$", self.md5):
             raise ValueError("Invalid md5")
+        
+        # Make sure that the rating is set, if not set it to the default
+        if self.rating is None:
+            self.rating = Rating.get_default()
 
         super(Post, self).save(*args, **kwargs)
 
