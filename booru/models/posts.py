@@ -123,6 +123,15 @@ class Post(models.Model):
         # Split the search phrase into words
         words = search_phrase.split()
 
+        # List of accepted parameters
+        accepted_params = {
+            'md5': str,
+            'rating': str,
+            'title': str,
+            'width': int,
+            'height': int
+        }
+
         # For each word, check if it is a tag
         for word in words:
             # Strip the word of spaces
@@ -138,7 +147,28 @@ class Post(models.Model):
             # Make sure that it isn't empty
             if len(word) == 0:
                 continue
-                
+            
+            potential_param = word.split(':')[0]
+            # Handle parameter tags
+            if potential_param in accepted_params:
+                expected_type = accepted_params[potential_param]
+
+                # Get the value of the parameter
+                val = word[len(potential_param) + 1:]
+
+                # Make sure that the value is of the correct type
+                try:
+                    val = expected_type(val)
+                except Exception:
+                    # They wouldn't find anything if the value is wrong
+                    return Post.objects.none()
+
+                search_criteria.append(
+                    SearchCriteriaExcludeParameter(potential_param, val) if should_exclude else SearchCriteriaParameter(potential_param, val)
+                )
+
+                continue
+
             # Handle wild cards
             if wild_card in word:
                 r = word
@@ -167,16 +197,18 @@ class Post(models.Model):
                 search_criteria.append(SearchCriteriaExcludeWildCardTags(tags) if should_exclude else SearchCriteriaWildCardTags(tags))
 
                 # TODO This is kinda bad because this could cause a lot of queries, maybe consider putting a limit on it or something
-            else:
-                # Get the tag by name or if it doesn't exist, make it none
-                tag = Tag.objects.filter(tag=word).first()
+                continue
+            
+            # Handle normal tag case
+            # Get the tag by name or if it doesn't exist, make it none
+            tag = Tag.objects.filter(tag=word).first()
 
-                # If the tag doesn't exist, return an empty query set
-                if tag is None:
-                    return Post.objects.none()
-                
-                # Add the criteria to the list
-                search_criteria.append(SearchCriteriaExcludeTag(tag) if should_exclude else SearchCriteriaTag(tag))
+            # If the tag doesn't exist, return an empty query set
+            if tag is None:
+                return Post.objects.none()
+            
+            # Add the criteria to the list
+            search_criteria.append(SearchCriteriaExcludeTag(tag) if should_exclude else SearchCriteriaTag(tag))
         
         # These will be the results of the search
         results = Post.objects.all()
@@ -460,3 +492,23 @@ class SearchCriteriaExcludeWildCardTags(SearchCriteria):
 
     def search(self, s) -> models.QuerySet:
         return s.exclude(tags__in=self.tags).distinct('id')
+
+class SearchCriteriaParameter(SearchCriteria):
+    """Used to search for posts that have a certain parameter"""
+
+    def __init__(self, parameter: str, value: str) -> None:
+        self.parameter = parameter
+        self.value = value
+
+    def search(self, s) -> models.QuerySet:
+        return s.filter(**{self.parameter: self.value})
+
+class SearchCriteriaExcludeParameter(SearchCriteria):
+    """Used to exclude posts that have a certain parameter"""
+
+    def __init__(self, parameter: str, value: str) -> None:
+        self.parameter = parameter
+        self.value = value
+
+    def search(self, s) -> models.QuerySet:
+        return s.exclude(**{self.parameter: self.value})
