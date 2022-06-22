@@ -304,9 +304,13 @@ class PostSearchTest(TestCase):
     tag3 = None
     tag4 = None
 
+    fixtures = ['ratings.json']
+
     def setUp(self):
         Post.objects.all().delete()
         Tag.objects.all().delete()
+
+        super().setUp()
 
         # Create two posts with different tags
         self.p1 = Post(width=420, height=420, folder=0, md5='ca6ffc3babb6f0f58a7e5c0c6b61e7bf')
@@ -557,6 +561,225 @@ class PostSearchTest(TestCase):
                     results[i],
                     all_posts[len(all_posts) - i - 1 - (page - 1) * 10]
                 )
+    
+    def test_parameter_md5(self):
+        # Create a bunch of posts
+        for i in range(0, 100):
+            post = Post(width=420, height=420, folder=0, md5=boorutils.hash_str(str(i)))
+            post.save()
+        
+
+        # Search for a post with the md5 of 0
+        zero_md5 = boorutils.hash_str('0')
+        results = Post.search('md5:' + zero_md5)
+
+        # There should be one result
+        self.assertEqual(results.count(), 1)
+
+        # The md5 of the result should be 0
+        self.assertEqual(results[0].md5, zero_md5)
+
+    def test_parameter_rating(self):
+        Post.objects.all().delete()
+        # Create a bunch of posts
+        safe = Rating.objects.get(name='safe')
+        questionable = Rating.objects.get(name='questionable')
+        explicit = Rating.objects.get(name='explicit')
+
+        ratings = [safe, questionable, explicit]
+
+        for i in range(0, 3):
+            for j in range(i * 33, 33 * (i + 1)):
+                post = Post(width=420, height=420, folder=0, rating=ratings[i], md5=boorutils.hash_str(str(j)))
+                post.save()
+        
+        for rating in ratings:
+            results = Post.search('rating:' + rating.name)
+
+            # There should be 33 results
+            self.assertEqual(results.count(), 33)
+
+            # The rating of the results should be the same as the rating
+            for result in results:
+                self.assertEqual(result.rating, rating)
+
+    def test_parameter_rating_invalid(self):
+        # Create a bunch of posts
+        safe = Rating.objects.get(name='safe')
+
+        for i in range(0, 3):
+            post = Post(width=420, height=420, folder=0, rating=safe, md5=boorutils.hash_str(str(i)))
+            post.save()
+
+        results = Post.search('rating:invalid')
+
+        # There should be 0 results
+        self.assertEqual(results.count(), 0)
+
+    def test_parameter_title(self):
+        # Create a bunch of posts
+        for i in range(0, 100):
+            post = Post(width=420, height=420, folder=0, title='title' + str(i), md5=boorutils.hash_str(str(i)))
+            post.save()
+        
+        # Search for a post with the title of title0
+        results = Post.search('title:title0')
+
+        # There should be 1 result
+        self.assertEqual(results.count(), 1)
+
+        # The title of the result should be title0
+        self.assertEqual(results[0].title, 'title0')
+    
+    def test_parameter_title_invalid(self):
+        # Create a bunch of posts
+        for i in range(0, 100):
+            post = Post(width=420, height=420, folder=0, title='title' + str(i), md5=boorutils.hash_str(str(i)))
+            post.save()
+        
+        # Search for a post with the title of title0
+        results = Post.search('title:invalid')
+
+        # There should be 0 results
+        self.assertEqual(results.count(), 0)
+    
+    def test_parameter_width(self):
+        Post.objects.all().delete()
+
+        # Create a bunch of posts
+        for i in range(0, 100):
+            post = Post(width=420 * i, height=420, folder=0, md5=boorutils.hash_str(str(i)))
+            post.save()
+
+        # Search for a post with the width of 420
+        results = Post.search('width:420')
+
+        # There should be 1 result
+        self.assertEqual(results.count(), 1)
+
+        # The width of the result should be 420
+        self.assertEqual(results[0].width, 420)
+    
+    def test_parameter_width_invalid(self):
+        # Create a bunch of posts
+        for i in range(0, 100):
+            post = Post(width=420 * i, height=420, folder=0, md5=boorutils.hash_str(str(i)))
+            post.save()
+        
+        # Search for a post with the width of 420
+        results = Post.search('width:invalid')
+
+        # There should be 0 results
+        self.assertEqual(results.count(), 0)
+    
+    def test_parameter_height(self):
+        Post.objects.all().delete()
+        # Create a bunch of posts
+        for i in range(0, 100):
+            post = Post(width=420, height=420 * i, folder=0, md5=boorutils.hash_str(str(i)))
+            post.save()
+        
+        # Search for a post with the height of 420
+        results = Post.search('height:420')
+
+        # There should be 1 result
+        self.assertEqual(results.count(), 1)
+
+        # The height of the result should be 420
+        self.assertEqual(results[0].height, 420)
+    
+    def test_parameter_height_invalid(self):
+        # Create a bunch of posts
+        for i in range(0, 100):
+            post = Post(width=420, height=420 * i, folder=0, md5=boorutils.hash_str(str(i)))
+            post.save()
+        
+        # Search for a post with the height of 420
+        results = Post.search('height:invalid')
+
+        # There should be 0 results
+        self.assertEqual(results.count(), 0)
+    
+    def test_parameter_negation(self):
+        """Negate a parameter much like a tag"""
+        Post.objects.all().delete()
+
+        # Create a bunch of posts
+        for i in range(0, 100):
+            post = Post(width=420, height=420, folder=0, md5=boorutils.hash_str(str(i)))
+            post.save()
+
+        # Search for a post with the md5 of 0
+        zero_md5 = boorutils.hash_str('0')
+
+        results = Post.search('-md5:' + zero_md5)
+
+        # Expect every post except the one with the md5 of 0
+        self.assertEqual(results.count(), 99)
+
+        # The md5 of the result should not be 0
+        for result in results:
+            self.assertNotEqual(result.md5, zero_md5)
+
+    def test_tag_with_colon(self):
+        """Test that a tag with a colon works - ignores non-valid parameters"""
+
+        # Add te:sting tag to a post
+        self.p1.tags.add(Tag.create_or_get('te:sting'))
+
+        # Search for a post with the tag te:sting
+        results = Post.search('te:sting')
+
+        # There should be 1 result
+        self.assertEqual(results.count(), 1)
+
+        # The result should be the same as the post
+        self.assertEqual(results[0], self.p1)
+    
+    def test_parameters_with_tags(self):
+        """Test that parameters along with tags work"""
+
+        ratings = [Rating.objects.get(name='safe'), Rating.objects.get(name='questionable'), Rating.objects.get(name='explicit')]
+
+        # Create a bunch of posts
+        for i in range(0, 100):
+            post = Post(width=420, height=420, folder=0, md5=boorutils.hash_str(str(i)), rating=ratings[i % 3])
+            post.save()
+
+            # Add a tag to the post
+            tag_name = "tag" + str(i // 10)
+            tag = Tag.create_or_get(tag_name)
+            tag.save()
+            
+            post.tags.add(tag)
+            post.save()
+        
+        # Search for a post with the tag tag0
+        results = Post.search('tag0')
+
+        # There should be 10 results
+        self.assertEqual(results.count(), 10)
+
+        # The tag of the result should be tag0
+        for result in results:
+            self.assertEqual(result.tags.all()[0].tag, 'tag0')
+
+        # Search for a post with the tag tag0 and the md5 of 0
+        results = Post.search('tag0 md5:' + boorutils.hash_str('0'))
+
+        # There should be 1 result
+        self.assertEqual(results.count(), 1)
+
+        # Search for rating explicit with the tag tag0
+        results = Post.search('rating:explicit tag0')
+
+        # There should be 3 results
+        self.assertEqual(results.count(), 3)
+
+        # The tag of the result should be tag0 and the rating of the result should be explicit
+        for result in results:
+            self.assertEqual(result.tags.all()[0].tag, 'tag0')
+            self.assertEqual(result.rating, Rating.objects.get(name='explicit'))
 
 class PostDeleteTest(TestCase):
     temp_storage = testutils.TempStorage()
