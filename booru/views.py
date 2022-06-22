@@ -135,7 +135,7 @@ def upload(request):
     if request.method == 'POST':
         # Make sure that the uploaded file is there
         if 'upload' not in request.FILES:
-            return HttpResponse('{"error": "No file uploaded"}', status=400, content_type='application/json')
+            return HttpResponse('No file uploaded', status=400)
         
         # Get the image file
         uploaded_file = request.FILES['upload']
@@ -143,7 +143,7 @@ def upload(request):
         # Get the tags
         tags = request.POST.get('tags', '')
         if len(tags.strip()) < 3:
-            return HttpResponse('{"error": "Tags must be at least 3 characters long"}', status=400, content_type='application/json')
+            return HttpResponse('Tags must be at least 3 characters long', status=400)
 
         # Get the post title
         title = request.POST.get('title', '')
@@ -162,7 +162,7 @@ def upload(request):
         try:
             rating = Rating.objects.get(pk=rating_pk)
         except Rating.DoesNotExist:
-            return HttpResponse('{"error":"Invalid rating"}', status=400, content_type='application/json')
+            return HttpResponse('Invalid rating', status=400)
 
         # Create the upload folder if it doesn't exist
         upload_folder = homebooru.settings.BOORU_UPLOAD_FOLDER
@@ -176,7 +176,7 @@ def upload(request):
 
         # Check if the file type is allowed
         if file_type not in homebooru.settings.BOORU_ALLOWED_FILE_EXTENSIONS:
-            return HttpResponse('{"error": "File type not allowed"}', status=400, content_type='application/json')
+            return HttpResponse('File type not allowed', status=400)
 
         # Get the filename
         filename = None
@@ -202,14 +202,14 @@ def upload(request):
 
         # Make sure that there are no posts with the same checksum
         if Post.objects.filter(md5=checksum).exists():
-            return HttpResponse('{"error": "File already exists"}', status=400, content_type='application/json')
+            return HttpResponse('File already exists', status=400)
 
         # Check all of the tags
         tag_names = tags.lower().split(' ')
 
         for tag_name in tag_names:
             if not Tag.is_name_valid(tag_name):
-                return HttpResponse('{"error": "Contains invalid tag name"}', status=400, content_type='application/json')
+                return HttpResponse('Contains invalid tag name', status=400)
         
         # Create the post
         try:

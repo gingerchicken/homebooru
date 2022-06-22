@@ -126,11 +126,7 @@
 
                             // If an error occurred then show it
                             if (!resp.ok) {
-                                // Get the json
-                                let json = await resp.json();
-
-                                // Get the error message
-                                let {error} = json;
+                                let error = await resp.text();
                                 
                                 // Show the error message
                                 $('.upload-error').html(error);
