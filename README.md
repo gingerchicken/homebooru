@@ -29,6 +29,3 @@ In production, this should **NOT** be enabled - therefore I made sure that the `
 
 ### Unit testing
 If you want to test the server, you simply need to define an environment variable `UNIT_TEST` to `True` in the `.env` file and restart the docker compose, instead of starting the application, it should instead run the unit tests.
-
-#### ⚠️ Caution ⚠️
-**DO NOT** run the unit tests on a production server, this will delete all data in the database as a part of some tests!
