@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core import serializers
 
 from ...models.posts import *
 import booru.tests.testutils as testutils
@@ -125,7 +126,7 @@ class UploadPOSTTest(TestCase):
         resp = self.make_post(self.test_path, 'tag1 tag2 tag3', 'a title', 'https://example.com/', 'explicit')
 
         # Make sure it was accepted
-        self.assertEqual(resp.status_code, 201)
+        self.assertEqual(resp.status_code, 302)
 
         # Make sure that the post was created
         self.assertEqual(Post.objects.count(), 1)
@@ -148,7 +149,7 @@ class UploadPOSTTest(TestCase):
 
         resp = self.make_post(testutils.VIDEO_PATH, 'tag1 tag2 tag3', 'a title', 'https://example.com/', 'explicit')
 
-        self.assertEqual(resp.status_code, 201)
+        self.assertEqual(resp.status_code, 302)
 
         # Check that the post was created
         self.assertEqual(Post.objects.count(), 1)
@@ -198,7 +199,7 @@ class UploadPOSTTest(TestCase):
 
         resp = self.make_post(testutils.FELIX_PATH, 'tag1 tag1', 'a title', 'https://example.com/', 'explicit')
 
-        self.assertEqual(resp.status_code, 201)
+        self.assertEqual(resp.status_code, 302)
 
         # Make sure only one tag was created
         self.assertEqual(Tag.objects.count(), 1)
@@ -215,7 +216,7 @@ class UploadPOSTTest(TestCase):
 
         resp = self.make_post(self.test_path, 'tag1 tag2 tag3', 'a title', 'https://example.com/', 'explicit')
 
-        self.assertEqual(resp.status_code, 201)
+        self.assertEqual(resp.status_code, 302)
 
         # Check that the post was created
         self.assertEqual(Post.objects.count(), 1)
@@ -241,3 +242,14 @@ class UploadPOSTTest(TestCase):
 
         # Check that the post has the right md5
         self.assertEqual(post.md5, boorutils.get_file_checksum(self.test_path))
+    
+    def test_redirects_to_correct_page(self):
+        """Redirects to the correct page"""
+
+        resp = self.make_post(self.test_path, 'tag1 tag2 tag3', 'a title', 'https://example.com/', 'explicit')
+
+        # Get the post
+        post = Post.objects.first()
+
+        self.assertEqual(resp.status_code, 302)
+        self.assertEqual(resp['Location'], '/view?id=' + str(post.id))

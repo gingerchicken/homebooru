@@ -124,13 +124,9 @@
                         (async () => {
                             let resp = await fetch(request);
 
-                            // Get the json
-                            let json = await resp.json();
-
                             // If an error occurred then show it
                             if (!resp.ok) {
-                                // Get the error message
-                                let {error} = json;
+                                let error = await resp.text();
                                 
                                 // Show the error message
                                 $('.upload-error').html(error);
@@ -139,9 +135,12 @@
                                 // Throw an error
                                 throw new Error(error);
                             }
-                            
-                            // Go to the home page
-                            window.location.href = '/';
+
+                            // Get the redirect url
+                            let redirectUrl = resp.url;
+
+                            // Redirect to the new url
+                            window.location.href = redirectUrl;
                         })()
                     });
                });
