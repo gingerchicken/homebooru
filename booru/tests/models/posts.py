@@ -699,7 +699,42 @@ class PostSearchTest(TestCase):
 
         # There should be 0 results
         self.assertEqual(results.count(), 0)
+    
+    def test_parameter_negation(self):
+        """Negate a parameter much like a tag"""
+        Post.objects.all().delete()
 
+        # Create a bunch of posts
+        for i in range(0, 100):
+            post = Post(width=420, height=420, folder=0, md5=boorutils.hash_str(str(i)))
+            post.save()
+
+        # Search for a post with the md5 of 0
+        zero_md5 = boorutils.hash_str('0')
+
+        results = Post.search('-md5:' + zero_md5)
+
+        # Expect every post except the one with the md5 of 0
+        self.assertEqual(results.count(), 99)
+
+        # The md5 of the result should not be 0
+        for result in results:
+            self.assertNotEqual(result.md5, zero_md5)
+
+    def test_tag_with_colon(self):
+        """Test that a tag with a colon works - ignores non-valid parameters"""
+
+        # Add te:sting tag to a post
+        self.p1.tags.add(Tag.create_or_get('te:sting'))
+
+        # Search for a post with the tag te:sting
+        results = Post.search('te:sting')
+
+        # There should be 1 result
+        self.assertEqual(results.count(), 1)
+
+        # The result should be the same as the post
+        self.assertEqual(results[0], self.p1)
 
 class PostDeleteTest(TestCase):
     temp_storage = testutils.TempStorage()
