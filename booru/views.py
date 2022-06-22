@@ -1,5 +1,7 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.core import serializers
+from django.urls import reverse
 
 import magic
 import os
@@ -235,4 +237,5 @@ def upload(request):
         # TODO check that the file isn't too big
         # TODO check that there aren't too many tags (add a setting for this)
 
-        return HttpResponse(status=201, content_type='application/json')
+        # Redirect to the view page
+        return HttpResponseRedirect(reverse('view') + '?id=' + str(post.id))
