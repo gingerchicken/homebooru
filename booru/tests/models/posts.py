@@ -735,6 +735,51 @@ class PostSearchTest(TestCase):
 
         # The result should be the same as the post
         self.assertEqual(results[0], self.p1)
+    
+    def test_parameters_with_tags(self):
+        """Test that parameters along with tags work"""
+
+        ratings = [Rating.objects.get(name='safe'), Rating.objects.get(name='questionable'), Rating.objects.get(name='explicit')]
+
+        # Create a bunch of posts
+        for i in range(0, 100):
+            post = Post(width=420, height=420, folder=0, md5=boorutils.hash_str(str(i)), rating=ratings[i % 3])
+            post.save()
+
+            # Add a tag to the post
+            tag_name = "tag" + str(i // 10)
+            tag = Tag.create_or_get(tag_name)
+            tag.save()
+            
+            post.tags.add(tag)
+            post.save()
+        
+        # Search for a post with the tag tag0
+        results = Post.search('tag0')
+
+        # There should be 10 results
+        self.assertEqual(results.count(), 10)
+
+        # The tag of the result should be tag0
+        for result in results:
+            self.assertEqual(result.tags.all()[0].tag, 'tag0')
+
+        # Search for a post with the tag tag0 and the md5 of 0
+        results = Post.search('tag0 md5:' + boorutils.hash_str('0'))
+
+        # There should be 1 result
+        self.assertEqual(results.count(), 1)
+
+        # Search for rating explicit with the tag tag0
+        results = Post.search('rating:explicit tag0')
+
+        # There should be 3 results
+        self.assertEqual(results.count(), 3)
+
+        # The tag of the result should be tag0 and the rating of the result should be explicit
+        for result in results:
+            self.assertEqual(result.tags.all()[0].tag, 'tag0')
+            self.assertEqual(result.rating, Rating.objects.get(name='explicit'))
 
 class PostDeleteTest(TestCase):
     temp_storage = testutils.TempStorage()
