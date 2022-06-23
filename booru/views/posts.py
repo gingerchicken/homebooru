@@ -1,7 +1,12 @@
-from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
-from django.core import serializers
 from django.urls import reverse
+from django.shortcuts import render
+
+from booru.models.tags import Tag
+from booru.models import Post, Rating
+from booru.pagination import Paginator
+
+from .filters import *
 
 import magic
 import os
@@ -10,41 +15,6 @@ import json
 
 import booru.boorutils as boorutils
 import homebooru.settings
-
-from .models.tags import Tag
-from .models import Post, Rating
-from .pagination import Paginator
-
-from django.template.defaulttags import register
-
-# Jinja trolling
-@register.filter
-def get_item(dictionary, key):
-    return dictionary.get(key)
-
-@register.filter
-def tag_view(tag_name):
-    # Replace _ with spaces
-    return tag_name.replace('_', ' ')
-
-@register.filter
-def remove(string, to_remove):
-    return string.replace(to_remove, '')
-
-@register.filter
-def concat(string, cat):
-    return string + str(cat)
-
-# Create your views here.
-def index(request):
-    # Get the total posts
-    total_posts = Post.objects.count()
-
-    # Get each digit of the total posts
-    total_posts_digits = [x for x in str(total_posts)]
-
-    # Render the homepage.html template with the total posts and the total posts digits
-    return render(request, 'booru/homepage.html', {'digits': total_posts_digits})
 
 def browse(request):
     # Get the search phrase url parameter
