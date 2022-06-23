@@ -117,3 +117,8 @@ class Tag(models.Model):
 
         # All checks passed
         return True
+    
+    def __str__(self):
+        """Returns the tag's name."""
+
+        return self.tag
