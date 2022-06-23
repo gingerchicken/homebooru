@@ -127,7 +127,7 @@ class TagTest(TestCase):
     def test_is_name_valid_with_valid(self):
         """Accepts valid tag names"""
 
-        valid_tags = ['1tag', 'funny_monkey', '=.=', ':=>', ':3']
+        valid_tags = ['1tag', 'funny_monkey', '=.=', ':=>', ':3', 're:zero']
 
         for tag in valid_tags:
             self.assertTrue(Tag.is_name_valid(tag))
@@ -136,6 +136,14 @@ class TagTest(TestCase):
         """Rejects invalid tag names"""
 
         invalid_tags = ['', '     ', 'e', 'funny-monkey', 'funny monkey', 'HeHehe', '*.*']
+
+        for tag in invalid_tags:
+            self.assertFalse(Tag.is_name_valid(tag))
+    
+    def test_is_name_valid_with_parameters(self):
+        """Rejects parameter-like tags"""
+
+        invalid_tags = ['md5:something', 'rating:safe', 'rating:', 'width:42', 'height:432423', 'height:', 'title:test']
 
         for tag in invalid_tags:
             self.assertFalse(Tag.is_name_valid(tag))
