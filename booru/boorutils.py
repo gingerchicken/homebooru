@@ -104,3 +104,26 @@ def generate_sample(path : str, save_path : str) -> bool:
         raise Exception("File was not created")
     
     return True
+
+def wildcard_to_regex(phrase : str, wildcard : str = '*') -> str:
+    """Converts a wildcard to a regex"""
+    r = phrase
+
+    # Regex escape the all of the characters, unless it is a wild card
+    escaped = ''
+    for c in r:
+        if c == wildcard:
+            escaped += c
+            continue
+        
+        # Escape the character but if it is a number don't make it the character code
+        if c.isdigit() or c.isalpha():
+            escaped += f"[{c}]"
+            continue
+            
+        # Escape the character as a character code
+        escaped += '\\' + c
+
+    r = escaped.replace(wildcard, '.*')
+
+    return r

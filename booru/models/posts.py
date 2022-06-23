@@ -171,24 +171,7 @@ class Post(models.Model):
 
             # Handle wild cards
             if wild_card in word:
-                r = word
-
-                # Regex escape the all of the characters, unless it is a wild card
-                escaped = ''
-                for c in r:
-                    if c == wild_card:
-                        escaped += c
-                        continue
-                    
-                    # Escape the character but if it is a number don't make it the character code
-                    if c.isdigit() or c.isalpha():
-                        escaped += f"[{c}]"
-                        continue
-                        
-                    # Escape the character as a character code
-                    escaped += '\\' + c
-                
-                r = escaped.replace(wild_card, '.*')
+                r = boorutils.wildcard_to_regex(word, wild_card)
 
                 # Get all of the tags where their names match the regex
                 tags = Tag.objects.filter(tag__regex=r)
