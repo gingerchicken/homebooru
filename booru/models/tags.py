@@ -20,6 +20,10 @@ class TagType(models.Model):
         except TagType.DoesNotExist:
             # This should never happen unless the database is completely broken
             return None
+    
+    def __str__(self):
+        """Returns the tag type's name."""
+        return self.name
 
 class Tag(models.Model):
     """Used to tag posts."""
