@@ -97,6 +97,19 @@ class Tag(models.Model):
         # Check that it is lowercase
         if name != name.lower():
             return False
-        
+
+        # Make sure that they don't start with an attribute
+        potential_attribute = name.split(':')[0]
+        disallowed_params = {
+            'md5': True,
+            'rating': True,
+            'title': True,
+            'width': True,
+            'height': True
+        }
+
+        if potential_attribute in disallowed_params:
+            return False
+
         # All checks passed
         return True

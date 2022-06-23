@@ -180,7 +180,7 @@ class UploadPOSTTest(TestCase):
         """Rejects invalid tag sets"""
 
         invalid = [
-            't a g', '**** *.*', '', '     '
+            't a g', '**** *.*', '', '     ', 'rating:safe', 'md5:520'
         ]
 
         for tags in invalid:
