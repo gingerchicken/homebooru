@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	{% if search_param and search_param|length > 0 %}
+		<title>Homebooru | Tag List | {{ search_param }}</title>
+	{% else %}
+		<title>Homebooru | Tag List</title>
+    {% endif %}
+
+
+    {% include "booru/components/head.html" %}
+    {% load static %}
+</head>
+
+<body>
+	<img style="position:absolute;left:-10px;" src="{% static '/layout/homebooru-com-pix.bmp' %}">
+	<div class="container-fluid">
+		{% include "booru/tags/components/nav-bar.html" %}
+	</div>
+	<div class="alert alert-warning small" style="padding: 10px 15px 10px 15px; font-size: 11px; display: none;" id="motd">
+        
+	</div>
+	<div class="tag-contain-push">
+        <div class="search-container">
+            <span class="search">
+                <input type="text" id="search-input" class="form-control" placeholder="Search for a tag...">
+            </span>
+            <span class="search-button">
+                <input name="commit" class="secondary_search" type="submit" value="Search">
+            </span>
+        </div>
+
+        <table class="tag-table">
+            <thead>
+                <tr>
+                    <th width="8%">Posts</th>
+                    <th>Tag</th>
+                    <th>Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tag in tags %}
+                    <tr>
+                        <td>{{ tag.total_posts }}</td>
+                        <td class="tag-name tag-type-{{tag.tag_type}}"><a href="/tags/edit?tag={{tag.tag}}">{{ tag.tag|tag_view }}</a></td>
+                        <td class="tag-type">{{ tag.tag_type }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+		<br>
+		<center>
+			<br>
+			{% include "booru/components/paginator.html" %}
+			<br>
+			<br>
+		</center>
+	</div>
+	<ul id="ui-id-1" tabindex="0" class="ui-menu ui-widget ui-widget-content ui-autocomplete ui-front" style="display: none;"></ul>
+	<div role="status" aria-live="assertive" aria-relevant="additions" class="ui-helper-hidden-accessible"></div>
+	{% include "booru/components/footer.html" %}
+</body>
+
+</html>
