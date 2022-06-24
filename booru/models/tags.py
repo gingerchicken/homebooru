@@ -2,6 +2,7 @@ from django.db import models
 from django.apps import apps
 
 import homebooru.settings
+import booru.boorutils as boorutils
 
 class TagType(models.Model):
     """Describes what a tag's category is."""
@@ -122,3 +123,51 @@ class Tag(models.Model):
         """Returns the tag's name."""
 
         return self.tag
+
+    def search(phase : str, sort_param : str = "tag", order : str = "ascending", wild_card : str = "*") -> list:
+        """Searches for tags."""
+
+        # Check that the order is valid
+        if order not in ["ascending", "descending"]:
+            raise ValueError("Invalid order")
+
+        # If the phrase is empty, return all tags
+        if phase == "":
+            return Tag.objects.all()
+
+        # Make sure that the sort_param is valid
+        if sort_param not in ["tag", "total_posts", "type"]:
+            raise ValueError("Invalid sort parameter")
+
+        # If the tag contains spaces, return nothing
+        if ' ' in phase:
+            return Tag.objects.none()
+        
+        qs = Tag.objects.all()
+
+        # Handle wildcards
+        if wild_card in phase:
+            regex = boorutils.wildcard_to_regex(phase, wildcard=wild_card)
+
+            qs = qs.filter(tag__regex=regex)
+        else:
+            # Search for where the tag's name is equal to the phase
+            qs = qs.filter(tag=phase)
+
+        # Sort the tags
+        if sort_param != "total_posts":
+            if sort_param == "type":
+                sort_param = "tag_type__name"
+
+            p = sort_param if order == "ascending" else "-" + sort_param
+
+            qs = qs.order_by(p)
+        else:
+            # This is slightly different as this is a functional attribute within the Python model
+            # TODO this is a repeated line, fix it
+            p = sort_param if order == "ascending" else "-" + sort_param
+
+            qs = qs.annotate(total_posts=models.Count('posts')).order_by(p)
+        
+        # Return the tags
+        return qs

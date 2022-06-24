@@ -147,3 +147,118 @@ class TagTest(TestCase):
 
         for tag in invalid_tags:
             self.assertFalse(Tag.is_name_valid(tag))
+
+class TagSearchTest(TestCase):
+    fixtures = ['booru/fixtures/tagtypes.json']
+    
+    def test_search_with_tag(self):
+        """Searches for a tag"""
+
+        # Create a tag
+        tag = Tag(tag='tag1')
+        tag.save()
+
+        # Search for the tag
+        tags = Tag.search('tag1')
+
+        # Make sure the tag is in the list
+        self.assertEqual(len(tags), 1)
+        self.assertEqual(tags[0].tag, 'tag1')
+    
+    def test_search_with_empty(self):
+        """Returns all tags when searching for an empty string"""
+
+        # Create a tag
+        tag = Tag(tag='tag1')
+        tag.save()
+
+        # Make another tag
+        tag = Tag(tag='tag2')
+        tag.save()
+
+        # Search for the tag
+        tags = Tag.search('')
+
+        # Make sure the tag is in the list
+        self.assertEqual(len(tags), 2)
+
+        # Make sure the tags are in the list
+        self.assertEqual(tags[0].tag, 'tag1')
+        self.assertEqual(tags[1].tag, 'tag2')
+
+    def test_search_with_wildcard(self):
+        """Searches for a tag with a wildcard"""
+
+        # Create a tag
+        tag = Tag(tag='tag1')
+        tag.save()
+
+        # Create another tag
+        tag = Tag(tag='hag1')
+        tag.save()
+
+        # Search for the tag
+        tags = Tag.search('tag*')
+
+        # Make sure the tag is in the list
+        self.assertEqual(len(tags), 1)
+        self.assertEqual(tags[0].tag, 'tag1')
+
+        # Searcg for another wildcard
+        tags = Tag.search('*ag1')
+
+        # Make sure the tag is in the list
+        self.assertEqual(len(tags), 2)
+        self.assertEqual(tags[0].tag, 'hag1')
+        self.assertEqual(tags[1].tag, 'tag1')
+
+    def test_sort_param(self):
+        """Sorts accordingly to sort_param"""
+
+        # Create a tag
+        tag1 = Tag(tag='tag1')
+        tag1.save()
+
+        tag1.tag_type = TagType.objects.get(name='copyright')
+        tag1.save()
+
+        # Create another tag
+        tag2 = Tag(tag='tag2')
+        tag2.save()
+
+        tag2.tag_type = TagType.objects.get(name='artist')
+        tag2.save()
+
+        # Create another tag
+        tag3 = Tag(tag='tag3')
+        tag3.save()
+
+        tag3.tag_type = TagType.objects.get(name='deprecated')
+        tag3.save()
+
+        # Search for the tag
+        tags = Tag.search('', sort_param='tag')
+
+        # Make sure the tag is in the list
+        self.assertEqual(len(tags), 3)
+
+        # Make sure the tags are in the list
+        self.assertEqual(tags[0].tag, 'tag1')
+        self.assertEqual(tags[1].tag, 'tag2')
+        self.assertEqual(tags[2].tag, 'tag3')
+
+        # Search for the tag
+        tags = Tag.search('', sort_param='type')
+
+        # Make sure the tag is in the list
+        self.assertEqual(len(tags), 3)
+
+        for t in tags:
+            print(t)
+
+        # Make sure the tags are in the list
+        self.assertEqual(tags[0].tag, 'tag2')
+        self.assertEqual(tags[1].tag, 'tag1')
+        self.assertEqual(tags[2].tag, 'tag3')
+
+        # TODO add test for total posts
