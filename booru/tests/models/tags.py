@@ -253,9 +253,6 @@ class TagSearchTest(TestCase):
         # Make sure the tag is in the list
         self.assertEqual(len(tags), 3)
 
-        for t in tags:
-            print(t)
-
         # Make sure the tags are in the list
         self.assertEqual(tags[0].tag, 'tag2')
         self.assertEqual(tags[1].tag, 'tag1')
