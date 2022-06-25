@@ -159,6 +159,10 @@ class TagSearchTest(TestCase):
         tag = Tag(tag='tag1')
         tag.save()
 
+        # Create another tag
+        tag = Tag(tag='tag2')
+        tag.save()
+
         # Search for the tag
         tags = Tag.search('tag1')
 
@@ -301,3 +305,52 @@ class TagSearchTest(TestCase):
         self.assertEqual(tags[0].tag, 'tag2')
         self.assertEqual(tags[1].tag, 'tag1')
         self.assertEqual(tags[2].tag, 'tag3')
+    
+    def test_sort_param_total_posts_desc(self):
+        """Sorts accordingly to sort_param with total_posts desc"""
+
+        self.setUp_sort_params()
+
+        # Search for the tag
+        tags = Tag.search('', sort_param='total_posts', order='descending')
+
+        # Make sure the tag is in the list
+        self.assertEqual(len(tags), 3)
+
+        # Make sure the tags are in the list
+        self.assertEqual(tags[0].tag, 'tag3')
+        self.assertEqual(tags[1].tag, 'tag1')
+        self.assertEqual(tags[2].tag, 'tag2')
+    
+    def test_sort_param_type_desc(self):
+        """Sorts accordingly to sort_param with type desc"""
+
+        self.setUp_sort_params()
+
+        # Search for the tag
+        tags = Tag.search('', sort_param='type', order='descending')
+
+        # Make sure the tag is in the list
+        self.assertEqual(len(tags), 3)
+
+        # Make sure the tags are in the list
+        self.assertEqual(tags[0].tag, 'tag3')
+        self.assertEqual(tags[1].tag, 'tag1')
+        self.assertEqual(tags[2].tag, 'tag2')
+    
+    def test_sort_param_name_desc(self):
+        """Sorts accordingly to sort_param with name desc"""
+
+        self.setUp_sort_params()
+
+        # Search for the tag
+        tags = Tag.search('', sort_param='tag', order='descending')
+
+        # Make sure the tag is in the list
+        self.assertEqual(len(tags), 3)
+
+        # Make sure the tags are in the list
+        self.assertEqual(tags[0].tag, 'tag3')
+        self.assertEqual(tags[1].tag, 'tag2')
+        self.assertEqual(tags[2].tag, 'tag1')
+    
