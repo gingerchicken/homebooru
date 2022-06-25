@@ -4,6 +4,7 @@ from ...models.tags import TagType, Tag
 from ...models.posts import Post
 
 import homebooru.settings
+import booru.boorutils as boorutils
 
 class TagTest(TestCase):
     fixtures = ['booru/fixtures/tagtypes.json']
@@ -212,9 +213,7 @@ class TagSearchTest(TestCase):
         self.assertEqual(tags[0].tag, 'hag1')
         self.assertEqual(tags[1].tag, 'tag1')
 
-    def test_sort_param(self):
-        """Sorts accordingly to sort_param"""
-
+    def setUp_sort_params(self):
         # Create a tag
         tag1 = Tag(tag='tag1')
         tag1.save()
@@ -236,6 +235,30 @@ class TagSearchTest(TestCase):
         tag3.tag_type = TagType.objects.get(name='deprecated')
         tag3.save()
 
+        # Create 3 posts
+        posts = []
+        for i in range(3):
+            post = Post(width=420, height=420, folder=0, md5=boorutils.hash_str(str(i)))
+            post.save()
+
+            posts.append(post)
+
+        # Add the first tag to the first and second post
+        posts[0].tags.add(tag3)
+        posts[1].tags.add(tag1)
+
+        # Add the second tag to the second post
+        posts[1].tags.add(tag3)
+
+        # Save all the posts
+        for post in posts:
+            post.save()
+    
+    def test_default(self):
+        """Sorts accordingly to sort_param with default (i.e. name)"""
+
+        self.setUp_sort_params()
+
         # Search for the tag
         tags = Tag.search('', sort_param='tag')
 
@@ -247,6 +270,11 @@ class TagSearchTest(TestCase):
         self.assertEqual(tags[1].tag, 'tag2')
         self.assertEqual(tags[2].tag, 'tag3')
 
+    def test_sort_param_type(self):
+        """Sorts accordingly to sort_param with type"""
+
+        self.setUp_sort_params()
+
         # Search for the tag
         tags = Tag.search('', sort_param='type')
 
@@ -257,5 +285,19 @@ class TagSearchTest(TestCase):
         self.assertEqual(tags[0].tag, 'tag2')
         self.assertEqual(tags[1].tag, 'tag1')
         self.assertEqual(tags[2].tag, 'tag3')
+    
+    def test_sort_param_total_posts(self):
+        """Sorts accordingly to sort_param with total_posts"""
 
-        # TODO add test for total posts
+        self.setUp_sort_params()
+
+        # Search for the tag
+        tags = Tag.search('', sort_param='total_posts')
+
+        # Make sure the tag is in the list
+        self.assertEqual(len(tags), 3)
+
+        # Make sure the tags are in the list
+        self.assertEqual(tags[0].tag, 'tag2')
+        self.assertEqual(tags[1].tag, 'tag1')
+        self.assertEqual(tags[2].tag, 'tag3')

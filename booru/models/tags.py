@@ -131,10 +131,6 @@ class Tag(models.Model):
         if order not in ["ascending", "descending"]:
             raise ValueError("Invalid order")
 
-        # If the phrase is empty, return all tags
-        if phase == "":
-            return Tag.objects.all()
-
         # Make sure that the sort_param is valid
         if sort_param not in ["tag", "total_posts", "type"]:
             raise ValueError("Invalid sort parameter")
@@ -150,24 +146,29 @@ class Tag(models.Model):
             regex = boorutils.wildcard_to_regex(phase, wildcard=wild_card)
 
             qs = qs.filter(tag__regex=regex)
-        else:
+        # Make sure that the tag isn't empty, if it is then we want to show everything
+        elif phase != "":
             # Search for where the tag's name is equal to the phase
             qs = qs.filter(tag=phase)
 
+        # Map sort param
+        if sort_param == "type":
+            sort_param = "tag_type__name"
+
+        # Handle total_posts
+        if sort_param == "total_posts":
+            # We may not use total_posts since it is used on the object but not in the database!
+            # Hence, I renamed it to just "t", nobody should see this other than the searching algorithm
+            sort_param = "t"
+
+            qs = qs.annotate(**{sort_param: models.Count('posts')})
+
+        # Negate the order if it is descending
+        if order == "descending":
+            sort_param = "-" + sort_param
+
         # Sort the tags
-        if sort_param != "total_posts":
-            if sort_param == "type":
-                sort_param = "tag_type__name"
-
-            p = sort_param if order == "ascending" else "-" + sort_param
-
-            qs = qs.order_by(p)
-        else:
-            # This is slightly different as this is a functional attribute within the Python model
-            # TODO this is a repeated line, fix it
-            p = sort_param if order == "ascending" else "-" + sort_param
-
-            qs = qs.annotate(total_posts=models.Count('posts')).order_by(p)
+        qs = qs.order_by(sort_param)
         
         # Return the tags
         return qs
