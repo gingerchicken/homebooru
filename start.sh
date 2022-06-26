@@ -15,7 +15,7 @@ if [ "$UNIT_TEST" = "True" ]; then
     fi
 
     # Run the unit tests
-    coverage run --source='./booru' manage.py test
+    coverage run --omit=*/tests/*.py --source='./booru' manage.py test
 
     # Check if we should display the report
     if [ "$UNIT_TEST_DISPLAY_COVERAGE" = "True" ]; then
