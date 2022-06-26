@@ -7,7 +7,7 @@ from .filters import *
 
 def tags(request):
     # Get the search phrase url parameter
-    search_phrase = request.GET.get('tags', '').strip()
+    search_phrase = request.GET.get('tag', '').strip()
 
     # TODO implement search functionality
 
