@@ -41,7 +41,7 @@
             <tbody>
                 {% for tag in tags %}
                     <tr>
-                        <td>{{ tag.total_posts }}</td>
+                        <td><a href="browse?tags={{tag}}">{{ tag.total_posts }}</a></td>
                         <td class="tag-name tag-type-{{tag.tag_type}}"><a href="/tags/edit?tag={{tag.tag}}">{{ tag.tag|tag_view }}</a></td>
                         <td class="tag-type">{{ tag.tag_type }}</td>
                     </tr>
