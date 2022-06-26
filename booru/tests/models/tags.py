@@ -354,3 +354,32 @@ class TagSearchTest(TestCase):
         self.assertEqual(tags[1].tag, 'tag2')
         self.assertEqual(tags[2].tag, 'tag1')
     
+    def test_central_wild_card(self):
+        """Searches for a tag with a wildcard in the middle"""
+
+        # Create a tag
+        tig = Tag.create_or_get("tig")
+        tig.save()
+
+        # Create another tag
+        tag = Tag.create_or_get("tag")
+        tag.save()
+
+        # Create yet another tag
+        tug = Tag.create_or_get("tug")
+        tug.save()
+
+        # Create a tag that doesn't match
+        lag = Tag.create_or_get("lag")
+        lag.save()
+
+        # Search for the tag
+        tags = Tag.search("t*g")
+
+        # Make sure the tag is in the list
+        self.assertEqual(len(tags), 3)
+
+        # Make sure that the tags are in the list
+        self.assertEqual(tags[0].tag, 'tag')
+        self.assertEqual(tags[1].tag, 'tig')
+        self.assertEqual(tags[2].tag, 'tug')
