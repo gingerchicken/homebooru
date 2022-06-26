@@ -29,25 +29,29 @@
                 <input name="commit" class="secondary_search" type="submit" value="Search">
             </span>
         </div>
-
-        <table class="tag-table">
-            <thead>
-                <tr>
-                    <th width="8%">Posts</th>
-                    <th>Tag</th>
-                    <th>Type</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for tag in tags %}
+        
+        {% if tags|length > 0 %}
+            <table class="tag-table">
+                <thead>
                     <tr>
-                        <td><a href="browse?tags={{tag}}">{{ tag.total_posts }}</a></td>
-                        <td class="tag-name tag-type-{{tag.tag_type}}"><a href="/tags/edit?tag={{tag.tag}}">{{ tag.tag|tag_view }}</a></td>
-                        <td class="tag-type">{{ tag.tag_type }}</td>
+                        <th width="8%">Posts</th>
+                        <th>Tag</th>
+                        <th>Type</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for tag in tags %}
+                        <tr>
+                            <td><a href="browse?tags={{tag}}">{{ tag.total_posts }}</a></td>
+                            <td class="tag-name tag-type-{{tag.tag_type}}"><a href="/tags/edit?tag={{tag.tag}}">{{ tag.tag|tag_view }}</a></td>
+                            <td class="tag-type">{{ tag.tag_type }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <h1>Nobody here but us chickens!</h1> Maybe try searching for something else?
+        {% endif %}
 		<br>
 		<center>
 			<br>
