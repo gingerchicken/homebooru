@@ -17,8 +17,11 @@ if [ "$UNIT_TEST" = "True" ]; then
     # Run the unit tests
     coverage run --source='./booru' manage.py test
 
-    # Show the coverage report
-    coverage report -m
+    # Check if we should display the report
+    if [ "$UNIT_TEST_DISPLAY_COVERAGE" = "True" ]; then
+        # Display the coverage report
+        coverage report -m
+    fi
 
     # Exit with the unit test exit code
     exit $?
