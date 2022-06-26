@@ -820,7 +820,7 @@ links 006FFA
 
 .tag-contain-push .search-container {
 	display: inline-block;
-	width: 100%;
+	width: 50%;
 	
 	/* Center it using the margin */
 	/* That looks centred but I am not too sure... if someone complains I will change it */
