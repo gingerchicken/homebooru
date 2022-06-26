@@ -383,3 +383,30 @@ class TagSearchTest(TestCase):
         self.assertEqual(tags[0].tag, 'tag')
         self.assertEqual(tags[1].tag, 'tig')
         self.assertEqual(tags[2].tag, 'tug')
+    
+    def test_invalid_sort_param(self):
+        """Rejects invalid sort_params"""
+
+        self.setUp_sort_params()
+
+        with self.assertRaises(ValueError):
+            Tag.search('', sort_param='invalid')
+    
+    def test_invalid_order(self):
+        """Rejects invalid orders"""
+
+        self.setUp_sort_params()
+
+        with self.assertRaises(ValueError):
+            Tag.search('', order='invalid')
+    
+    def test_space_in_tag(self):
+        """Returns an empty query set if the search contains a space"""
+
+        self.setUp_sort_params()
+
+        # Search for the tag
+        tags = Tag.search(' ')
+
+        # Make sure the tag is in the list
+        self.assertEqual(len(tags), 0)
