@@ -39,16 +39,21 @@
                     <div class="ordering">
                         <div class="option">
                             Order as<select id="type" name="order_direction">
-                                <option value="ascending">Ascending</option>
-                                <option value="descending" selected="selected">Descending</option>
+                                {% with options='ascending descending' %}
+                                    {% for option in options.split %}
+                                        <option value="{{ option }}"{% if option == order_direction %} selected="selected"{% endif %}>{{option|title}}</option>
+                                    {% endfor %}
+                                {% endwith %}
                             </select>
                         </div>
 
                         <div class="option">
                             Sort by<select id="order" name="order_by">
-                                <option value="tag">Name</option>
-                                <option value="type">Type</option>
-                                <option value="total_posts">Total Count</option>
+                                {% with options='tag type total_posts' %}
+                                    {% for option in options.split %}
+                                        <option value="{{ option }}"{% if option == order_by %} selected="selected"{% endif %}>{{ option|tag_view|title }}</option>
+                                    {% endfor %}
+                                {% endwith %}
                             </select>
                         </div>
                     </div>
