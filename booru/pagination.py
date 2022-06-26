@@ -1,5 +1,7 @@
 import math
 
+from django.db import models
+
 class Paginator:
     def __init__(self, page, total_count, per_page=10, width=4, page_url=''):
         self.page = page
@@ -38,3 +40,13 @@ class Paginator:
             actual.append(num)
         
         return actual
+    
+    @staticmethod
+    def paginate(qs : models.QuerySet, page : int, per_page : int):
+        """Creates a tuple of the selected pages and a paginator"""
+
+        limit = per_page
+        offset = (page - 1) * per_page
+
+        # Thanks to https://stackoverflow.com/a/53864585/8736749
+        return qs[offset : offset + limit], Paginator(page, qs.count(), per_page)

@@ -1,45 +1,45 @@
 /* Artist */
-.tag-type-artist > a {
+.tag-type-artist * {
     color: #A00;
 }
 
-.tag-type-artist > a:hover {
+.tag-type-artist *:hover {
     color: #9093FF;
 }
 
 /* Character */
-.tag-type-character > a {
+.tag-type-character * {
     color: #0A0;
 }
 
-.tag-type-character > a:hover {
+.tag-type-character *:hover {
     color: #9093FF;
 }
 
 /* Metadata */
-.tag-type-metadata > a {
+.tag-type-metadata * {
     color: #A00;
 }
 
-.tag-type-metadata > a:hover {
+.tag-type-metadata *:hover {
     color: #9093FF;
 }
 
 /* Deprecated */
-.tag-type-deprecated > a {
+.tag-type-deprecated * {
     color: #c0c0c0;
     text-decoration: line-through;
 }
 
-.tag-type-deprecated > a:hover {
+.tag-type-deprecated *:hover {
     color: #c0c0c0;
 }
 
 /* Copyright */
-.tag-type-copyright > a {
+.tag-type-copyright * {
     color: #A0A;
 }
 
-.tag-type-copyright > a:hover {
+.tag-type-copyright *:hover {
     color: #9093FF;
 }

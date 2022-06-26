@@ -171,24 +171,7 @@ class Post(models.Model):
 
             # Handle wild cards
             if wild_card in word:
-                r = word
-
-                # Regex escape the all of the characters, unless it is a wild card
-                escaped = ''
-                for c in r:
-                    if c == wild_card:
-                        escaped += c
-                        continue
-                    
-                    # Escape the character but if it is a number don't make it the character code
-                    if c.isdigit() or c.isalpha():
-                        escaped += f"[{c}]"
-                        continue
-                        
-                    # Escape the character as a character code
-                    escaped += '\\' + c
-                
-                r = escaped.replace(wild_card, '.*')
+                r = boorutils.wildcard_to_regex(word, wild_card)
 
                 # Get all of the tags where their names match the regex
                 tags = Tag.objects.filter(tag__regex=r)
@@ -226,11 +209,7 @@ class Post(models.Model):
 
         # If pagination is enabled, select the correct page
         if paginate:
-            limit = per_page
-            offset = (page - 1) * per_page
-
-            # Thanks to https://stackoverflow.com/a/53864585/8736749
-            return results[offset : offset + limit], Paginator(page, results.count(), per_page)
+            return Paginator.paginate(results, page, per_page)
 
         return results
 

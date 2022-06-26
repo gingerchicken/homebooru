@@ -2,6 +2,8 @@ from django.db import models
 from django.apps import apps
 
 import homebooru.settings
+import booru.boorutils as boorutils
+from booru.pagination import Paginator
 
 class TagType(models.Model):
     """Describes what a tag's category is."""
@@ -20,6 +22,10 @@ class TagType(models.Model):
         except TagType.DoesNotExist:
             # This should never happen unless the database is completely broken
             return None
+    
+    def __str__(self):
+        """Returns the tag type's name."""
+        return self.name
 
 class Tag(models.Model):
     """Used to tag posts."""
@@ -113,3 +119,61 @@ class Tag(models.Model):
 
         # All checks passed
         return True
+    
+    def __str__(self):
+        """Returns the tag's name."""
+
+        return self.tag
+
+    def search(phase : str, sort_param : str = "tag", order : str = "ascending", wild_card : str = "*", paginate=False, page=1, per_page=20) -> list:
+        """Searches for tags."""
+
+        # Check that the order is valid
+        if order not in ["ascending", "descending"]:
+            raise ValueError("Invalid order")
+
+        # Make sure that the sort_param is valid
+        if sort_param not in ["tag", "total_posts", "type"]:
+            raise ValueError("Invalid sort parameter")
+
+        # If the tag contains spaces, return nothing
+        if ' ' in phase:
+            return Tag.objects.none()
+        
+        qs = Tag.objects.all()
+
+        # Handle wildcards
+        if wild_card in phase:
+            regex = boorutils.wildcard_to_regex(phase, wildcard=wild_card)
+
+            qs = qs.filter(tag__regex=regex)
+        # Make sure that the tag isn't empty, if it is then we want to show everything
+        elif phase != "":
+            # Search for where the tag's name is equal to the phase
+            qs = qs.filter(tag=phase)
+
+        # Map sort param
+        if sort_param == "type":
+            sort_param = "tag_type__name"
+
+        # Handle total_posts
+        if sort_param == "total_posts":
+            # We may not use total_posts since it is used on the object but not in the database!
+            # Hence, I renamed it to just "t", nobody should see this other than the searching algorithm
+            sort_param = "t"
+
+            qs = qs.annotate(**{sort_param: models.Count('posts')})
+
+        # Negate the order if it is descending
+        if order == "descending":
+            sort_param = "-" + sort_param
+
+        # Sort the tags
+        qs = qs.order_by(sort_param)
+        
+        # Handle pagination
+        if paginate:
+            return Paginator.paginate(qs, page, per_page)
+
+        # Return the tags
+        return qs
