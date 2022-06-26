@@ -52,19 +52,45 @@ class PaginatorTest(TestCase):
         paginator = Paginator(2, 50, 10)
         self.assertEqual(paginator.has_prev, True)
     
+    def test_prev(self):
+        """Returns expected prev"""
+        paginator = Paginator(2, 50, 40)
+        self.assertEqual(paginator.prev, 1)
+    
     def test_numbers(self):
         """Returns expected numbers"""
+
+        # Just general cases here
         paginator = Paginator(1, 500, 10, width=4)
         self.assertEqual(paginator.numbers, [1, 2, 3, 4, 5])
 
+        # Test if the numbers shift to the right
         paginator = Paginator(6, 500, 10, width=4)
         self.assertEqual(paginator.numbers, [ 2, 3, 4, 5, 6, 7, 8, 9, 10])
 
         paginator = Paginator(4, 500, 10, width=4)
         self.assertEqual(paginator.numbers, [1, 2, 3, 4, 5, 6, 7, 8])
 
+        # Check if it handles the end correctly
         paginator = Paginator(45, 500, 10, width=4)
         self.assertEqual(paginator.numbers, [41, 42, 43, 44, 45, 46, 47, 48, 49])
 
         paginator = Paginator(46, 500, 10, width=4)
         self.assertEqual(paginator.numbers, [42, 43, 44, 45, 46, 47, 48, 49, 50])
+    
+        # Check if it handles going past the end correctly
+        paginator = Paginator(1, 500, 100, width=8)
+        self.assertEqual(paginator.numbers, [1, 2, 3, 4, 5])
+
+    def test_has_next(self):
+        """Returns expected has next"""
+        paginator = Paginator(1, 50, 40)
+        self.assertEqual(paginator.has_next, True)
+
+        paginator = Paginator(2, 50, 40)
+        self.assertEqual(paginator.has_next, False)
+    
+    def test_next(self):
+        """Returns expected next"""
+        paginator = Paginator(1, 50, 40)
+        self.assertEqual(paginator.next, 2)
