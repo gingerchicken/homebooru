@@ -2,6 +2,9 @@
 Django==4.0.5
 djangorestframework
 
+# Testing
+coverage
+
 # Postgres
 psycopg2-binary
 
