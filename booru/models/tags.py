@@ -3,6 +3,7 @@ from django.apps import apps
 
 import homebooru.settings
 import booru.boorutils as boorutils
+from booru.pagination import Paginator
 
 class TagType(models.Model):
     """Describes what a tag's category is."""
@@ -124,7 +125,7 @@ class Tag(models.Model):
 
         return self.tag
 
-    def search(phase : str, sort_param : str = "tag", order : str = "ascending", wild_card : str = "*") -> list:
+    def search(phase : str, sort_param : str = "tag", order : str = "ascending", wild_card : str = "*", paginate=False, page=1, per_page=20) -> list:
         """Searches for tags."""
 
         # Check that the order is valid
@@ -170,5 +171,9 @@ class Tag(models.Model):
         # Sort the tags
         qs = qs.order_by(sort_param)
         
+        # Handle pagination
+        if paginate:
+            return Paginator.paginate(qs, page, per_page)
+
         # Return the tags
         return qs
