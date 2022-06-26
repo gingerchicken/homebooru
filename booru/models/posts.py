@@ -209,11 +209,7 @@ class Post(models.Model):
 
         # If pagination is enabled, select the correct page
         if paginate:
-            limit = per_page
-            offset = (page - 1) * per_page
-
-            # Thanks to https://stackoverflow.com/a/53864585/8736749
-            return results[offset : offset + limit], Paginator(page, results.count(), per_page)
+            return Paginator.paginate(results, page, per_page)
 
         return results
 
