@@ -138,6 +138,9 @@ class TagTest(TestCase):
 
         invalid_tags = ['', '     ', 'e', 'funny-monkey', 'funny monkey', 'HeHehe', '*.*']
 
+        # Generate a tag that is over 100 chars long
+        invalid_tags.append(''.join(['a' for i in range(101)]))
+
         for tag in invalid_tags:
             self.assertFalse(Tag.is_name_valid(tag))
     
