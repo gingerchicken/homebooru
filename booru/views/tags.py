@@ -1,7 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 
-from booru.models.tags import Tag
+from booru.models.tags import Tag, TagType
 import homebooru.settings
 
 from .filters import *
@@ -55,3 +55,49 @@ def tags(request):
         'order_by': order_by,
         'order_direction': order_direction
     })
+
+def edit_tag(request):
+    # Get the tag id url parameter
+    tag_name = request.GET.get('tag', '')
+
+    if not Tag.is_name_valid(tag_name):
+        return HttpResponse(status=404)
+    
+    # Get the tag
+    tag = None
+
+    try:
+        tag = Tag.objects.get(tag=tag_name)
+    except Tag.DoesNotExist:
+        return HttpResponse("Unable to find tag", status=404)
+
+    # Handle GET request
+
+    if request.method == 'GET':
+        # Get the tag types
+        tag_types = TagType.objects.all()
+
+        # Render the tags.html template with the tag
+        return render(request, 'booru/tags/edit.html', {
+            'tag': tag,
+            'tag_types': tag_types
+        })
+    
+    # Handle POST request
+    if request.method == 'POST':
+        # Get the new tag type
+        new_tag_type = request.POST.get('tag_type', tag.tag_type.name)
+
+        # Get the tag type
+        tag_type = None
+        try:
+            tag_type = TagType.objects.get(name=new_tag_type)
+        except TagType.DoesNotExist:
+            return HttpResponse("Unable to find tag type", status=404)
+
+        # Update the tag
+        tag.tag_type = tag_type
+        tag.save()
+
+        # Redirect to the tags page
+        return HttpResponseRedirect(f"/tags?tag={tag.tag}")

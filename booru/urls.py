@@ -12,5 +12,6 @@ urlpatterns = [
     path('view', views.view, name='view'),
 
     # Tags
-    path('tags', views.tags, name='tags')
+    path('tags', views.tags, name='tags'),
+    path('tags/edit', views.edit_tag, name='edit_tag')
 ]
