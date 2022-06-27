@@ -1,10 +1,14 @@
 #!/bin/bash
 
-# Create the database migrations
-python manage.py makemigrations
+if [ "$DB_MIGRATE" = "True" ]; then
+    # Migrate booru
+    python manage.py makemigrations booru
+    python manage.py migrate
 
-# Migrate the database
-python manage.py migrate --run-syncdb
+    # Migrate the rest of the site
+    python manage.py makemigrations
+    python manage.py migrate --run-syncdb
+fi
 
 # Check for the unit test enviroment variable
 # If it is set and equal to "True" then run the unit tests
