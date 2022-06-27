@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 from .tags import Tag, TagType
 from .posts_search_criteria import *
@@ -53,9 +54,8 @@ class Post(models.Model):
     # Post folder (which folder in the storage directory the post is stored in) (this is indicated as an integer)
     folder = models.IntegerField()
 
-    # Owner as a user id foreign key, but for now we will just store the owner as a string
-    # TODO add foreign key to user table
-    owner = models.CharField(max_length=100, blank=True, null=True)
+    # Owner as a user id foreign key
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
     # Makes if the post is a video type or not
     is_video = models.BooleanField(default=False)
