@@ -29,7 +29,7 @@ class Paginator:
     
     @property
     def display_arrows_right(self):
-        return self.page < self.total_count - self.width
+        return self.page < self.total_pages - self.width
     
     @property
     def numbers(self):
