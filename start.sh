@@ -17,6 +17,9 @@ if [ "$UNIT_TEST" = "True" ]; then
     # Run the unit tests
     coverage run --omit=*/tests/*.py --source='./booru' manage.py test
 
+    # Save the exit code of the unit tests
+    UNIT_TEST_EXIT_CODE=$?
+
     # Check if we should display the report
     if [ "$UNIT_TEST_DISPLAY_COVERAGE" = "True" ]; then
         # Display the coverage report
@@ -24,7 +27,7 @@ if [ "$UNIT_TEST" = "True" ]; then
     fi
 
     # Exit with the unit test exit code
-    exit $?
+    exit $UNIT_TEST_EXIT_CODE
 fi
 
 # Chcek if the LOAD_FIXTURES variable is set and equal to "True"
