@@ -41,10 +41,10 @@ class PaginatorTest(TestCase):
         paginator = Paginator(45, 50, 1, width=4)
         self.assertEqual(paginator.display_arrows_right, True)
 
+        # Cases where the end is in site of the current page
         paginator = Paginator(46, 50, 1, width=4)
         self.assertEqual(paginator.display_arrows_right, False)
-
-        # Case where the end is in site of the current page
+        
         paginator = Paginator(1, 50, 25, width=4)
         self.assertEqual(paginator.display_arrows_right, False)
 
