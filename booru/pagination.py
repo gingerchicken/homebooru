@@ -20,12 +20,16 @@ class Paginator:
         return self.page > 1
     
     @property
+    def has_next(self):
+        return self.page < self.total_pages
+
+    @property
     def display_arrows_left(self):
         return self.page > self.width + 1
     
     @property
     def display_arrows_right(self):
-        return self.page < self.total_count - self.width
+        return self.page < self.total_pages - self.width
     
     @property
     def numbers(self):
@@ -41,6 +45,14 @@ class Paginator:
         
         return actual
     
+    @property
+    def next(self):
+        return self.page + 1
+
+    @property
+    def prev(self):
+        return self.page - 1
+
     @staticmethod
     def paginate(qs : models.QuerySet, page : int, per_page : int):
         """Creates a tuple of the selected pages and a paginator"""

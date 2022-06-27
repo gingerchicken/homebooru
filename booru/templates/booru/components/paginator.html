@@ -3,7 +3,7 @@
         <div class="pagination">
             {% if paginator.display_arrows_left %}
                 <a href="{{paginator.page_url}}&pid=1" alt="first page">«</a>
-                <a href="{{paginator.page_url}}&pid={{paginator.pid}}" alt="previous page">‹</a>
+                {% if paginator.has_prev %}<a href="{{paginator.page_url}}&pid={{paginator.prev}}" alt="previous page">‹</a>{% endif %}
             {% endif %}
             
             {% for page_number in paginator.numbers %}
@@ -15,7 +15,7 @@
             {% endfor %}
     
             {% if paginator.display_arrows_right %}
-                <a href="{{paginator.page_url}}&pid={{paginator.pid}}" alt="next page">›</a>
+                {% if paginator.has_next %}<a href="{{paginator.page_url}}&pid={{paginator.next}}" alt="next page">›</a>{% endif %}
                 <a href="{{paginator.page_url}}&pid={{paginator.total_pages}}" alt="last page">»</a>
             {% endif %}
         </div>
