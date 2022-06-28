@@ -115,7 +115,7 @@ class Post(models.Model):
         super(Post, self).delete(*args, **kwargs)
 
     @staticmethod
-    def search(search_phrase, wild_card="*", paginate=False, page=1, per_page=20):
+    def search(search_phrase, wild_card="*"):
         """Search for posts that match a user entered search phrase"""
 
         search_criteria = [] 
@@ -206,10 +206,6 @@ class Post(models.Model):
 
         # Sort the results by their id in descending order
         results = results.order_by('-id')
-
-        # If pagination is enabled, select the correct page
-        if paginate:
-            return Paginator.paginate(results, page, per_page)
 
         return results
 

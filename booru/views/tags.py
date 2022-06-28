@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 
+from booru.pagination import Paginator
 from booru.models.tags import Tag, TagType
 import homebooru.settings
 
@@ -27,22 +28,17 @@ def tags(request):
     
     # Get the tags
     tags = Tag.objects.none()
-    paginator = None
 
     # Handle any invalid inputs
     try:
-        tags, paginator = Tag.search(
-            search_phrase,
-            sort_param=order_by,
-            order=order_direction,
-            paginate=True,
-            page=page_number,
-            per_page=homebooru.settings.BOORU_TAGS_PER_PAGE
-        )
+        tags = Tag.search(search_phrase, sort_param=order_by, order=order_direction)
     except ValueError:
         # Send a 400 error as this will be a bad request
         # TODO create a custom error page for 400 errors
         return HttpResponse(status=400)
+    
+    # Get the paginator
+    tags, paginator = Paginator.paginate(tags, page_number, homebooru.settings.BOORU_TAGS_PER_PAGE)
 
     # Configure paginator
     paginator.page_url = f"{request.path}?tag={search_phrase}&order_by={order_by}&order_direction={order_direction}"
