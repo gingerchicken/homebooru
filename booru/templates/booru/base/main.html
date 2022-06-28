@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Homebooru | {% block page_name %}{% endblock %} {% block page_title %}{% endblock %}</title>
+
+        {% include "booru/components/head.html" %}
+        {% load static %}
+
+        {% block head %}{% endblock %}
+    </head>
+
+    <body>
+        <img style="position:absolute;left:-10px;" src="{% static '/layout/homebooru-com-pix.bmp' %}">
+        <div class="container-fluid">
+            {% block navbar %}{% include "booru/tags/components/nav-bar.html" %}{% endblock %}
+        </div>
+        <div class="alert alert-warning small" style="padding: 10px 15px 10px 15px; font-size: 11px; display: none;" id="motd"></div>
+        <div style="display: inline; padding: 0px 15px 0px 15px;" id="motdspacer">&nbsp;</div>
+
+        {% block main %}{% endblock %}
+
+        {% block footer %}
+            {% include "booru/components/footer.html" %}
+        {% endblock %}
+    </body>
+</html>
