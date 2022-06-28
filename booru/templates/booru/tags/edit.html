@@ -1,47 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<title>Homebooru | Edit Tag | {{ tag }}</title>
+{% extends "booru/tags/base/main.html" %}
+{% load static %}
 
-    {% include "booru/components/head.html" %}
-    {% load static %}
-</head>
+{% block page_title %}
+    Edit Tag | {{ tag }}
+{% endblock %}
 
-<body>
-	<img style="position:absolute;left:-10px;" src="{% static '/layout/homebooru-com-pix.bmp' %}">
-	<div class="container-fluid">
-		{% include "booru/tags/components/nav-bar.html" %}
-	</div>
-	<div class="alert alert-warning small" style="padding: 10px 15px 10px 15px; font-size: 11px; display: none;" id="motd">
-        
-	</div>
-	<div class="tag-contain-push">
-        <form action="?tag={{ tag }}" method="POST" class="tag-edit-form">
-            <div class="tag-title-display tag-type-{{tag.tag_type}}">
-                <span>{{ tag.tag|tag_view }}</span>
-            </div>
+{% block main_content %}
+    <form action="?tag={{ tag }}" method="POST" class="tag-edit-form">
+        <div class="tag-title-display tag-type-{{tag.tag_type}}">
+            <span>{{ tag.tag|tag_view }}</span>
+        </div>
 
-            {% csrf_token %}
+        {% csrf_token %}
 
-            <div class="tag-type">
-                New Type
-                <select id="new-type" name="tag_type">
-                    {% for tag_type in tag_types %}
-                        <option value="{{ tag_type }}"{% if tag_type == tag.tag_type %} selected="selected"{% endif %}>{{ tag_type|title }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+        <div class="tag-type">
+            New Type
+            <select id="new-type" name="tag_type">
+                {% for tag_type in tag_types %}
+                    <option value="{{ tag_type }}"{% if tag_type == tag.tag_type %} selected="selected"{% endif %}>{{ tag_type|title }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-            {% comment %} <div class="tag-description">
-                <textarea id="new-description" name="tag_description" placeholder="Description">{{ tag.tag_description }}</textarea>
-            </div> {% endcomment %}
+        {% comment %} <div class="tag-description">
+            <textarea id="new-description" name="tag_description" placeholder="Description">{{ tag.tag_description }}</textarea>
+        </div> {% endcomment %}
 
-            <div class="submit">
-                <input name="commit" class="secondary_search" type="submit" value="Save">
-            </div>
-        </form>
-	</div>
-	{% include "booru/components/footer.html" %}
+        <div class="submit">
+            <input name="commit" class="secondary_search" type="submit" value="Save">
+        </div>
+    </form>
 
     <script>
         // When the user changes the tag type, update the tag title display's tag-type- class.
@@ -58,6 +46,4 @@
             $('.tag-title-display').addClass('tag-type-' + new_type);
         });
     </script>
-</body>
-
-</html>
+{% endblock %}
