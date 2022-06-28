@@ -1,7 +1,0 @@
-{% extends "booru/base/main.html" %}
-
-{% block page_title %}
-    {% if search_param and search_param|length > 0 %}
-        | {{ search_param }}
-    {% endif %}
-{% endblock %}
