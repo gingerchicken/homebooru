@@ -1,113 +1,94 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	{% if search_param and search_param|length > 0 %}
-		<title>Homebooru | Tag List | {{ search_param }}</title>
-	{% else %}
-		<title>Homebooru | Tag List</title>
-    {% endif %}
+{% extends "booru/tags/base/main.html" %}
+{% load static %}
 
+{% block page_title %}
+    Tag List{% if search_param %}| {{ search_param }}{% endif %}
+{% endblock %}
 
-    {% include "booru/components/head.html" %}
-    {% load static %}
-</head>
+{% block main_content %}
+    <div class="search-container">
+        <form action="" method="get">
+            <span class="search">
+                <input name="tag" type="text" id="search-input" class="form-control" value="{{ search_param }}" placeholder="Search for a tag...">
+            </span>
+            <span class="search-button">
+                <input name="commit" class="secondary_search" type="submit" value="Search">
+            </span>
+            
+            <div class="ordering-container">
+                <a href="javascript:toggleOrdering();">
+                    <div id="display-ordering">
+                        <span id="open-arrow" class="ui-icon ui-icon-caret-1-n"></span> Result Ordering
+                    </div>
+                </a>
+                <div class="ordering">
+                    <div class="option">
+                        Order as<select id="type" name="order_direction">
+                            {% with options='ascending descending' %}
+                                {% for option in options.split %}
+                                    <option value="{{ option }}"{% if option == order_direction %} selected="selected"{% endif %}>{{option|title}}</option>
+                                {% endfor %}
+                            {% endwith %}
+                        </select>
+                    </div>
 
-<body>
-	<img style="position:absolute;left:-10px;" src="{% static '/layout/homebooru-com-pix.bmp' %}">
-	<div class="container-fluid">
-		{% include "booru/tags/components/nav-bar.html" %}
-	</div>
-	<div class="alert alert-warning small" style="padding: 10px 15px 10px 15px; font-size: 11px; display: none;" id="motd">
-        
-	</div>
-	<div class="tag-contain-push">
-        <div class="search-container">
-            <form action="" method="get">
-                <span class="search">
-                    <input name="tag" type="text" id="search-input" class="form-control" value="{{ search_param }}" placeholder="Search for a tag...">
-                </span>
-                <span class="search-button">
-                    <input name="commit" class="secondary_search" type="submit" value="Search">
-                </span>
-                
-                <div class="ordering-container">
-                    <a href="javascript:toggleOrdering();">
-                        <div id="display-ordering">
-                            <span id="open-arrow" class="ui-icon ui-icon-caret-1-n"></span> Result Ordering
-                        </div>
-                    </a>
-                    <div class="ordering">
-                        <div class="option">
-                            Order as<select id="type" name="order_direction">
-                                {% with options='ascending descending' %}
-                                    {% for option in options.split %}
-                                        <option value="{{ option }}"{% if option == order_direction %} selected="selected"{% endif %}>{{option|title}}</option>
-                                    {% endfor %}
-                                {% endwith %}
-                            </select>
-                        </div>
-
-                        <div class="option">
-                            Sort by<select id="order" name="order_by">
-                                {% with options='tag type total_posts' %}
-                                    {% for option in options.split %}
-                                        <option value="{{ option }}"{% if option == order_by %} selected="selected"{% endif %}>{{ option|tag_view|title }}</option>
-                                    {% endfor %}
-                                {% endwith %}
-                            </select>
-                        </div>
+                    <div class="option">
+                        Sort by<select id="order" name="order_by">
+                            {% with options='tag type total_posts' %}
+                                {% for option in options.split %}
+                                    <option value="{{ option }}"{% if option == order_by %} selected="selected"{% endif %}>{{ option|tag_view|title }}</option>
+                                {% endfor %}
+                            {% endwith %}
+                        </select>
                     </div>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
+    </div>
 
-        <script>
-            /**
-            * Toggle the ordering settings
-            */
-            function toggleOrdering() {
-                $('.ordering').toggle();
+    <script>
+        /**
+        * Toggle the ordering settings
+        */
+        function toggleOrdering() {
+            $('.ordering').toggle();
 
-                // Set the arrow to the correct direction
-                if ($('.ordering').is(':visible')) {
-                    $('#open-arrow').removeClass('ui-icon-caret-1-s');
-                    $('#open-arrow').addClass('ui-icon-caret-1-n');
-                } else {
-                    $('#open-arrow').removeClass('ui-icon-caret-1-n');
-                    $('#open-arrow').addClass('ui-icon-caret-1-s');
-                }
+            // Set the arrow to the correct direction
+            if ($('.ordering').is(':visible')) {
+                $('#open-arrow').removeClass('ui-icon-caret-1-s');
+                $('#open-arrow').addClass('ui-icon-caret-1-n');
+            } else {
+                $('#open-arrow').removeClass('ui-icon-caret-1-n');
+                $('#open-arrow').addClass('ui-icon-caret-1-s');
             }
+        }
 
-            // Toggle them by default (as they should be visible for non-JS users)
-            toggleOrdering();
-        </script>
-        
-        {% if tags|length > 0 %}
-            <table class="tag-table">
-                <thead>
+        // Toggle them by default (as they should be visible for non-JS users)
+        toggleOrdering();
+    </script>
+    
+    {% if tags|length > 0 %}
+        <table class="tag-table">
+            <thead>
+                <tr>
+                    <th width="8%">Posts</th>
+                    <th>Tag</th>
+                    <th>Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tag in tags %}
                     <tr>
-                        <th width="8%">Posts</th>
-                        <th>Tag</th>
-                        <th>Type</th>
+                        <td><a href="browse?tags={{tag}}" target="_blank" rel="noopener">{{ tag.total_posts }}</a></td>
+                        <td class="tag-name tag-type-{{tag.tag_type}}"><a href="/tags/edit?tag={{tag.tag}}" target="_blank" rel="noopener">{{ tag.tag|tag_view }}</a></td>
+                        <td class="tag-type">{{ tag.tag_type }}</td>
                     </tr>
-                </thead>
-                <tbody>
-                    {% for tag in tags %}
-                        <tr>
-                            <td><a href="browse?tags={{tag}}" target="_blank" rel="noopener">{{ tag.total_posts }}</a></td>
-                            <td class="tag-name tag-type-{{tag.tag_type}}"><a href="/tags/edit?tag={{tag.tag}}" target="_blank" rel="noopener">{{ tag.tag|tag_view }}</a></td>
-                            <td class="tag-type">{{ tag.tag_type }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <h1>Nobody here but us chickens!</h1> Maybe try searching for something else?
-        {% endif %}
-		<br>
-		{% include "booru/components/paginator.html" %}
-	</div>
-	{% include "booru/components/footer.html" %}
-</body>
-
-</html>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <h1>Nobody here but us chickens!</h1> Maybe try searching for something else?
+    {% endif %}
+    <br>
+    {% include "booru/components/paginator.html" %}
+{% endblock %}

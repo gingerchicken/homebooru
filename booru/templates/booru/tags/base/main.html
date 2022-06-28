@@ -1,0 +1,12 @@
+{% extends "booru/base/main.html" %}
+{% load static %}
+
+{% block navbar %}
+    {% include "booru/tags/components/nav-bar.html" %}
+{% endblock %}
+
+{% block main %}
+    <div class="tag-contain-push">
+        {% block main_content %}{% endblock %}
+    </div>
+{% endblock%}

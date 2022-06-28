@@ -1,0 +1,11 @@
+{% extends "booru/posts/base/main.html" %}
+
+{% block main %}
+    <div class="padding15">
+        {% block before_tags %}{% endblock %}
+        <ul id="tag-list" class='hidden-xs'>{% block main_tags %}{% endblock %}</ul><span id="nup"></span>
+    </div>
+    <div class="contain-push" style="height: 1556px;">
+        {% block main_content %}{% endblock %}
+    </div>
+{% endblock %}
