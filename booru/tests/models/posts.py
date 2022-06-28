@@ -517,51 +517,6 @@ class PostSearchTest(TestCase):
         # Make sure they're in the correct order
         self.assertEqual(tag_names, expected_names)
     
-    def test_pagination(self):
-        ps = []
-
-        # Create a bunch of posts
-        for i in range(0, 100):
-            post = Post(width=420, height=420, folder=0, md5=boorutils.hash_str(str(i)))
-            post.save()
-
-            ps.append(post)
-        
-        # Search for all posts
-        results = Post.search('', paginate=True, page=1, per_page=10)[0]
-
-        # There should be 10 results
-        self.assertEqual(results.count(), 10)
-        
-        all_posts = Post.objects.all()
-
-        # Results should be the last 10 posts
-        for i in range(0, 10):
-            self.assertEqual(results[i], all_posts[len(all_posts) - i - 1])
-
-        max_pages = math.ceil(len(all_posts) / 10)
-        
-        for page in range(2, max_pages + 1):
-            all_results = Post.search('', paginate=True, page=page, per_page=10)
-
-            # Search for the next page
-            results = all_results[0]
-
-            # Make sure that the second part of the results is of the Paginator type
-            self.assertIsInstance(all_results[1], Paginator)
-
-            total = len(all_posts) % 10 if page == max_pages else 10
-
-            # There should be 10 results
-            self.assertEqual(results.count(), total)
-
-            # Results should be the last 90-80 posts
-            for i in range(0, total):
-                self.assertEqual(
-                    results[i],
-                    all_posts[len(all_posts) - i - 1 - (page - 1) * 10]
-                )
-    
     def test_parameter_md5(self):
         # Create a bunch of posts
         for i in range(0, 100):

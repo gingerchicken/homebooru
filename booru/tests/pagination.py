@@ -1,6 +1,10 @@
 from django.test import TestCase
 
+import math
+
 from booru.pagination import Paginator
+from booru.models import Post
+import booru.boorutils as boorutils
 
 class PaginatorTest(TestCase):
     def test_total_pages(self):
@@ -98,3 +102,58 @@ class PaginatorTest(TestCase):
         """Returns expected next"""
         paginator = Paginator(1, 50, 40)
         self.assertEqual(paginator.next, 2)
+
+class PaginatorPaginate(TestCase):
+    def example_search(self):
+        return Post.objects.all().order_by('-id')
+
+    def setUp(self):
+        super().setUp()
+
+        Post.objects.all().delete()
+
+        # Create a bunch of posts for generating a query set
+        for i in range(0, 100):
+            post = Post(width=420, height=420, folder=0, md5=boorutils.hash_str(str(i)))
+            post.save()
+    
+    def tearDown(self):
+        super().tearDown()
+
+    def assertPaginated(self, per_page = 10):
+        # Search for all posts
+        all_posts = self.example_search()
+        max_pages = math.ceil(len(all_posts) / per_page)
+        
+        for page in range(1, max_pages + 1):
+            results, p = Paginator.paginate(all_posts, page, per_page)
+            
+            self.assertIsInstance(p, Paginator)
+            self.assertEqual(p.total_pages, max_pages)
+            self.assertEqual(p.page, page)
+            self.assertEqual(p.total_count, len(all_posts))
+
+            total = len(all_posts) % per_page if page == max_pages else per_page
+            if len(all_posts) % per_page == 0 and page == max_pages:
+                total = per_page
+
+            # There should be 10 results
+            self.assertEqual(len(results), total)
+
+            # Results should be the last 90-80 posts
+            for i in range(0, total):
+                j = per_page * (page - 1) + i
+
+                actual = results[i]
+                expected = all_posts[j]
+
+                self.assertEqual(actual, expected, "Expected %s, got %s (in page %s)" % (expected, actual, page))
+
+
+    def test_pagination_with_even(self):
+        """Pagination with even number of results"""
+        self.assertPaginated()
+    
+    def test_pagination_with_odd(self):
+        """Pagination with odd number of results"""
+        self.assertPaginated(per_page=11)
