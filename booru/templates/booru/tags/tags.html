@@ -94,8 +94,8 @@
                 <tbody>
                     {% for tag in tags %}
                         <tr>
-                            <td><a href="browse?tags={{tag}}">{{ tag.total_posts }}</a></td>
-                            <td class="tag-name tag-type-{{tag.tag_type}}"><a href="/tags/edit?tag={{tag.tag}}">{{ tag.tag|tag_view }}</a></td>
+                            <td><a href="browse?tags={{tag}}" target="_blank" rel="noopener">{{ tag.total_posts }}</a></td>
+                            <td class="tag-name tag-type-{{tag.tag_type}}"><a href="/tags/edit?tag={{tag.tag}}" target="_blank" rel="noopener">{{ tag.tag|tag_view }}</a></td>
                             <td class="tag-type">{{ tag.tag_type }}</td>
                         </tr>
                     {% endfor %}
