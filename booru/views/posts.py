@@ -33,13 +33,11 @@ def browse(request):
     if page < 1:
         page = 1
 
+    # Get the search result set
+    result_set = Post.search(search_phrase)
+
     # Search with the given search phrase
-    posts, pagination = Post.search(
-        search_phrase,
-        paginate=True,
-        page=page,
-        per_page=homebooru.settings.BOORU_POSTS_PER_PAGE
-    )
+    posts, pagination = Paginator.paginate(result_set, page, homebooru.settings.BOORU_POSTS_PER_PAGE)
 
     # Configure the pagination
     pagination.page_url = '/browse?tags=' + search_phrase
