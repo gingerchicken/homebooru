@@ -20,7 +20,7 @@ $ docker-compose up --build
 By default, since the PostgreSQL database should be locked off from the rest of the network, the server will have a default username and password of `homebooru` and `H0meboOru!420`. You can change these by editing the `.env` file in the root directory.
 
 ## Contributions
-If you have any suggestions for improvements, please open an issue on the [GitHub repository](https://github.com/gingerchicken/homebooru). If you have a bit of knowledge with Python and Django, feel free to fork the repository and submit a pull request for new features.
+If you have any suggestions for improvements, please open an issue on the [GitHub repository](https://github.com/gingerchicken/homebooru). If you have a bit of knowledge with Python and Django, feel free to fork the repository and submit a pull request for new features. Before contributing to the project, I would recommend reading some of the [Miscellaneous Project Information](/docs/MISC.md) to understand why certain things are implemented in certain ways and maybe what ethics you should work with when contributing (such as the low JavaScript dependence).
 
 ### Debug Environment
 
