@@ -1,0 +1,20 @@
+{% extends "booru/base/main.html" %}
+{% load static %}
+
+{% block navbar %}
+    {% include "booru/users/components/nav-bar.html" %}
+{% endblock %}
+
+{% block main %}
+
+    <div class="center-form">
+        {% block main_content %}
+
+        {% endblock %}
+    </div>
+
+{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static '/css/custom/users.css' %}">
+{% endblock %}

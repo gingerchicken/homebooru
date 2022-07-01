@@ -154,3 +154,7 @@ BOORU_TAGS_PER_PAGE  = 22   # How many tags to display on the tag search page
 FIXTURE_DIRS = [
     'booru/fixtures'
 ]
+
+# Auth
+LOGIN_REDIRECT_URL  = '/'
+LOGOUT_REDIRECT_URL = '/'
