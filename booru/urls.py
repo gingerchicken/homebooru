@@ -13,5 +13,10 @@ urlpatterns = [
 
     # Tags
     path('tags', views.tags, name='tags'),
-    path('tags/edit', views.edit_tag, name='edit_tag')
+    path('tags/edit', views.edit_tag, name='edit_tag'),
+
+    # Accounts
+    path('accounts/login', views.login, name='login'),
+    # path('accounts/logout', views.logout, name='logout'),
+    # path('accounts/register', views.register, name='register')
 ]

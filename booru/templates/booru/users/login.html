@@ -1,0 +1,26 @@
+{% extends "booru/users/base/main.html" %}
+
+{% block page_title %}
+    Login
+{% endblock %}
+
+{% block main_content %}
+    <div class="center-form-header">Login</div>
+    <span>You need an account to access some parts of our website. You can register for an account <a href="/account/register">here</a>.</span>
+    <div class="login-form">
+        <form method="post">
+            {% csrf_token %}
+            Username:
+            <input type="text" name="username" value="" style="width: 100%;">
+            Password:
+            <input type="password" name="password" value="" style="width: 100%;">
+            {% if error %}
+                <div class="login-warning">{{error}}</div>
+            {% endif %}
+
+            <input type="submit" name="submit" value="Login">
+
+            <div class="forgot-password"><a href="javascript:alert('sorry to hear');">Forgotten your password?</a></div>
+        </form>
+    </div>
+{% endblock %}

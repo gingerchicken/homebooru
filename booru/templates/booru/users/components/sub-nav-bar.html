@@ -1,0 +1,10 @@
+{% extends "booru/components/sub-nav-bar.html" %}
+    
+{% block items %}
+    <li><a href="/accounts/login">Login</a></li>
+    <li><a href="/accounts/register">Register</a></li>
+    {% if request.user.is_authenticated %}
+        <li><a href="/accounts/logout">Logout</a></li>
+        <li><a href="/accounts/profile">My profile</a></li>
+    {% endif %}
+{% endblock %}
