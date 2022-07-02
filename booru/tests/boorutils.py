@@ -157,3 +157,29 @@ class GenerateSampleTest(TestCase):
         self.assertFalse(generate_sample("assets/TEST_DATA/content/felix.jpg", self.output_image))
 
     # TODO test videos
+
+class ValidUsernameTest(TestCase):
+    def test_valid_username(self):
+        usernames = ["test", "H0wITsDone", "cool_man123", "games_are_fun", "gamer", "SalC1", "yay"]
+
+        for username in usernames:
+            self.assertTrue(is_valid_username(username))
+    
+    def test_invalid_username(self):
+        usernames = ["", " ", "test@", "gamer man", "chad!!", "a" * 21, "a", "aa", None, False]
+
+        for username in usernames:
+            self.assertFalse(is_valid_username(username))
+
+class ValidPasswordTest(TestCase):
+    def test_valid_password(self):
+        passwords = ["P@ssw0rd1.3!", "水泥420!", "Now this @~is ep1c!" "SomethingReallyS3cure1!", "Password123!", "IL0v3Gaming!"]
+
+        for password in passwords:
+            self.assertTrue(is_valid_password(password))
+    
+    def test_invalid_password(self):
+        passwords = ["", " ", "test", "gaming", "password", "a", "aaaaa", "password1"]
+
+        for password in passwords:
+            self.assertFalse(is_valid_password(password))
