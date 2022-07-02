@@ -4,6 +4,8 @@ import pathlib
 
 from ..boorutils import *
 
+import homebooru.settings
+
 class HashStrTest(TestCase):
     def test_hash_str(self):
         self.assertEqual(hash_str("test"), "098f6bcd4621d373cade4e832627b4f6")
@@ -183,6 +185,23 @@ class ValidPasswordTest(TestCase):
 
         for password in passwords:
             self.assertFalse(is_valid_password(password))
+    
+    def test_disable_safety(self):
+        # Disable safety
+        homebooru.settings.LOGIN_ALLOW_INSECURE_PASSWORD = True
+
+        passwords = ["something", "a", "abc", "password123"]
+
+        for password in passwords:
+            self.assertTrue(is_valid_password(password))
+
+        # Re-enable safety
+        homebooru.settings.LOGIN_ALLOW_INSECURE_PASSWORD = False
+
+        # Make sure they would have failed
+        for password in passwords:
+            self.assertFalse(is_valid_password(password))
+
 
 class ValidEmailTest(TestCase):
     def test_valid_emails(self):

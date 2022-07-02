@@ -162,6 +162,10 @@ def is_valid_password(password : str):
     if not password:
         return False
 
+    # Check for password safety bypass
+    if homebooru.settings.LOGIN_ALLOW_INSECURE_PASSWORD:
+        return True
+
     # Make sure that the password is at least 6 characters long
     if len(password) < 6:
         return False
