@@ -1,6 +1,7 @@
 import hashlib
 import pathlib
 import ffmpegio
+import re
 
 import homebooru.settings
 
@@ -175,3 +176,24 @@ def is_valid_password(password : str):
 
     # It passes all checks
     return True
+
+def is_valid_email(email : str):
+    """Checks if an email is valid"""
+
+    # Check if the email is empty
+    if not email:
+        return False
+
+    # Make sure that it contains an @
+    if '@' not in email:
+        return False
+
+    # Make sure that it contains a .
+    if '.' not in email:
+        return False
+
+    # This hopefully captures other cases
+    regex = '^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$'
+
+    # Use the regex to check if the email is valid
+    return re.match(regex, email) is not None

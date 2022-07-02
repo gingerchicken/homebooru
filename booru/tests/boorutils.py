@@ -183,3 +183,16 @@ class ValidPasswordTest(TestCase):
 
         for password in passwords:
             self.assertFalse(is_valid_password(password))
+
+class ValidEmailTest(TestCase):
+    def test_valid_emails(self):
+        emails = ["test@gmail.com", "martincool2003@outlook.com", "gaming@gov.uk"]
+
+        for email in emails:
+            self.assertTrue(is_valid_email(email))
+
+    def test_invalid_emails(self):
+        emails = ["", " ", "test", "test@gmailcom", "testgmail.com", "test@", "test@gmail", "test@gmail.", "test@gmail.", "huevo.com", "example", None]
+
+        for email in emails:
+            self.assertFalse(is_valid_email(email))
