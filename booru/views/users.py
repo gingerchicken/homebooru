@@ -43,25 +43,27 @@ def register(request):
 
         # Make sure that the passwords match
         if password != conf_password:
-            return render(request, 'booru/users/register.html', {'error': 'Passwords do not match'})
+            return render(request, 'booru/users/register.html', {'error': 'Passwords do not match'}, status=400)
 
         # Check that the username is valid
         if not boorutils.is_valid_username(username):
-            return render(request, 'booru/users/register.html', {'error': 'Invalid username'})
+            return render(request, 'booru/users/register.html', {'error': 'Invalid username'}, status=400)
 
         # Check if the password is valid
         if not boorutils.is_valid_password(password):
-            return render(request, 'booru/users/register.html', {'error': 'Password is not valid'})
+            return render(request, 'booru/users/register.html', {'error': 'Password is not valid'}, status=400)
 
         # Check if the username is valid
         if User.objects.filter(username=username).exists():
-            return render(request, 'booru/users/register.html', {'error': 'Username already exists'})
+            return render(request, 'booru/users/register.html', {'error': 'Username already exists'}, status=400)
         
-        # Check if the email is valid
-        if User.objects.filter(email=email).exists():
-            return render(request, 'booru/users/register.html', {'error': 'Email already exists'})
+        # Check that the email is valid (ignore if none is provided)
+        if len(email) > 0 and not boorutils.is_valid_email(email):
+            return render(request, 'booru/users/register.html', {'error': 'Email is not valid'}, status=400)
 
-        # TODO look at handling errors for the email
+        # Check if the email is valid (ignore if none is provided)
+        if len(email) > 0 and User.objects.filter(email=email).exists():
+            return render(request, 'booru/users/register.html', {'error': 'Email already exists'}, status=400)
 
         # Create the user
         user = User.objects.create_user(username, email, password)
