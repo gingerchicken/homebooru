@@ -8,10 +8,10 @@ class Profile(models.Model):
     owner = models.OneToOneField(User, on_delete=models.CASCADE)
 
     # Avatar saved as a post on the site
-    avatar = models.ForeignKey(Post, on_delete=models.CASCADE, blank=True, related_name='avatar')
+    avatar = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, blank=True, related_name='avatar')
 
     # Background post saved as a post on the site
-    background = models.ForeignKey(Post, on_delete=models.CASCADE, blank=True, related_name='background')
+    background = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, blank=True, related_name='background')
 
     # Profile bio
     bio = models.TextField(max_length=500, blank=True, default='')
