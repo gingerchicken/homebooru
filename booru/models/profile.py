@@ -22,8 +22,15 @@ class Profile(models.Model):
     @property
     def uploads(self):
         """Get all posts uploaded by the user"""
-        return Post.objects.filter(owner=self.owner)
-    
+
+        # Get the user's posts
+        posts = Post.objects.filter(owner=self.owner)
+
+        # Order them with the most recent first (i.e. the highest id first)
+        posts = posts.order_by('-id')
+
+        return posts
+
     @staticmethod
     def create_or_get(user : User):
         """Get or create a profile for a user"""
