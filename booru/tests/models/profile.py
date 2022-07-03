@@ -84,3 +84,54 @@ class ProfileUploadsTest(TestCase):
 
         # Check that the correct posts are returned
         self.assertEqual(uploads.count(), 0)
+
+class ProfileCreateOrGetTest(TestCase):
+    def test_creates(self):
+        """Test that it creates a profile for a user"""
+
+        # Create a user
+        user = User.objects.create_user(
+            username='test',
+            password='test'
+        )
+        user.save()
+
+        # Make sure that there are no profiles for the user
+        self.assertFalse(Profile.objects.filter(owner=user).exists())
+
+        # Get the user's profile
+        profile = Profile.create_or_get(user)
+
+        # Check that the profile was created
+        self.assertTrue(Profile.objects.filter(owner=user).exists())
+
+    def test_gets(self):
+        """Test that it gets a profile for a user"""
+
+        # Create a user
+        user = User.objects.create_user(
+            username='test',
+            password='test'
+        )
+        user.save()
+
+        # Create another user
+        user2 = User.objects.create_user(
+            username='test2',
+            password='test2'
+        )
+        user2.save()
+
+        # Create a profile for the user
+        expected = Profile(owner=user, bio='testing haha')
+        expected.save()
+
+        # Get the user's profile
+        profile = Profile.create_or_get(user)
+
+        # Check that the profile was retrieved
+        self.assertTrue(Profile.objects.filter(owner=user).exists())
+        self.assertEqual(profile.owner, user)
+
+        # Check that the profile was retrieved correctly
+        self.assertEqual(profile, expected)
