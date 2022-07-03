@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 
 import homebooru.settings
 import booru.boorutils as boorutils
+from booru.models.profile import Profile as ProfileModel
 
 from .filters import *
 
@@ -81,23 +82,30 @@ def profile(request):
     # Get the user id url parameter
     user_id = request.GET.get('id', None)
 
+    user = None
     
     # If the user id is not None, use the requester's user id
     if user_id is None:
-        return render(request, 'booru/users/profile.html', {'user': request.user})
-    
-    user = None
+        user = request.user if request.user.is_authenticated else None
+    else:
+        # Convert the user id to an integer
+        try:
+            user_id = int(user_id)
+        except ValueError:
+            return render(request, 'booru/users/profile.html', {'error': 'Invalid user id'}, status=400)
 
-    # Convert the user id to an integer
-    try:
-        user_id = int(user_id)
-    except ValueError:
-        return render(request, 'booru/users/profile.html', {'error': 'Invalid user id'}, status=400)
+        # Get the user
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            pass
     
-    # Get the user
-    try:
-        user = User.objects.get(id=user_id)
-    except User.DoesNotExist:
+    # If the user is None, send an error message
+    if user is None:
         return render(request, 'booru/users/profile.html', {'error': 'User does not exist'}, status=404)
     
-    return render(request, 'booru/users/profile.html', {'user': user})
+    # Get the user's profile
+    profile = ProfileModel.create_or_get(user)
+    
+    # Render the profile page
+    return render(request, 'booru/users/profile.html', {'profile': profile, 'owner': user})

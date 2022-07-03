@@ -46,3 +46,7 @@
 .forgot-password {
     margin-top: 5px;
 }
+
+.profile_bio {
+    font-style: italic;
+}

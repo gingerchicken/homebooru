@@ -1,7 +1,11 @@
 {% extends "booru/users/base/main.html" %}
 
 {% block page_title %}
-    {{ user.username }}'s Profile
+    {% if error %}
+        Profile
+    {% else %}
+        {{ owner.username }}'s Profile
+    {% endif %}
 {% endblock %}
 
 {% block main %}
@@ -23,7 +27,7 @@
                             <div class="statistics" id="statistics">
                                 <div class="row profileStatSeparator">
                                     <div class="col-md-9">Joined</div>
-                                    <div class="col-md-3"><small>{{ user.date_joined }}</small></div>
+                                    <div class="col-md-3"><small>{{ owner.date_joined }}</small></div>
                                 </div>
                                 <div class="row profileStatSeparator">
                                     <div class="col-md-9">Posts</div>
@@ -48,7 +52,7 @@
             </div>
             <div class="row">
                 <div class="profileUserDisplay">
-                    <span class="profileUsernameDisplay">{{ user }} -</span> Member
+                    <span class="profileUsernameDisplay">{{ owner }} -</span> Member
                 </div>
             </div> 
             <div class="row" style="margin-top: 10px; margin-bottom: 10px;">
@@ -82,7 +86,14 @@
             <br>
             <div class="row">
                 <div class="col-xs-12">
-                    <span class="profileSectionTitle">About <b>Myself:</b></span><br><br>
+                    <span class="profileSectionTitle">About <b>Myself:</b></span>
+                    <div class="profile_bio">
+                        {% if profile.bio %}
+                            {{ profile.bio }}
+                        {% else %}
+                            There is nothing interesting about me.
+                        {% endif %}
+                    </div>
                 </div>
             </div>
             <br>
