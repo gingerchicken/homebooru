@@ -1,0 +1,98 @@
+{% extends "booru/users/base/main.html" %}
+
+{% block page_title %}
+    {{ user.username }}'s Profile
+{% endblock %}
+
+{% block main %}
+    <div class="container" style="margin-top: 20px">
+        {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% else %}
+            <div class="row">
+                <div class="col-xs-12">
+                    <a href="#">
+                        <div class="profileAvatar" style="background: #fff url('/avatars/avatar_anonymous.png') no-repeat center;"></div>
+                    </a>
+                    <div class="hidden-sm hidden-xs profileStatisticsBoxContainer">
+                        <div class="profileStatisticsBox">
+                            <div class="row">
+                                <div class="col-md-7 profileStatisticsBoxTitle">Statistics</div>
+                                {% comment %} <div class="col-md-5 profileToggleStats"><a href="javascript:;" onclick="toggleStats();">Toggle Stats</a></div> {% endcomment %}
+                            </div>
+                            <div class="statistics" id="statistics">
+                                <div class="row profileStatSeparator">
+                                    <div class="col-md-9">Joined</div>
+                                    <div class="col-md-3"><small>{{ user.date_joined }}</small></div>
+                                </div>
+                                <div class="row profileStatSeparator">
+                                    <div class="col-md-9">Posts</div>
+                                    <div class="col-md-3"><a href="#">0</a></div>
+                                </div>
+                                {% comment %} <!-- <div class="row profileStatSeparator">
+                                    <div class="col-md-9">Favorites</div>
+                                    <div class="col-md-3"><a href="#">0</a></div>
+                                </div> --> {% endcomment %}
+                                <div class="row profileStatSeparator">
+                                    <div class="col-md-9">Comments</div>
+                                    <div class="col-md-3">0</div>
+                                </div>
+                                <br>
+                                <span style="font-size: 11px; height: 512px; display: inline-block;">You may add this user as your friend or leave a message on their comment section.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profileBackgroundSize" style="background: #000000 url('/layout/profile_background.jpg') no-repeat; background-position: 0px -150px; background-size: cover;">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="profileUserDisplay">
+                    <span class="profileUsernameDisplay">{{ user }} -</span> Member
+                </div>
+            </div> 
+            <div class="row" style="margin-top: 10px; margin-bottom: 10px;">
+                {% if user == request.user and user.is_authenticated %}
+                    <div class="col-md-3">
+                        <a href="#">
+                            <div class="profileOptionSelect">Change Avatar</div>
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="col-md-3">
+                        <a href="#">
+                            <div class="profileOptionSelect">Send PM</div>
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <span class="profileSectionTitle">Recent <b>Uploads</b> <a href="#">»</a></span><br><br>
+                </div>
+            </div>
+            <br>
+            <br>
+            <div class="row">
+                <div class="col-xs-12">
+                    <span class="profileSectionTitle">Recent <b>Favorites</b> <a href="#">»</a></span><br><br>
+                </div>
+            </div>
+            <br>
+            <br>
+            <div class="row">
+                <div class="col-xs-12">
+                    <span class="profileSectionTitle">About <b>Myself:</b></span><br><br>
+                </div>
+            </div>
+            <br>
+            <br>
+            {% comment %} <div class="row">
+                <div class="profileUserDisplay">
+                    <span class="profileRewardsTitle">Achievements</span>
+                </div>
+                <br>
+            </div> {% endcomment %}
+        {% endif %}
+    </div>
+{% endblock %}
