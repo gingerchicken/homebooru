@@ -1,8 +1,11 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import render
+
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
+from django.contrib.auth import logout as auth_logout
+
 from django.contrib.auth.models import User
 
 import homebooru.settings
@@ -109,3 +112,10 @@ def profile(request):
     
     # Render the profile page
     return render(request, 'booru/users/profile.html', {'profile': profile, 'owner': user})
+
+def logout(request):
+    # Log the user out
+    auth_logout(request)
+
+    # Redirect
+    return HttpResponseRedirect(homebooru.settings.LOGOUT_REDIRECT_URL)

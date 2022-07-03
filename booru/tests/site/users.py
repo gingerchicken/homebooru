@@ -232,3 +232,39 @@ class RegisterTest(TestCase):
 
             # Check that the error context is correct
             self.assertIn(response.context.get('error'), 'Email is not valid')
+
+class LogoutTest(TestCase):
+    """Tests for the logout view"""
+
+    def test_logout(self):
+        """Test that the logout view works"""
+
+        # Create a user
+        self.fred = User.objects.create_user(
+            username='fred',
+            password='SomethingExtrem31ySecure!'
+        )
+        self.fred.save()
+
+        # Log the user in
+        self.client.login(username='fred', password='SomethingExtrem31ySecure!')
+
+        # Try to log the user out
+        response = self.client.get(reverse('logout'))
+
+        # Check that the user is logged out
+        self.assertFalse(self.client.session.get('_auth_user_id'))
+
+        # Check that they get redirected to the homepage
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('index'))
+    
+    def test_logout_no_user(self):
+        """Test that the logout view works when no user is logged in"""
+
+        # Try to log the user out
+        response = self.client.get(reverse('logout'))
+
+        # Check that they get redirected to the homepage
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('index'))
