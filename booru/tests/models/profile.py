@@ -135,3 +135,14 @@ class ProfileCreateOrGetTest(TestCase):
 
         # Check that the profile was retrieved correctly
         self.assertEqual(profile, expected)
+
+    def test_rejects_anon(self):
+        """Test that it rejects anon users"""
+
+        # Make sure that an error is raised for anon users
+        with self.assertRaises(Exception):
+            Profile.create_or_get(None)
+        
+        with self.assertRaises(Exception):
+            p = Profile(owner=None)
+            p.save()

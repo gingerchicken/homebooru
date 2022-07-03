@@ -5,7 +5,7 @@ from .posts import Post
 
 class Profile(models.Model):
     # Owner of the profile (User)
-    owner = models.OneToOneField(User, on_delete=models.CASCADE)
+    owner = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)
 
     # Avatar saved as a post on the site
     avatar = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, blank=True, related_name='avatar')
