@@ -56,7 +56,7 @@
                 </div>
             </div> 
             <div class="row" style="margin-top: 10px; margin-bottom: 10px;">
-                {% if user == request.user and user.is_authenticated %}
+                {% if profile.owner == request.user and user.is_authenticated %}
                     <div class="col-md-3">
                         <a href="#">
                             <div class="profileOptionSelect">Change Avatar</div>
