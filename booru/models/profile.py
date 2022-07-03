@@ -45,3 +45,11 @@ class Profile(models.Model):
 
         # Return the profile
         return profile
+    
+    @property
+    def recent_uploads(self):
+        return self.uploads[:5]
+    
+    @property
+    def recent_favourites(self):
+        return self.favourites.all()[:5]

@@ -31,7 +31,7 @@
                                 </div>
                                 <div class="row profileStatSeparator">
                                     <div class="col-md-9">Posts</div>
-                                    <div class="col-md-3"><a href="#">0</a></div>
+                                    <div class="col-md-3"><a href="/browse?tags=user:{{owner.id}}">{{ profile.uploads.count }}</a></div>
                                 </div>
                                 {% comment %} <!-- <div class="row profileStatSeparator">
                                     <div class="col-md-9">Favorites</div>
@@ -72,14 +72,24 @@
             </div>
             <div class="row">
                 <div class="col-xs-12">
-                    <span class="profileSectionTitle">Recent <b>Uploads</b> <a href="#">»</a></span><br><br>
+                    <span class="profileSectionTitle">Recent <b>Uploads</b> <a href="/browse?tags=user:{{owner.id}}">»</a></span>
+                    <div class="profile-posts">
+                        {% for post in profile.recent_uploads %}
+                            {% include "booru/posts/components/thumbnail.html" %}
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
             <br>
             <br>
             <div class="row">
                 <div class="col-xs-12">
-                    <span class="profileSectionTitle">Recent <b>Favorites</b> <a href="#">»</a></span><br><br>
+                    <span class="profileSectionTitle">Recent <b>Favourites</b> <a href="#">»</a></span><br><br>
+                    <div class="profile-favorites">
+                        {% for post in profile.recent_favourites %}
+                            {% include "booru/posts/components/thumbnail.html" %}
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
             <br>
