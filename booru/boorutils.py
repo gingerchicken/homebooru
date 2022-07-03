@@ -1,6 +1,7 @@
 import hashlib
 import pathlib
 import ffmpegio
+import re
 
 import homebooru.settings
 
@@ -127,3 +128,76 @@ def wildcard_to_regex(phrase : str, wildcard : str = '*') -> str:
     r = escaped.replace(wildcard, '.*')
 
     return r
+
+def is_valid_username(username : str) -> bool:
+    """Checks if a username is valid"""
+    
+    # Check if the username is empty
+    if not username:
+        return False
+
+    # Make sure that the username is at least 3 characters long
+    if len(username) < 3:
+        return False
+
+    # Check if the username is too long
+    if len(username) > 20:
+        return False
+
+    # Check if the username contains invalid characters
+    for c in username:
+        if c.isalnum(): continue
+        if c in '_.': continue
+        
+        # It must be invalid
+        return False
+
+    # It must be valid as all checks passed
+    return True
+
+def is_valid_password(password : str):
+    """Checks if a password is valid"""
+
+    # Check if the password is empty
+    if not password:
+        return False
+
+    # Check for password safety bypass
+    if homebooru.settings.LOGIN_ALLOW_INSECURE_PASSWORD:
+        return True
+
+    # Make sure that the password is at least 6 characters long
+    if len(password) < 6:
+        return False
+    
+    # It must contain at least one number
+    if not any(c.isdigit() for c in password):
+        return False
+    
+    # It must contain at least one special character (i.e. non-alphanumeric)
+    if not any(not c.isalnum() for c in password):
+        return False
+
+    # It passes all checks
+    return True
+
+def is_valid_email(email : str):
+    """Checks if an email is valid"""
+
+    # Check if the email is empty
+    if not email:
+        return False
+
+    # Make sure that it contains an @
+    if '@' not in email:
+        return False
+
+    # Make sure that it contains a .
+    if '.' not in email:
+        return False
+
+    # This hopefully captures other cases
+    regex = '^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$'
+
+    # Use the regex to check if the email is valid
+    return re.match(regex, email) is not None

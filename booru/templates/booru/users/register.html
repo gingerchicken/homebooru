@@ -1,0 +1,28 @@
+{% extends "booru/users/base/main.html" %}
+
+{% block page_title %}
+    Register
+{% endblock %}
+
+{% block main_content %}
+    <div class="center-form-header">Register</div>
+    <span>Sign up for an account by filling in the information below. You do not need to supply an email address however, for greater support, it is recommended that you provide one.</span>
+    <div class="login-form">
+        <form method="post">
+            {% csrf_token %}
+            Username:
+            <input type="text" name="username" value="" style="width: 100%;">
+            Email:
+            <input type="text" name="email" value="" style="width: 100%;">
+            Password:
+            <input type="password" name="password" value="" style="width: 100%;">
+            Confirm password:
+            <input type="password" name="conf_password" value="" style="width: 100%;">
+            {% if error %}
+                <div class="login-warning">{{error}}</div>
+            {% endif %}
+
+            <input type="submit" name="submit" value="Register">
+        </form>
+    </div>
+{% endblock %}
