@@ -405,6 +405,22 @@ class PostSearchTest(TestCase):
         self.assertEqual(wildcard.count(), 1)
         self.assertEqual(wildcard[0], new_post)
     
+    def test_exclude_tag(self):
+        # Search for all posts without tag1
+        results = Post.search('-tag1')
+
+        # There should be no results
+        self.assertEqual(results.count(), 0)
+
+        # Search for all posts wtihout tag2
+        results = Post.search('-tag2')
+
+        # There should be one result
+        self.assertEqual(results.count(), 1)
+        
+        # It should be the second post
+        self.assertEqual(results[0], self.p2)
+
     def test_escape_regex_characters(self):
         # This should only occur with wildcards
         wildcard = Post.search('tag\\*')
