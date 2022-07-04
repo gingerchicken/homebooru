@@ -297,6 +297,26 @@ class PostCreateFromFileTest(TestCase):
 
     # We should be testing for web accessibility but the way it works in production should be slightly different to the way it works in testing
 
+    def test_rejects_non_existant_files(self):
+        """Rejects non-existant files"""
+
+        # Create a post from a file
+        with self.assertRaises(Exception):
+            Post.create_from_file('TEST_FILE_DOES_NOT_EXIST.jpg')
+
+        # Check that the post was not created
+        self.assertEqual(Post.objects.count(), 0)
+    
+    def test_rejects_directories(self):
+        """Rejects directories"""
+
+        # Create a post from a file
+        with self.assertRaises(Exception):
+            Post.create_from_file(testutils.CONTENT_PATH)
+
+        # Check that the post was not created
+        self.assertEqual(Post.objects.count(), 0)
+
 class PostSearchTest(TestCase):
     p1 = None
     p2 = None
@@ -429,6 +449,23 @@ class PostSearchTest(TestCase):
         self.assertEqual(results[1], self.p1)
 
         # TODO add \t and \n cases
+    
+    def test_stops_with_extensive_search(self):
+        """Stops searching after finding zero results"""
+    
+        big_phrase = ''
+
+        # Create a bunch of tags
+        for i in range(50, 1000):
+            tag = Tag(tag='tag' + str(i))
+            tag.save()
+
+            big_phrase += str(tag) + ' '
+
+        # Search for all posts with tag1 and tag2
+        results = Post.search(big_phrase)
+
+        self.assertEqual(len(results), 0)
 
     def test_exclude_tag(self):
         # Search for all posts without tag1
