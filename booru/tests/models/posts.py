@@ -895,6 +895,18 @@ class PostSearchTest(TestCase):
         # There should be 100 results
         self.assertEqual(results.count(), 100)
 
+        # Look for a user that doesn't exist
+        results = Post.search('user:9999')
+
+        # There should be 0 results
+        self.assertEqual(results.count(), 0)
+
+        # Test negation
+        results = Post.search('-user:9999')
+
+        # There should be 100 results
+        self.assertEqual(results.count(), 100)
+
 class PostDeleteTest(TestCase):
     temp_storage = testutils.TempStorage()
 
