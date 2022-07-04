@@ -52,4 +52,12 @@ class Profile(models.Model):
     
     @property
     def recent_favourites(self):
-        return self.favourites.all()[:5]
+        # Get the favourite posts
+        posts = self.favourites.all()
+
+        # TODO this should be ordered by the most recent added to the favourites
+        # Order them with the most recent first (i.e. the highest id first)
+        posts = posts.order_by('-id')
+
+        # Limit to the first 5
+        return posts[:5]

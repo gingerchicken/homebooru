@@ -146,3 +146,71 @@ class ProfileCreateOrGetTest(TestCase):
         with self.assertRaises(Exception):
             p = Profile(owner=None)
             p.save()
+
+class ProfileRecents(TestCase):
+    def setUp(self):
+        # Create a user
+        self.user = User.objects.create_user(
+            username='test',
+            password='test'
+        )
+        self.user.save()
+
+    def assertLimit(self, get_limit, add_post, r=False):
+        """Test that it returns the correct number of posts"""
+
+        ps = []
+
+        for i in range(0, 10):
+            ps.append(Post(
+                md5=boorutils.hash_str(str(i)),
+                owner=self.user,
+                folder=1,
+                width=420,
+                height=420
+            ))
+
+            ps[i].save()
+        
+        # Get the user's profile
+        profile = Profile.create_or_get(self.user)
+
+        for i in range(0, len(ps)):
+            j = len(ps) - i - 1 if r else i
+            add_post(profile, ps[j])
+
+        # Get the user's recent uploads
+        recent = get_limit(profile)
+
+        # Check that the correct number of posts are returned
+        self.assertEqual(len(recent), 5)
+
+        # Check that the correct posts are returned
+        ps.reverse()
+
+        for i in range(0, 5):
+            self.assertEqual(recent[i], ps[i])
+    
+    def test_recent_uploads_5(self):
+        """Test that it returns the correct number of recent uploads"""
+    
+        def get_limit(profile):
+            return profile.recent_uploads
+        
+        def add_post(profile, post):
+            post.owner = profile.owner
+            post.save()
+
+        self.assertLimit(get_limit, add_post)
+    
+    def test_recent_favourites(self):
+        """Test that it returns the correct number of recent favourites"""
+    
+        def get_limit(profile):
+            return profile.recent_favourites
+        
+        def add_post(profile, post):
+            profile.favourites.add(post)
+            profile.save()
+
+        self.assertLimit(get_limit, add_post)
