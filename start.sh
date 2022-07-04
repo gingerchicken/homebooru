@@ -19,7 +19,7 @@ if [ "$UNIT_TEST" = "True" ]; then
     fi
 
     # Run the unit tests
-    coverage run --omit=*/tests/*.py,*/migrations/*.py --source='./booru' manage.py test
+    coverage run --omit=*/tests/*.py,*/migrations/*.py --source='./booru' manage.py test --verbosity 2
 
     # Save the exit code of the unit tests
     UNIT_TEST_EXIT_CODE=$?
