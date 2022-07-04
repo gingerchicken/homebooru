@@ -405,6 +405,31 @@ class PostSearchTest(TestCase):
         self.assertEqual(wildcard.count(), 1)
         self.assertEqual(wildcard[0], new_post)
     
+    def test_ignores_whitespace(self):
+        """Appropriately ignores whitespaces"""
+
+        # Search for all posts with tag1 and tag2
+        results = Post.search('tag1      tag2         ')
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0], self.p1)
+
+        # Test for another case
+        results = Post.search('                   tag1')
+
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0], self.p2)
+        self.assertEqual(results[1], self.p1)
+
+        # Test for another case
+        results = Post.search('-  -  -    -  tag1')
+
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0], self.p2)
+        self.assertEqual(results[1], self.p1)
+
+        # TODO add \t and \n cases
+
     def test_exclude_tag(self):
         # Search for all posts without tag1
         results = Post.search('-tag1')
