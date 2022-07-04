@@ -243,6 +243,25 @@ class UploadPOSTTest(TestCase):
         # Check that the post has the right md5
         self.assertEqual(post.md5, boorutils.get_file_checksum(self.test_path))
     
+    def test_post_logged_in(self):
+        """Marks the owner of a post as the person who uploaded it"""
+
+        # Create a user
+        user = User.objects.create_user(username='test', password='test')
+
+        # Login the user
+        self.client.login(username='test', password='test')
+
+        # Make a post
+        resp = self.make_post(self.test_path, 'tag1 tag2 tag3', 'a title', 'https://example.com/', 'explicit')
+
+        # Check that the post was created
+        self.assertEqual(Post.objects.count(), 1)
+
+        # Check that the post has the correct owner
+        post = Post.objects.first()
+        self.assertEqual(post.owner, user)
+
     def test_redirects_to_correct_page(self):
         """Redirects to the correct page"""
 

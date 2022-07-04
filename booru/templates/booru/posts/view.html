@@ -12,7 +12,7 @@
 	<div id="postStatistics">
 		<h3>Statistics</h3>
 		<li>Id: {{ post.id }}</li>
-		<li>Posted: {{post.timestamp}}<br> by <a href="#">{% if post.owner %}{{post.owner}}{% else %}Anonymous User{% endif %}</a></li>
+		<li>Posted: {{post.timestamp}}<br> by <a href="{% if post.owner %} /accounts/profile/{{ post.owner.id }} {% else %} # {% endif %}">{% if post.owner %}{{post.owner}}{% else %}Anonymous User{% endif %}</a></li>
 		<li>Size: {{ post.width }}x{{ post.height }}</li>
 		{% if post.source|length > 0 %}<li>Source: <a href="{{post.source}}" rel="nofollow">{{post.source}}</a></li>{% endif %}
 		<li>Rating: {{post.rating|title}}</li>

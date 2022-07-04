@@ -101,6 +101,8 @@ def upload(request):
     
     # Check if it is a POST request
     if request.method == 'POST':
+        # TODO check if the user is logged in (if required)
+
         # Make sure that the uploaded file is there
         if 'upload' not in request.FILES:
             return HttpResponse('No file uploaded', status=400)
@@ -190,6 +192,10 @@ def upload(request):
         post.title = title
         post.source = source
         post.rating = rating
+        
+        # Add the owner
+        if request.user.is_authenticated:
+            post.owner = request.user
 
         # Add the post
         post.save()

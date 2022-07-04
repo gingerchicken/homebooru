@@ -47,6 +47,10 @@
     margin-top: 5px;
 }
 
+.profile_bio {
+    font-style: italic;
+}
+
 .email-message {
     font-style: italic;
     font-weight: bold;

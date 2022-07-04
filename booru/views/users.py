@@ -1,12 +1,16 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import render
+
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
+from django.contrib.auth import logout as auth_logout
+
 from django.contrib.auth.models import User
 
 import homebooru.settings
 import booru.boorutils as boorutils
+from booru.models.profile import Profile as ProfileModel
 
 from .filters import *
 
@@ -76,3 +80,29 @@ def register(request):
     
     if request.method == "GET":
         return render(request, 'booru/users/register.html')
+
+def profile(request, user_id : int):
+    user = None
+
+    # Get the user
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        pass
+    
+    # If the user is None, send an error message
+    if user is None:
+        return render(request, 'booru/users/profile.html', {'error': 'User does not exist'}, status=404)
+    
+    # Get the user's profile
+    profile = ProfileModel.create_or_get(user)
+    
+    # Render the profile page
+    return render(request, 'booru/users/profile.html', {'profile': profile, 'owner': user})
+
+def logout(request):
+    # Log the user out
+    auth_logout(request)
+
+    # Redirect
+    return HttpResponseRedirect(homebooru.settings.LOGOUT_REDIRECT_URL)
