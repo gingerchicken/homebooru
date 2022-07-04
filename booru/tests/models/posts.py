@@ -1255,7 +1255,7 @@ class PostGetProximatePosts(TestCase):
         self.assertEqual(posts['newer'], self.newest)
         self.assertEqual(posts['older'], self.oldest)
 
-class RatingTest(TestCase):
+class RatingGetDefaultTest(TestCase):
     fixtures = ['tagtypes.json', 'ratings.json']
 
     def test_get_default(self):
@@ -1289,3 +1289,12 @@ class RatingTest(TestCase):
         r = Rating.get_default()
 
         self.assertEqual(r.name, "test")
+
+class RatingTest(TestCase):
+    def test_string_conversion(self):
+        """Test that the string conversion works"""
+        r = Rating()
+        r.name = "test"
+        r.save()
+
+        self.assertEqual(str(r), "test")
