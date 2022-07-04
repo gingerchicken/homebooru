@@ -2,6 +2,8 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
 
+from booru.models.profile import Profile
+
 class LoginPageTest(TestCase):
     def setUp(self):
         # Create a user called fred
@@ -232,6 +234,43 @@ class RegisterTest(TestCase):
 
             # Check that the error context is correct
             self.assertIn(response.context.get('error'), 'Email is not valid')
+
+class ProfileTest(TestCase):
+    def test_user_not_found(self):
+        """Returns 404 with correct error when not found"""
+
+        # Try to get a profile for a user that doesn't exist
+        response = self.client.get(reverse('profile', kwargs={'user_id': 4300}))
+
+        # Check that the user is not found
+        self.assertEqual(response.status_code, 404)
+        self.assertIn(response.context.get('error'), 'User does not exist')
+
+        # Make sure that no owner or profile is given
+        self.assertIsNone(response.context.get('owner'))
+        self.assertIsNone(response.context.get('profile'))
+
+    def test_user_found(self):
+        """Returns 200 with correct profile when found"""
+
+        # Create a user called fred
+        self.fred = User.objects.create_user(
+            username='fred',
+            password='SomethingExtrem31ySecure!'
+        )
+        self.fred.save()
+
+        # Try to get a profile for the user
+        response = self.client.get(reverse('profile', kwargs={'user_id': self.fred.id}))
+
+        # Check that the user is found
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context.get('owner'), self.fred)
+
+        # Returns correct profile
+        profile = Profile.create_or_get(self.fred)
+        self.assertEqual(response.context.get('profile'), profile)
+
 
 class LogoutTest(TestCase):
     """Tests for the logout view"""
