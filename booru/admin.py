@@ -15,3 +15,7 @@ admin.site.register(Tag)
 
 from .models import TagType
 admin.site.register(TagType)
+
+# Profiles
+from .models import Profile
+admin.site.register(Profile)
