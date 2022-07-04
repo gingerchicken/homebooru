@@ -161,8 +161,12 @@ class Post(models.Model):
                 try:
                     val = expected_type(val)
                 except Exception:
-                    # They wouldn't find anything if the value is wrong
-                    return Post.objects.none()
+                    if not should_exclude:
+                        # They wouldn't find anything if the value is wrong
+                        return Post.objects.none()
+                    
+                    # If it is an exclusion, just continue as this would have had no effect
+                    continue
 
                 # Handle the user case
                 if potential_param == 'user':

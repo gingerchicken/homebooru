@@ -558,6 +558,16 @@ class PostSearchTest(TestCase):
             # The rating of the results should be the same as the rating
             for result in results:
                 self.assertEqual(result.rating, rating)
+            
+            # Test negation
+            results = Post.search('-rating:' + rating.name)
+
+            # There should be 66 results
+            self.assertEqual(results.count(), 66)
+
+            # The rating of the results should not be the same as the rating
+            for result in results:
+                self.assertNotEqual(result.rating, rating)
 
     def test_parameter_rating_invalid(self):
         # Create a bunch of posts
@@ -572,7 +582,16 @@ class PostSearchTest(TestCase):
         # There should be 0 results
         self.assertEqual(results.count(), 0)
 
+        # Test negation
+        results = Post.search('-rating:invalid')
+
+        # There should be 5 results
+        self.assertEqual(results.count(), 5)
+
     def test_parameter_title(self):
+        # Remove all other posts
+        Post.objects.all().delete()
+
         # Create a bunch of posts
         for i in range(0, 100):
             post = Post(width=420, height=420, folder=0, title='title' + str(i), md5=boorutils.hash_str(str(i)))
@@ -586,6 +605,16 @@ class PostSearchTest(TestCase):
 
         # The title of the result should be title0
         self.assertEqual(results[0].title, 'title0')
+
+        # Test negation
+        results = Post.search('-title:title0')
+
+        # There should be 99 results
+        self.assertEqual(results.count(), 99)
+
+        # The title of the results should not be title0
+        for result in results:
+            self.assertNotEqual(result.title, 'title0')
     
     def test_parameter_title_invalid(self):
         # Create a bunch of posts
@@ -598,6 +627,12 @@ class PostSearchTest(TestCase):
 
         # There should be 0 results
         self.assertEqual(results.count(), 0)
+
+        # Test negation
+        results = Post.search('-title:invalid')
+
+        # There should be 102 results
+        self.assertEqual(results.count(), 102)
     
     def test_parameter_width(self):
         Post.objects.all().delete()
@@ -615,6 +650,16 @@ class PostSearchTest(TestCase):
 
         # The width of the result should be 420
         self.assertEqual(results[0].width, 420)
+
+        # Test negation
+        results = Post.search('-width:420')
+
+        # There should be 99 results
+        self.assertEqual(results.count(), 99)
+
+        # The width of the results should not be 420
+        for result in results:
+            self.assertNotEqual(result.width, 420)
     
     def test_parameter_width_invalid(self):
         # Create a bunch of posts
@@ -627,6 +672,12 @@ class PostSearchTest(TestCase):
 
         # There should be 0 results
         self.assertEqual(results.count(), 0)
+
+        # Test negation
+        results = Post.search('-width:invalid')
+
+        # There should be 102 results
+        self.assertEqual(results.count(), 102)
     
     def test_parameter_height(self):
         Post.objects.all().delete()
@@ -643,6 +694,16 @@ class PostSearchTest(TestCase):
 
         # The height of the result should be 420
         self.assertEqual(results[0].height, 420)
+
+        # Test negation
+        results = Post.search('-height:420')
+
+        # There should be 99 results
+        self.assertEqual(results.count(), 99)
+
+        # The height of the results should not be 420
+        for result in results:
+            self.assertNotEqual(result.height, 420)
     
     def test_parameter_height_invalid(self):
         # Create a bunch of posts
@@ -655,6 +716,11 @@ class PostSearchTest(TestCase):
 
         # There should be 0 results
         self.assertEqual(results.count(), 0)
+
+        # Test negation
+        results = Post.search('-height:invalid')
+
+        # There should be 102 results
     
     def test_parameter_negation(self):
         """Negate a parameter much like a tag"""
@@ -806,6 +872,12 @@ class PostSearchTest(TestCase):
 
         # There should be 0 results
         self.assertEqual(results.count(), 0)
+
+        # Test negation
+        results = Post.search('-user:invalid')
+
+        # There should be 100 results
+        self.assertEqual(results.count(), 100)
 
 class PostDeleteTest(TestCase):
     temp_storage = testutils.TempStorage()
