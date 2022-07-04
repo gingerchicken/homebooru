@@ -297,6 +297,26 @@ class PostCreateFromFileTest(TestCase):
 
     # We should be testing for web accessibility but the way it works in production should be slightly different to the way it works in testing
 
+    def test_rejects_non_existant_files(self):
+        """Rejects non-existant files"""
+
+        # Create a post from a file
+        with self.assertRaises(Exception):
+            Post.create_from_file('TEST_FILE_DOES_NOT_EXIST.jpg')
+
+        # Check that the post was not created
+        self.assertEqual(Post.objects.count(), 0)
+    
+    def test_rejects_directories(self):
+        """Rejects directories"""
+
+        # Create a post from a file
+        with self.assertRaises(Exception):
+            Post.create_from_file(testutils.CONTENT_PATH)
+
+        # Check that the post was not created
+        self.assertEqual(Post.objects.count(), 0)
+
 class PostSearchTest(TestCase):
     p1 = None
     p2 = None
@@ -405,6 +425,64 @@ class PostSearchTest(TestCase):
         self.assertEqual(wildcard.count(), 1)
         self.assertEqual(wildcard[0], new_post)
     
+    def test_ignores_whitespace(self):
+        """Appropriately ignores whitespaces"""
+
+        # Search for all posts with tag1 and tag2
+        results = Post.search('tag1      tag2         ')
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0], self.p1)
+
+        # Test for another case
+        results = Post.search('                   tag1')
+
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0], self.p2)
+        self.assertEqual(results[1], self.p1)
+
+        # Test for another case
+        results = Post.search('-  -  -    -  tag1')
+
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0], self.p2)
+        self.assertEqual(results[1], self.p1)
+
+        # TODO add \t and \n cases
+    
+    def test_stops_with_extensive_search(self):
+        """Stops searching after finding zero results"""
+    
+        big_phrase = ''
+
+        # Create a bunch of tags
+        for i in range(50, 1000):
+            tag = Tag(tag='tag' + str(i))
+            tag.save()
+
+            big_phrase += str(tag) + ' '
+
+        # Search for all posts with tag1 and tag2
+        results = Post.search(big_phrase)
+
+        self.assertEqual(len(results), 0)
+
+    def test_exclude_tag(self):
+        # Search for all posts without tag1
+        results = Post.search('-tag1')
+
+        # There should be no results
+        self.assertEqual(results.count(), 0)
+
+        # Search for all posts wtihout tag2
+        results = Post.search('-tag2')
+
+        # There should be one result
+        self.assertEqual(results.count(), 1)
+        
+        # It should be the second post
+        self.assertEqual(results[0], self.p2)
+
     def test_escape_regex_characters(self):
         # This should only occur with wildcards
         wildcard = Post.search('tag\\*')
@@ -879,6 +957,18 @@ class PostSearchTest(TestCase):
         # There should be 100 results
         self.assertEqual(results.count(), 100)
 
+        # Look for a user that doesn't exist
+        results = Post.search('user:9999')
+
+        # There should be 0 results
+        self.assertEqual(results.count(), 0)
+
+        # Test negation
+        results = Post.search('-user:9999')
+
+        # There should be 100 results
+        self.assertEqual(results.count(), 100)
+
 class PostDeleteTest(TestCase):
     temp_storage = testutils.TempStorage()
 
@@ -1227,7 +1317,7 @@ class PostGetProximatePosts(TestCase):
         self.assertEqual(posts['newer'], self.newest)
         self.assertEqual(posts['older'], self.oldest)
 
-class RatingTest(TestCase):
+class RatingGetDefaultTest(TestCase):
     fixtures = ['tagtypes.json', 'ratings.json']
 
     def test_get_default(self):
@@ -1261,3 +1351,12 @@ class RatingTest(TestCase):
         r = Rating.get_default()
 
         self.assertEqual(r.name, "test")
+
+class RatingTest(TestCase):
+    def test_string_conversion(self):
+        """Test that the string conversion works"""
+        r = Rating()
+        r.name = "test"
+        r.save()
+
+        self.assertEqual(str(r), "test")

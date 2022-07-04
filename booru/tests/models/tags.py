@@ -151,6 +151,16 @@ class TagTest(TestCase):
 
         for tag in invalid_tags:
             self.assertFalse(Tag.is_name_valid(tag))
+    
+    def test_string_conversion(self):
+        """Converts to string correctly"""
+
+        # Create a tag
+        tag = Tag(tag='tag1')
+        tag.save()
+
+        # Make sure the string conversion works
+        self.assertEqual(str(tag), 'tag1')
 
 class TagSearchTest(TestCase):
     fixtures = ['booru/fixtures/tagtypes.json']
@@ -413,3 +423,16 @@ class TagSearchTest(TestCase):
 
         # Make sure the tag is in the list
         self.assertEqual(len(tags), 0)
+
+class TagTypeTest(TestCase):
+    fixtures = ['booru/fixtures/tagtypes.json']
+
+    def test_string_conversion(self):
+        """Converts the tag type to a string"""
+
+        # Create a tag type
+        test_type = TagType(name='test')
+        test_type.save()
+
+        # Make sure the tag type is a string
+        self.assertEqual(str(test_type), 'test')

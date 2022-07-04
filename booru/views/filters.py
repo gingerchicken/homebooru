@@ -15,5 +15,5 @@ def remove(string, to_remove):
     return string.replace(to_remove, '')
 
 @register.filter
-def concat(string, cat):
-    return string + str(cat)
+def concat(a, b):
+    return str(a) + str(b)

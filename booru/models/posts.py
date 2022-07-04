@@ -414,18 +414,10 @@ class Post(models.Model):
         """Get the posts that are proximate to this one"""
 
         # Get the first result where the id is less than this one (i.e. it was added earlier)
-        older = None
-        try:
-            older = search_results.filter(id__lt=self.id).first()
-        except Post.DoesNotExist as e:
-            pass
+        older = search_results.filter(id__lt=self.id).first()
 
         # Get the second result where the id is greater than this one (i.e. it was added later)
-        newer = None
-        try:
-            newer = search_results.filter(id__gt=self.id).last()
-        except Post.DoesNotExist as e:
-            pass
+        newer = search_results.filter(id__gt=self.id).last()
 
         # Return the results
         return {
