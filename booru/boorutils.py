@@ -69,10 +69,6 @@ def generate_thumbnail(path : str, save_path : str) -> bool:
 
     # Use ffmpeg to generate the thumbnail (i.e. create a new image with the resolution of ?x150)
     rescale_image(file_path, file_save_path, "-1:150")
-
-    # Check that the file was created
-    if not file_save_path.exists():
-        raise Exception("File was not created")
     
     return True
 
@@ -99,10 +95,6 @@ def generate_sample(path : str, save_path : str) -> bool:
 
     # Rescale the image
     rescale_image(file_path, file_save_path, "850:-1")
-    
-    # Check that the file was created
-    if not file_save_path.exists():
-        raise Exception("File was not created")
     
     return True
 
