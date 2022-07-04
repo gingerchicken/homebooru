@@ -81,27 +81,14 @@ def register(request):
     if request.method == "GET":
         return render(request, 'booru/users/register.html')
 
-def profile(request):
-    # Get the user id url parameter
-    user_id = request.GET.get('id', None)
-
+def profile(request, user_id : int):
     user = None
-    
-    # If the user id is not None, use the requester's user id
-    if user_id is None:
-        user = request.user if request.user.is_authenticated else None
-    else:
-        # Convert the user id to an integer
-        try:
-            user_id = int(user_id)
-        except ValueError:
-            return render(request, 'booru/users/profile.html', {'error': 'Invalid user id'}, status=400)
 
-        # Get the user
-        try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            pass
+    # Get the user
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        pass
     
     # If the user is None, send an error message
     if user is None:
