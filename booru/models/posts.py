@@ -129,7 +129,8 @@ class Post(models.Model):
             'rating': str,
             'title': str,
             'width': int,
-            'height': int
+            'height': int,
+            'user': int
         }
 
         # For each word, check if it is a tag
@@ -163,6 +164,14 @@ class Post(models.Model):
                     # They wouldn't find anything if the value is wrong
                     return Post.objects.none()
 
+                # Handle the user case
+                if potential_param == 'user':
+                    # Add the user to the search criteria
+                    search_criteria.append(SearchCriteriaExcludeUser(val) if should_exclude else SearchCriteriaUser(val))
+
+                    continue
+                
+                # Handle the generic cases
                 search_criteria.append(
                     SearchCriteriaExcludeParameter(potential_param, val) if should_exclude else SearchCriteriaParameter(potential_param, val)
                 )

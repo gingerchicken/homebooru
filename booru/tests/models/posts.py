@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.contrib.auth.models import User
 
 from ...models.posts import Post, Rating
 from ...models.tags import Tag, TagType
@@ -735,6 +736,76 @@ class PostSearchTest(TestCase):
         for result in results:
             self.assertEqual(result.tags.all()[0].tag, 'tag0')
             self.assertEqual(result.rating, Rating.objects.get(name='explicit'))
+
+    def test_parameter_user(self):
+        """Test that the user parameter works"""
+        # Remove all other posts
+        Post.objects.all().delete()
+
+        # Create a user
+        user = User(username='test', password='huevo')
+        user.save()
+
+        # Create another user
+        user2 = User(username='test2', password='huevo')
+        user2.save()
+
+        # Create a bunch of posts
+        for i in range(0, 50):
+            post = Post(width=420, height=420, folder=0, md5=boorutils.hash_str(str(i)), owner=user)
+            post.save()
+        
+        for i in range(50, 100):
+            post = Post(width=420, height=420, folder=0, md5=boorutils.hash_str(str(i)), owner=user2)
+            post.save()
+        
+        # Search for a post with the user of user1
+        results = Post.search('user:' + str(user.id))
+
+        # There should be 50 results
+        self.assertEqual(results.count(), 50)
+
+        # The user of the result should be user
+        for result in results:
+            self.assertEqual(result.owner, user)
+        
+        # Test negation
+        results = Post.search('-user:' + str(user.id))
+
+        # There should be 50 results
+        self.assertEqual(results.count(), 50)
+
+        # The user of the result should be user
+        for result in results:
+            self.assertEqual(result.owner, user2)
+    
+    def test_parameter_user_invalid(self):
+        """Test that the user parameter works"""
+        # Remove all other posts
+        Post.objects.all().delete()
+
+        # Create a user
+        user = User(username='test', password='huevo')
+        user.save()
+
+        # Create another user
+        user2 = User(username='test2', password='huevo')
+        user2.save()
+
+        # Create a bunch of posts
+        for i in range(0, 50):
+            post = Post(width=420, height=420, folder=0, md5=boorutils.hash_str(str(i)), owner=user)
+            post.save()
+        
+        for i in range(50, 100):
+            post = Post(width=420, height=420, folder=0, md5=boorutils.hash_str(str(i)), owner=user2)
+            post.save()
+        
+        # Search for a post with the user of user1
+        results = Post.search('user:invalid')
+
+        # There should be 0 results
+        self.assertEqual(results.count(), 0)
 
 class PostDeleteTest(TestCase):
     temp_storage = testutils.TempStorage()
