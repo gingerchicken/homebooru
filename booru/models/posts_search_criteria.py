@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 from .tags import Tag
 
@@ -69,3 +70,44 @@ class SearchCriteriaExcludeParameter(SearchCriteria):
 
     def search(self, s) -> models.QuerySet:
         return s.exclude(**{self.parameter: self.value})
+
+class SearchCriteriaUser(SearchCriteria):
+    """Used to search for posts by a certain user"""
+
+    def __init__(self, user_id: int) -> None:
+        self.user_id = user_id
+
+    @property
+    def user(self) -> User:
+        # If the user doesn't exist, return None
+        if not User.objects.filter(id=self.user_id).exists():
+            return None
+        
+        # Get the user
+        return User.objects.get(id=self.user_id)
+
+    def search(self, s) -> models.QuerySet:
+        user = self.user
+
+        # If the user doesn't exist, return an empty queryset
+        if not user:
+            return s.none()
+
+        # Return the posts by the user
+        return s.filter(owner=user)
+
+class SearchCriteriaExcludeUser(SearchCriteriaUser):
+    """Used to exclude posts by a certain user"""
+
+    def __init__(self, user_id: int) -> None:
+        self.user_id = user_id
+
+    def search(self, s) -> models.QuerySet:
+        user = self.user
+
+        # If the user doesn't exist, return the query set since it's already excluded
+        if not user:
+            return s
+
+        # Return the posts by the user
+        return s.exclude(owner=user)
