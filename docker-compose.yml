@@ -15,8 +15,6 @@ services:
       - .:/code
       - ${ACTUAL_STORAGE_PATH}:${BOORU_STORAGE_PATH}
       - ${ACTUAL_STATIC_PATH}:${STATIC_ROOT}
-    ports:
-      - "8000:8000"
     environment:
       # Database
       - POSTGRES_NAME=${DB_NAME}
@@ -37,4 +35,13 @@ services:
       - BOORU_STORAGE_PATH=${BOORU_STORAGE_PATH}
     depends_on:
       - db
-
+  nginx:
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ${ACTUAL_STORAGE_PATH}:/storage/
+      - ${ACTUAL_STATIC_PATH}:/static/
+      - ./.nginx/booru.conf:/etc/nginx/conf.d/booru.conf
+    depends_on:
+      - web
