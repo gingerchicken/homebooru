@@ -13,7 +13,8 @@ services:
     build: .
     volumes:
       - .:/code
-      - ./data/storage:${BOORU_STORAGE_PATH}
+      - ${ACTUAL_STORAGE_PATH}:${BOORU_STORAGE_PATH}
+      - ${ACTUAL_STATIC_PATH}:${STATIC_ROOT}
     ports:
       - "8000:8000"
     environment:
