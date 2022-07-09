@@ -53,6 +53,7 @@ INSTALLED_APPS = [
 
     # Homebooru
     'booru.apps.BooruConfig',
+    'booru.management.commands.createsecretkey'
 ]
 
 # Show static files in debug mode
