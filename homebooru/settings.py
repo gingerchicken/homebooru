@@ -27,8 +27,18 @@ SECRET_KEY = 'django-insecure--(39sq1mfklbeb!0nc@8^h($-%-z$=qn8#teheqy$&fu=51_=*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
+# TODO change these to your own domain
 ALLOWED_HOSTS = [
     '*'
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost'
+]
+
+
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost'
 ]
 
 
@@ -40,11 +50,17 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
 
     # Homebooru
     'booru.apps.BooruConfig',
 ]
+
+# Show static files in debug mode
+COLLECT_STATIC = os.environ.get('COLLECT_STATIC', 'False').lower() == 'true'
+if DEBUG or COLLECT_STATIC:
+    INSTALLED_APPS += [
+        'django.contrib.staticfiles'
+    ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -127,6 +143,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = Path(os.environ.get('STATIC_ROOT', '/static/'))
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field

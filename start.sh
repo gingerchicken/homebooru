@@ -42,8 +42,14 @@ fi
 
 # Check if the debug enviroment variable is set and equal to "False"
 if [ "$DEBUG" = "False" ]; then
+    # Enable the static file app
+    export COLLECT_STATIC=True
+
     # Collect static files
-    echo "yes" | python manage.py collectstatic
+    python manage.py collectstatic --noinput
+    
+    # Disable
+    export COLLECT_STATIC=False
 fi
 
 # Start the application

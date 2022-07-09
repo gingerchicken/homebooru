@@ -24,9 +24,10 @@ urlpatterns = [
     path('', include('booru.urls')) # This makes the posts page the homepage
 ]
 
-# Append storage folders
-for folder in settings.BOORU_STORAGE_SUBFOLDERS:
-    url = settings.BOORU_STORAGE_URL + folder + '/'
-    p = settings.BOORU_STORAGE_PATH / folder
+if settings.DEBUG:
+    # Append storage folders
+    for folder in settings.BOORU_STORAGE_SUBFOLDERS:
+        url = settings.BOORU_STORAGE_URL + folder + '/'
+        p = settings.BOORU_STORAGE_PATH / folder
 
-    urlpatterns += static(url, document_root=p)
+        urlpatterns += static(url, document_root=p)

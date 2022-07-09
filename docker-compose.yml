@@ -13,8 +13,8 @@ services:
     build: .
     volumes:
       - .:/code
-    ports:
-      - "8000:8000"
+      - ${ACTUAL_STORAGE_PATH}:${BOORU_STORAGE_PATH}
+      - ${ACTUAL_STATIC_PATH}:${STATIC_ROOT}
     environment:
       # Database
       - POSTGRES_NAME=${DB_NAME}
@@ -30,6 +30,18 @@ services:
       # Unit Testing
       - UNIT_TEST=${UNIT_TEST}
       - UNIT_TEST_DISPLAY_COVERAGE=${UNIT_TEST_DISPLAY_COVERAGE}
+
+      # Booru
+      - BOORU_STORAGE_PATH=${BOORU_STORAGE_PATH}
     depends_on:
       - db
-
+  nginx:
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ${ACTUAL_STORAGE_PATH}:/storage/
+      - ${ACTUAL_STATIC_PATH}:/static/
+      - ./.nginx/booru.conf:/etc/nginx/conf.d/booru.conf
+    depends_on:
+      - web

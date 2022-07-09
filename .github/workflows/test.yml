@@ -11,6 +11,7 @@ jobs:
       - name: "Create .env file"
         run: |
           echo -e "\nUNIT_TEST=True" >> .env
+          echo -e "\DEBUG=True" >> .env
       - name: "Build docker-compose stack"
         run: docker-compose up -d --build
       - name: "Attach to test container"
