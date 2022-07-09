@@ -42,6 +42,6 @@ services:
     volumes:
       - ${ACTUAL_STORAGE_PATH}:/storage/
       - ${ACTUAL_STATIC_PATH}:/static/
-      - ./.nginx/booru.conf:/etc/nginx/conf.d/booru.conf
+      - ./.nginx:/etc/nginx/conf.d/booru.conf
     depends_on:
       - web
