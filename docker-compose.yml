@@ -13,6 +13,7 @@ services:
     build: .
     volumes:
       - .:/code
+      - ./secret.txt:/code/secret.txt
       - ${ACTUAL_STORAGE_PATH}:${BOORU_STORAGE_PATH}
       - ${ACTUAL_STATIC_PATH}:${STATIC_ROOT}
     environment:
