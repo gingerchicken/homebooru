@@ -46,7 +46,8 @@ INSTALLED_APPS = [
 ]
 
 # Show static files in debug mode
-if DEBUG:
+COLLECT_STATIC = os.environ.get('COLLECT_STATIC', 'False').lower() == 'true'
+if DEBUG or COLLECT_STATIC:
     INSTALLED_APPS += [
         'django.contrib.staticfiles'
     ]
