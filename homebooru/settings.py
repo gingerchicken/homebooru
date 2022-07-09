@@ -30,6 +30,9 @@ try:
 except FileNotFoundError:
     SECRET_KEY = os.environ.get('SECRET_KEY')
 
+# This can be rotated but it will invalidate all existing sessions
+# See https://stackoverflow.com/a/52509362/8736749
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
