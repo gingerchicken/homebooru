@@ -22,13 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-
-# Read the secret key from the file 'secret.txt'
-try:
-    with open(BASE_DIR / 'secret.txt') as f:
-        SECRET_KEY = f.read().strip()
-except FileNotFoundError:
-    SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # This can be rotated but it will invalidate all existing sessions
 # See https://stackoverflow.com/a/52509362/8736749

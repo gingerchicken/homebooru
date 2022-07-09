@@ -1,11 +1,26 @@
 #!/bin/bash
 
-# Check if ./secret.txt doesn't exist
-# or if ROLL_SECRET is set to True
-if [ ! -f ./secret.txt ] || [ "$ROLL_SECRET" = "True" ]; then
-    # Generate a new secret
-    python manage.py createsecretkey --force --length 128
+# Check if the SECRET_KEY environment variable is set
+if [ -z "$SECRET_KEY" ]; then
+    # Check if ./secret.txt doesn't exist
+    # or if ROLL_SECRET is set to True
+    if [ ! -f ./secret.txt ] || [ "$ROLL_SECRET" = "True" ]; then
+        # Generate a new secret
+        python manage.py createsecretkey --force --length 128
+    fi
+
+    # Read the secret from ./secret.txt
+    SECRET=$(cat ./secret.txt)
+
+    # Set it as an environment variable
+    export SECRET_KEY=$SECRET
+
+    echo "Pulled secret key from file"
+else
+    # Say that the secret is set
+    echo "Pulled secret from environment variable"
 fi
+
 
 if [ "$DB_MIGRATE" = "True" ]; then
     # Migrate booru
