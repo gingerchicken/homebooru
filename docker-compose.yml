@@ -23,6 +23,10 @@ services:
       - LOAD_FIXTURES=${LOAD_FIXTURES}
       - DB_MIGRATE=${DB_MIGRATE}
 
+      # Secret
+      - ROLL_SECRET=${ROLL_SECRET}
+      - SECRET_KEY=${SECRET_KEY} # Feel free to change this in production to something static and secure!
+
       # Debugging
       - BOORU_SHOW_FFMPEG_OUTPUT=${BOORU_SHOW_FFMPEG_OUTPUT}
       - DEBUG=${DEBUG}

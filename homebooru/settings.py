@@ -22,7 +22,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure--(39sq1mfklbeb!0nc@8^h($-%-z$=qn8#teheqy$&fu=51_=*'
+SECRET_KEY = os.environ.get('SECRET_KEY')
+
+# This can be rotated but it will invalidate all existing sessions
+# See https://stackoverflow.com/a/52509362/8736749
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
@@ -53,6 +56,7 @@ INSTALLED_APPS = [
 
     # Homebooru
     'booru.apps.BooruConfig',
+    'booru.management.commands.createsecretkey'
 ]
 
 # Show static files in debug mode
