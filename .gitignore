@@ -140,6 +140,7 @@ GitHub.sublime-settings
 *.sqlite3
 data/db
 */migrations/*.py
+/secret.txt
 
 # Tests
 assets/TEST_DATA
