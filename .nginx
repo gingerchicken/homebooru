@@ -6,8 +6,6 @@ server {
     client_max_body_size 8G;
 
     # TODO add error pages etc.
-    # TODO look into using uWSGI for this as that's what the wiki recommends
-    # https://docs.djangoproject.com/en/4.0/howto/deployment/wsgi/uwsgi/
 
     # Django forward
     location @django_proxy {
