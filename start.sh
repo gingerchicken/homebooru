@@ -6,7 +6,7 @@ if [ -z "$SECRET_KEY" ]; then
     # or if ROLL_SECRET is set to True
     if [ ! -f ./secret.txt ] || [ "$ROLL_SECRET" = "True" ]; then
         # Generate a new secret
-        python manage.py createsecretkey --force --length 128
+        python manage.py createsecretkey --force --length 128 > /dev/null
     fi
 
     # Read the secret from ./secret.txt
