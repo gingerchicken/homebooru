@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# Check if ./secret.txt exists
-if [ ! -f ./secret.txt ]; then
-    # Create secret.txt
-    python manage.py createsecretkey --force --length 64
+# Check if ./secret.txt doesn't exist
+# or if ROLL_SECRET is set to True
+if [ ! -f ./secret.txt ] || [ "$ROLL_SECRET" = "True" ]; then
+    # Generate a new secret
+    python manage.py createsecretkey --force --length 128
 fi
 
 if [ "$DB_MIGRATE" = "True" ]; then
