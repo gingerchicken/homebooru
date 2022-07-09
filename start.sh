@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Check if ./secret.txt exists
+if [ ! -f ./secret.txt ]; then
+    # Create secret.txt
+    python manage.py createsecretkey --force --length 64
+fi
+
 if [ "$DB_MIGRATE" = "True" ]; then
     # Migrate booru
     python manage.py makemigrations booru
