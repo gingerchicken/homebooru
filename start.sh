@@ -53,4 +53,10 @@ if [ "$DEBUG" = "False" ]; then
 fi
 
 # Start the application
-python manage.py runserver 0.0.0.0:8000
+if [ "$DEBUG" = "True" ]; then
+    # Start the application in debug mode
+    python manage.py runserver 0.0.0.0:8000
+else
+    # Start the application in production mode
+    gunicorn homebooru.wsgi:application -b 0.0.0.0:8000
+fi
