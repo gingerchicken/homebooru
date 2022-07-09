@@ -24,8 +24,21 @@ If you have any suggestions for improvements, please open an issue on the [GitHu
 
 ### Debug Environment
 
-### Enabling Django Debugging
+#### Enabling Django Debugging
 In production, this should **NOT** be enabled - therefore I made sure that the `DEBUG` environment variable is set to `False` in the `.env` file by default. If you do want more information, you can enable it by setting the `DEBUG` environment variable to `True`.
 
-### Unit testing
+#### Accessing the Debugging Server
+As I prepared the `docker-compose.yml` file for the server, I did not make the Django server accessible from the "direct" outside world, but instead through a reverse proxy.
+
+Therefore, to get direct access to the server, you will need to add the following to the `docker-compose.yml` file in the `web` section:
+
+```yml
+web:
+  ports:
+    - "8000:8000"
+```
+
+*Feel free to disable the nginx image while debugging, but I recommend keeping it enabled for production.*
+
+#### Unit testing
 If you want to test the server, you simply need to define an environment variable `UNIT_TEST` to `True` in the `.env` file and restart the docker compose, instead of starting the application, it should instead run the unit tests.
