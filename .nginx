@@ -7,12 +7,20 @@ server {
     # https://docs.djangoproject.com/en/4.0/howto/deployment/wsgi/uwsgi/
 
     # Django forward
-    location / {
+    location @django_proxy {
         # Forward to the Django docker container
         proxy_pass http://web:8000;
 
-        # Maximum size of the request body
+        # Maximum size of the request body (people can upload large images)
         client_max_body_size 1G;
+
+        # gunicorn recommended settings
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+
+        # Prevent nginx "doing something" clever with redirects
+        proxy_redirect off;
     }
 
     # Serve the booru storage files
@@ -40,5 +48,11 @@ server {
     location /static/ {
         alias /static/;
         allow all;
+    }
+
+    # Serve the site
+    location / {
+        # Try to serve the requested page as a static file first.
+        try_files $uri @django_proxy;
     }
 }
