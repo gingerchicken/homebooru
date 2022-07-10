@@ -80,5 +80,5 @@ if [ "$DEBUG" = "True" ]; then
     python manage.py runserver 0.0.0.0:8000
 else
     # Start the application in production mode
-    gunicorn homebooru.wsgi:application -b 0.0.0.0:8000
+    gunicorn homebooru.wsgi:application -b 0.0.0.0:8000 --workers $WORKERS
 fi
