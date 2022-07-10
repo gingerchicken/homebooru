@@ -37,6 +37,9 @@ services:
 
       # Booru
       - BOORU_STORAGE_PATH=${BOORU_STORAGE_PATH}
+
+      # Production
+      - WORKERS=${GUNICORN_WORKERS}
     depends_on:
       - db
   nginx:
