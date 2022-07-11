@@ -25,11 +25,13 @@
 		<h3>Options</h3>
 		<li><a href="?id={{post.id}}&tags={{search_param}}&resize=1" onclick="Homebooru.Posts.setImageUrl('{{post.media_url}}'); $('#resized_notice').hide(); return false;">Resize</a></li>
 		<li><a href="{{post.media_url}}" target="_blank" style="font-weight: bold;">Original</a></li>
-		<li><a href="#" onclick="if(confirm('Are you sure you want to delete this post?')){ Homebooru.Posts.remove('<%= image.id %>'); } else return false;">Delete</a></li>
-		<li><div id="pfd"><a href="#" onclick="pflag({{post.id}}); return false;">Flag for deletion</a></div></li>
-		<li><a href="#" onclick="postVote('up'); addFav({{post.id}}); return false;">Add to favorites</a></li>
-		<li><a href="#" onclick="Homebooru.Pools.addImage({{post.id}}); return false;">Add to Pool</a></li>
-		<li><a href="#" onclick="Homebooru.Posts.lockPost(); return false;">Lock</a></li>
+		<div id="moderation-options" style="display: none;">
+			<li><a href="#" onclick="view.delete();">Delete</a></li>
+			<li><div id="pfd"><a href="#" onclick="pflag({{post.id}}); return false;">Flag for deletion</a></div></li>
+			<li><a href="#" onclick="postVote('up'); addFav({{post.id}}); return false;">Add to favorites</a></li>
+			<li><a href="#" onclick="Homebooru.Pools.addImage({{post.id}}); return false;">Add to Pool</a></li>
+			<li><a href="#" onclick="Homebooru.Posts.lockPost(); return false;">Lock</a></li>
+		</div>
 	</div>
 {% endblock %}
 
@@ -70,4 +72,18 @@
 			</div>
 		</div>
 	</div>
+
+	<script>
+		// Since JavaScript must be enabled, display the moderation-options div.
+		$('#moderation-options').show();
+	</script>
+{% endblock %}
+
+{% block head %}
+	<!-- Include Post Moderation -->
+	<script type="text/javascript" src="{% static 'js/custom/view-post.js' %}"></script>
+
+	<script>
+		const view = new ViewPost('{{ csrf_token }}');
+	</script>
 {% endblock %}
