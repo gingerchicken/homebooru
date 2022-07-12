@@ -1,6 +1,6 @@
 <div class="thumbnail-preview">
     <span id="s{{post.id}}" class="thumb">
-        <a id="p{{post.id}}" href="/view?id={{post.id}}&tags={{search_param}}">
+        <a id="p{{post.id}}" href="/post/{{post.id}}?tags={{search_param}}">
             <img src="/thumbnails/{{post.folder}}/thumbnail_{{post.md5}}.jpg" alt="Image: {{post.id}}" title="{% for tag in post.tags.all %}{{tag.tag}} {% endfor %}score:{{post.score}} rating:{{post.rating}}" class="preview {% if post.is_video == 1 %}webm{% endif %}">
         </a>
     </span>
