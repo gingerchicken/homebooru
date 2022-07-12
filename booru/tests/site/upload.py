@@ -271,4 +271,4 @@ class UploadPOSTTest(TestCase):
         post = Post.objects.first()
 
         self.assertEqual(resp.status_code, 302)
-        self.assertEqual(resp['Location'], '/view?id=' + str(post.id))
+        self.assertEqual(resp['Location'], '/post/' + str(post.id))

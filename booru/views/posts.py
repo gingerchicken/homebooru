@@ -225,4 +225,4 @@ def upload(request):
         # TODO check that there aren't too many tags (add a setting for this)
 
         # Redirect to the view page
-        return HttpResponseRedirect(reverse('view') + '?id=' + str(post.id))
+        return HttpResponseRedirect(reverse('view', kwargs={'post_id': post.id}))

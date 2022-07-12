@@ -30,7 +30,7 @@ class PostDeleteTest(TestCase):
         """Sends a request to the post delete page"""
 
         return self.client.delete(
-            reverse('view') + '?id=' + str(post_id)
+            '/post/' + str(post_id)
         )
 
     def test_post_delete_as_owner(self):
