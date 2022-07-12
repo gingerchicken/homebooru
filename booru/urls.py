@@ -9,7 +9,7 @@ urlpatterns = [
     # Posts
     path('browse', views.browse, name='browse'),
     path('upload', views.upload, name='upload'),
-    path('view', views.view, name='view'),
+    path('post/<int:post_id>', views.view, name='view'),
 
     # Tags
     path('tags', views.tags, name='tags'),

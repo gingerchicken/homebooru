@@ -53,24 +53,21 @@ def browse(request):
         'paginator': pagination
     })
 
-def view(request):
-    if request.method == 'GET':
-        # Get the post id url parameter
-        post_id = request.GET.get('id', '')
+def view(request, post_id):
+    # Get the post
+    post = None
+    try:
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        # Send a 404
+        return HttpResponse(status=404)
 
+    if request.method == 'GET':
         # Get the resize url parameter
         resize = request.GET.get('resize', '') == '1'
 
         # Get search phrase url parameter
         search_phrase = request.GET.get('tags', '').strip()
-
-        # Get the post
-        post = None
-        try:
-            post = Post.objects.get(id=post_id)
-        except Post.DoesNotExist:
-            # Send a 404
-            return HttpResponse(status=404)
         
         # Get the sorted tags
         sorted_tags = post.get_sorted_tags()
@@ -90,17 +87,6 @@ def view(request):
         })
     
     if request.method == 'DELETE':
-        # Get the post id url parameter
-        post_id = request.GET.get('id', '')
-
-        # Get the post
-        post = None
-        try:
-            post = Post.objects.get(id=post_id)
-        except Post.DoesNotExist:
-            # Send a 404
-            return HttpResponse(status=404)
-
         # Get the user
         user = request.user
 
@@ -239,4 +225,4 @@ def upload(request):
         # TODO check that there aren't too many tags (add a setting for this)
 
         # Redirect to the view page
-        return HttpResponseRedirect(reverse('view') + '?id=' + str(post.id))
+        return HttpResponseRedirect(reverse('view', kwargs={'post_id': post.id}))
