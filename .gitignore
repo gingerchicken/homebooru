@@ -148,3 +148,6 @@ assets/TEST_DATA
 # Booru
 data/storage
 data/static
+
+# Third-party Static
+jquery.min.js
