@@ -10,6 +10,10 @@
     </head>
 
     <body>
+        <div id="overlay" style="display: none;">
+            {% block overlay %}{% endblock %}
+        </div>
+
         <img style="position:absolute;left:-10px;" src="{% static 'layout/homebooru-com-pix.bmp' %}">
         <div class="container-fluid">
             {% block navbar %}{% include "booru/components/nav-bar.html" %}{% endblock %}

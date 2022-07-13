@@ -1,0 +1,97 @@
+/* Overlay */
+
+#overlay {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+
+	z-index: 2;
+
+	background-color: rgba(0, 0, 0, 0.25);
+
+	/* I am not sure if flex is :vomit: yet */
+	display: flex;
+	align-items: center;
+}
+
+/* Message box */
+#overlay .message-box {
+	/* Set the size */
+	width: 400px;
+
+	/* Set the position */
+	margin-left: calc(50% - 400px / 2);
+	margin-right: calc(50% - 400px / 2);
+
+	/* Styling */
+	background-color: #fff;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+}
+
+#overlay .message-box .message {
+	padding: 10px;
+
+	min-width: 100%;
+	min-height: 70%;
+
+	font-weight: 500;
+}
+
+#overlay .message-box .error {
+	/* color: #f00; */
+}
+
+#overlay .message-box .message-title {
+	min-height: 22px;
+	font-weight: bolder;
+
+	padding-left: 2.5px;
+	padding-right: 2.5px;
+
+	background: linear-gradient(#328dfe, #0773fb);
+
+	/* Align spans in vertical center */
+	display: flex;
+	align-items: center;
+
+	color: #fff;
+}
+
+#overlay .message-box .message-title > span {
+	/* Space up the spans by 2.5 px - i.e. the icon and the title text */
+	margin-left: 2.5px;
+}
+
+/* Buttons */
+#overlay .message-box .buttons {
+	min-height: 5%;
+	padding: 5px;
+
+	display: block;
+	text-align: center;
+}
+
+#overlay .message-box .buttons button {
+	color: #fff;
+
+	min-width: 64px;
+
+	font-weight: bold;
+
+	border: 0px;
+	padding: 5px;
+	background: #0773fb;
+
+	margin: 5px;
+}
+
+#overlay .message-box .buttons button:hover {
+	border: 0px;
+	background: #fbb307;
+}
+
