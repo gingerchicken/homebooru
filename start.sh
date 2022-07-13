@@ -1,5 +1,26 @@
 #!/bin/bash
 
+# Check if we need to install jQuery
+if [ "$INSTALL_JQUERY" = "True" ]; then
+    # Feel free to check for more recent versions of jQuery: https://jquery.com/download/
+    
+    echo "Installing jQuery..."
+
+    # Where to save the file
+    JQUERY_PATH="./booru/static/js/thirdparty/jquery.min.js"
+
+    # Download jQuery v3.6.0
+    wget -O $JQUERY_PATH "https://code.jquery.com/jquery-3.6.0.min.js"
+
+    # Check if the file was downloaded
+    if [ ! -f $JQUERY_PATH ]; then
+        echo "Error: jQuery was not downloaded."
+        exit 1
+    fi
+
+    echo "jQuery installed to $JQUERY_PATH"
+fi
+
 # Check if the SECRET_KEY environment variable is set
 if [ -z "$SECRET_KEY" ]; then
     # Check if ./secret.txt doesn't exist
