@@ -26,6 +26,14 @@ class ViewPost {
      * Delete the post
      */
     async delete() {
+        let confirm = new OverlayConfirm();
+
+        try {
+            await confirm.show('Are you sure you want to delete this post?');
+        } catch (e) {
+            return;
+        }
+
         // Send a delete request to the server
         let response = await this.request('DELETE');
 
