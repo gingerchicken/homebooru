@@ -86,6 +86,8 @@
 	border: 0px;
 	padding: 5px;
 	background: #0773fb;
+
+	margin: 5px;
 }
 
 #overlay .message-box .buttons button:hover {
