@@ -40,6 +40,9 @@ services:
 
       # Production
       - WORKERS=${GUNICORN_WORKERS}
+
+      # Static
+      - INSTALL_JQUERY=${INSTALL_JQUERY}
     depends_on:
       - db
   nginx:
