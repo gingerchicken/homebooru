@@ -138,3 +138,33 @@ class OverlayError extends OverlayMessage {
         $(this.element).find('.message').addClass('error');
     }
 }
+
+class OverlayConfirm extends OverlayMessage {
+    constructor(elementId) {
+        super(elementId);
+    }
+
+    get icon() {
+        return 'ui-icon-help'
+    }
+
+    async show(question, title = 'Confirmation', ...args) {
+        return new Promise((resolve, reject) => {
+            // Create Yes and No buttons.
+            let yesButton = new OverlayButton('Yes', () => {
+                this.hide();
+
+                resolve();
+            });
+
+            let noButton = new OverlayButton('No', () => {
+                this.hide();
+
+                reject();
+            });
+
+            // Show the message.
+            super.show(question, title, yesButton, noButton, ...args);
+        });
+    }
+}
