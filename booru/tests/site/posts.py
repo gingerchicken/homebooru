@@ -288,6 +288,39 @@ class PostLockTest(TestCase):
 
         # Check the post was not locked
         self.assertFalse(post.locked)
+    
+    def test_unlock(self):
+        # Give user permission to lock posts
+        self.user.user_permissions.add(Permission.objects.get(codename='lock_post'))
+        self.user.save()
+
+        # Make sure they have the permission
+        self.assertTrue(self.user.has_perm('booru.lock_post'))
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Lock the post
+        self.post.locked = True
+        self.post.save()
+
+        # Get the post
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post was locked
+        self.assertTrue(post.locked)
+
+        # Send the request
+        resp = self.send_request(self.post.id, locked=False)
+
+        # Check the response status code
+        self.assertEqual(resp.status_code, 203, resp.content.decode('utf-8'))
+
+        # Get the post
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post was unlocked
+        self.assertFalse(post.locked)
 
 class PostFlagDeleteTest(TestCase):
     temp_storage = testutils.TempStorage()
@@ -460,4 +493,32 @@ class PostFlagDeleteTest(TestCase):
         post = Post.objects.get(id=self.post.id)
 
         # Check the post was not flagged for deletion
+        self.assertFalse(post.delete_flag)
+    
+    def test_unflag_post_as_owner(self):
+        """Allows the owner to unflag the post for deletion"""
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Make the user the owner
+        self.post.owner = self.user
+
+        # Save the post
+        self.post.save()
+
+        # Flag the post for deletion
+        self.post.delete_flag = True
+        self.post.save()
+
+        # Send the request
+        resp = self.send_request(self.post.id, delete=False)
+
+        # Check the response status code
+        self.assertEqual(resp.status_code, 203)
+
+        # Get the post from the database
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post was unflagged for deletion
         self.assertFalse(post.delete_flag)

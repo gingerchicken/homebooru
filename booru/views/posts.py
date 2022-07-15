@@ -112,11 +112,6 @@ def view(request, post_id):
 
         # TODO there is probably a better way to do this
 
-        # Check if the post is locked
-        if post.locked:
-            # Send a 403
-            return HttpResponse(status=403, content='Post is locked.')
-
         # Check if we should update the post's locked
         if 'locked' in request.POST:
             # Check if the user can lock the post
@@ -127,6 +122,9 @@ def view(request, post_id):
             # TODO make this a form or something - this is a bit of a hack
             # Update the post's locked
             post.locked = boorutils.bool_from_str(request.POST['locked'])
+        elif post.locked: # Check if the post is locked (as we wouldn't have locked it if it wasn't)
+            # Send a 403
+            return HttpResponse(status=403, content='Post is locked.')
 
         # Check if we should flag the post for deletion
         if 'delete_flag' in request.POST:
