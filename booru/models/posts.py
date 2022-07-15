@@ -81,6 +81,9 @@ class Post(models.Model):
     # Post locked
     locked = models.BooleanField(default=False)
 
+    # Delete flag
+    delete_flag = models.BooleanField(default=False)
+
     def save(self, *args, **kwargs):
         """Saves the post to the database."""
 
@@ -432,4 +435,5 @@ class Post(models.Model):
         # Create a can lock perm
         permissions = (
             ('lock_post', 'Can lock posts'),
+            ('flag_delete', 'Can flag posts for deletion'),
         )

@@ -128,6 +128,16 @@ def view(request, post_id):
             # Update the post's locked
             post.locked = boorutils.bool_from_str(request.POST['locked'])
 
+        # Check if we should flag the post for deletion
+        if 'delete_flag' in request.POST:
+            # Check if the user can flag the post for deletion
+            if post.owner != user and not user.has_perm('booru.flag_delete'):
+                # Send a 403
+                return HttpResponse(status=403, content='You do not have permission to flag posts for deletion.')
+
+            # Update the post's flag_delete
+            post.delete_flag = boorutils.bool_from_str(request.POST['delete_flag'])
+
         post.save()
         return HttpResponse(status=203)
 

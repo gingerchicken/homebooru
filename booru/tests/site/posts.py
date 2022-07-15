@@ -288,3 +288,176 @@ class PostLockTest(TestCase):
 
         # Check the post was not locked
         self.assertFalse(post.locked)
+
+class PostFlagDeleteTest(TestCase):
+    temp_storage = testutils.TempStorage()
+    
+    def setUp(self):
+        self.temp_storage.setUp()
+
+        # Create a user
+        self.user = User.objects.create_user(username='test', password='huevo')
+        self.user.save()
+
+        # Add booru.change_post
+        permission = Permission.objects.get(codename='change_post')
+        self.user.user_permissions.add(permission)
+        self.user.save()
+
+
+        # Create a post
+        self.post = Post.create_from_file(
+            testutils.FELIX_PATH
+        )
+        self.post.save()
+    
+    def tearDown(self):
+        self.temp_storage.tearDown()
+
+    def send_request(self, post_id, delete=True):
+        """Sends a request to the post flag delete page"""
+
+        return self.client.post(
+            '/post/' + str(post_id), {'delete_flag': delete}
+        )
+
+    def test_post_flag_delete_as_owner(self):
+        """Allows the owner to flag the post for deletion"""
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Make the user the owner
+        self.post.owner = self.user
+
+        # Save the post
+        self.post.save()
+
+        # Send the request
+        resp = self.send_request(self.post.id)
+
+        # Check the response status code
+        self.assertEqual(resp.status_code, 203)
+
+        # Get the post from the database
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post was flagged for deletion
+        self.assertTrue(post.delete_flag)
+    
+    def test_post_flag_delete_as_admin(self):
+        """Allows admins to flag posts for deletion"""
+
+        # Create an admin
+        admin = User.objects.create_user(username='admin', password='huevo', is_superuser=True)
+        admin.save()
+
+        # Login
+        self.assertTrue(self.client.login(username='admin', password='huevo'))
+
+        # Send the request
+        resp = self.send_request(self.post.id)
+
+        # Check the response status code
+        self.assertEqual(resp.status_code, 203)
+
+        # Get the post from the database
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post was flagged for deletion
+        self.assertTrue(post.delete_flag)
+    
+    def test_post_flag_delete_as_anonymous(self):
+        """Disallows anonymous users from flagging posts for deletion"""
+
+        # Logout
+        self.client.logout()
+
+        # Send the request
+        resp = self.send_request(self.post.id)
+
+        # Sends a 403
+        self.assertEqual(resp.status_code, 403)
+
+        # Get the post from the database
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post was not flagged for deletion
+        self.assertFalse(post.delete_flag)
+    
+    def test_allows_users_with_perm(self):
+        # Give user permission to flag posts for deletion
+        self.user.user_permissions.add(Permission.objects.get(codename='flag_delete'))
+        self.user.save()
+
+        # Make sure they have the permission
+        self.assertTrue(self.user.has_perm('booru.flag_delete'))
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Send the request
+        resp = self.send_request(self.post.id)
+
+        # Check the response status code
+        self.assertEqual(resp.status_code, 203, resp.content.decode('utf-8'))
+
+        # Get the post again
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post was flagged for deletion
+        self.assertTrue(post.delete_flag)
+
+    def test_disallows_without_change_perm(self):
+        # Give user permission to flag posts for deletion
+        self.user.user_permissions.add(Permission.objects.get(codename='flag_delete'))
+        self.user.save()
+
+        # Remove the booru.change_post permission
+        permission = Permission.objects.get(codename='change_post')
+        self.user.user_permissions.remove(permission)
+        self.user.save()
+
+        # Make sure they have the correct permissions
+        self.assertTrue(self.user.has_perm('booru.flag_delete'))
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Send the request
+        resp = self.send_request(self.post.id, delete=True)
+
+        # Check the response status code
+        self.assertEqual(resp.status_code, 403, resp.content.decode('utf-8'))
+
+        # Get the post
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post was not flagged for deletion
+        self.assertFalse(post.delete_flag)
+
+    def test_disallows_without_flag_delete_perm(self):
+        """Disallows people who aren't the owner and don't have the flag deletion permission"""
+
+        # Create another user
+        user2 = User.objects.create_user(username='test2', password='huevo')
+        user2.save()
+
+        # Give user2 permission to change posts
+        user2.user_permissions.add(Permission.objects.get(codename='change_post'))
+        user2.save()
+
+        # Login
+        self.assertTrue(self.client.login(username='test2', password='huevo'))
+
+        # Send the request
+        resp = self.send_request(self.post.id, delete=True)
+
+        # Check the response status code
+        self.assertEqual(resp.status_code, 403, resp.content.decode('utf-8'))
+
+        # Get the post
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post was not flagged for deletion
+        self.assertFalse(post.delete_flag)
