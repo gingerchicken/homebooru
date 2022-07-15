@@ -101,6 +101,38 @@ def view(request, post_id):
         # Redirect to the home page
         return HttpResponseRedirect(reverse('index'))
 
+    if request.method == 'POST':
+        # Get the user
+        user = request.user
+
+        # # Check if the user has permission to edit the post
+        if user != post.owner and not user.has_perm('booru.change_post'):
+            # Send a 403
+            return HttpResponse(status=403)
+
+        # TODO there is probably a better way to do this
+
+        # Check if the post is locked
+        if post.locked:
+            # Send a 403
+            return HttpResponse(status=403, content='Post is locked.')
+
+        # Check if we should update the post's locked
+        if 'locked' in request.POST:
+            # Check if the user can lock the post
+            if not user.has_perm('booru.lock_post'):
+                # Send a 403
+                return HttpResponse(status=403, content='You do not have permission to lock posts.')
+
+            # TODO make this a form or something - this is a bit of a hack
+            v = str(request.POST['locked']).lower() == 'true'
+
+            # Update the post's locked
+            post.locked = v
+
+        post.save()
+        return HttpResponse(status=203)
+
 def upload(request):
     # Check if it is a GET request
     if request.method == 'GET':

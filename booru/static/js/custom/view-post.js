@@ -5,7 +5,8 @@ class ViewPost {
 
     get headers() {
         return {
-            'X-CSRFToken': this.csrfToken
+            'X-CSRFToken': this.csrfToken,
+            'Content-Type': 'application/json'
         }
     }
 
@@ -59,7 +60,7 @@ class ViewPost {
     */
     async edit(data = {}, showError = true) {
         // Send a PUT request to the server
-        let resp = await this.request('PUT', location.href, data);
+        let resp = await this.request('POST', location.href, data);
 
         if (showError && !resp.ok) {
             // Show an error if it was not accepted
@@ -116,7 +117,7 @@ class ViewPost {
             let message = new OverlayMessage();
             message.show('Successfully locked post.', 'Success');
         }
-        
+
         return resp;
     }
 }
