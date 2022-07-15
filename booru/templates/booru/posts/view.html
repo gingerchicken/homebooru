@@ -27,10 +27,18 @@
 		<li><a href="/{{post.media_url}}" target="_blank" style="font-weight: bold;">Original</a></li>
 		<div id="moderation-options" style="display: none;">
 			<li><a href="#" onclick="view.delete();">Delete</a></li>
-			<li><div id="pfd"><a href="#" onclick="pflag({{post.id}}); return false;">Flag for deletion</a></div></li>
+			{% if post.delete_flag %}
+				<li><a href="#" onclick="view.unflag(); return false;">Unflag for deletion</a></li>
+			{% else %}
+				<li><a href="#" onclick="view.flag(); return false;">Flag for deletion</a></li>
+			{% endif %}
 			<li><a href="#" onclick="postVote('up'); addFav({{post.id}}); return false;">Add to favorites</a></li>
 			<li><a href="#" onclick="Homebooru.Pools.addImage({{post.id}}); return false;">Add to Pool</a></li>
-			<li><a href="#" onclick="view.lock(); return false;">Lock</a></li>
+			{% if post.locked %}
+				<li><a href="#" onclick="view.unlock(); return false;">Unlock</a></li>
+			{% else %}
+				<li><a href="#" onclick="view.lock(); return false;">Lock</a></li>
+			{% endif %}
 		</div>
 	</div>
 {% endblock %}

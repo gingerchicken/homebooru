@@ -127,4 +127,91 @@ class ViewPost {
 
         return resp;
     }
+
+    /**
+     * Unlock the post
+     * @returns {Promise<Response>} response
+     */
+    async unlock() {
+        // Check if the user wants to unlock the post
+        let confirm = new OverlayConfirm();
+
+        // Get the confirmation
+        try {
+            await confirm.show('Are you sure you want to unlock this post?');
+        } catch (e) {
+            return;
+        }
+
+        // Send the request to the server
+        let resp = await this.edit({
+            locked: false
+        });
+
+        if (resp.ok) {
+            // Show a success message
+            let message = new OverlayMessage();
+            message.show('Successfully unlocked post.', 'Success');
+        }
+
+        return resp;
+    }
+
+    /**
+     * Flag the post for deletion
+     * @returns {Promise<Response>} response
+    */
+    async flag() {
+        // Check if the user wants to flag the post
+        let confirm = new OverlayConfirm();
+
+        // Get the confirmation
+        try {
+            await confirm.show('Are you sure you want to flag this post for deletion?');
+        } catch (e) {
+            return;
+        }
+
+        // Send the request to the server
+        let resp = await this.edit({
+            delete_flag: true
+        });
+
+        if (resp.ok) {
+            // Show a success message
+            let message = new OverlayMessage();
+            message.show('Successfully flagged post for deletion.', 'Success');
+        }
+
+        return resp;
+    }
+
+    /**
+     * Unflag the post for deletion
+     * @returns {Promise<Response>} response
+    */
+    async unflag() {
+        // Check if the user wants to unflag the post
+        let confirm = new OverlayConfirm();
+
+        // Get the confirmation
+        try {
+            await confirm.show('Are you sure you want to unflag this post for deletion?');
+        } catch (e) {
+            return;
+        }
+
+        // Send the request to the server
+        let resp = await this.edit({
+            delete_flag: false
+        });
+
+        if (resp.ok) {
+            // Show a success message
+            let message = new OverlayMessage();
+            message.show('Successfully removed flag for deletion.', 'Success');
+        }
+
+        return resp;
+    }
 }
