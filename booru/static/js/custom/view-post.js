@@ -5,8 +5,7 @@ class ViewPost {
 
     get headers() {
         return {
-            'X-CSRFToken': this.csrfToken,
-            'Content-Type': 'application/json'
+            'X-CSRFToken': this.csrfToken
         }
     }
 
@@ -17,10 +16,18 @@ class ViewPost {
      * @returns {Promise<Response>} response
      */
     request(method, url = location.href, data = {}) {
+        // Convert the data to FormData
+        let formData = new FormData();
+
+        for (let key in data) {
+            formData.append(key, data[key]);
+        }
+
+        // Send the request
         return fetch(url, {
-            method,
+            method: method,
             headers: this.headers,
-            body: JSON.stringify(data)
+            body: formData
         });
     }
 
