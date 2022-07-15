@@ -30,7 +30,7 @@
 			<li><div id="pfd"><a href="#" onclick="pflag({{post.id}}); return false;">Flag for deletion</a></div></li>
 			<li><a href="#" onclick="postVote('up'); addFav({{post.id}}); return false;">Add to favorites</a></li>
 			<li><a href="#" onclick="Homebooru.Pools.addImage({{post.id}}); return false;">Add to Pool</a></li>
-			<li><a href="#" onclick="Homebooru.Posts.lockPost(); return false;">Lock</a></li>
+			<li><a href="#" onclick="view.lock(); return false;">Lock</a></li>
 		</div>
 	</div>
 {% endblock %}
