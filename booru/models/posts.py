@@ -78,6 +78,9 @@ class Post(models.Model):
     # Post title
     title = models.CharField(max_length=512, blank=True, null=True)
 
+    # Post locked
+    locked = models.BooleanField(default=False)
+
     def save(self, *args, **kwargs):
         """Saves the post to the database."""
 
@@ -424,3 +427,9 @@ class Post(models.Model):
             'older': older,
             'newer': newer
         }
+    
+    class Meta:
+        # Create a can lock perm
+        permissions = (
+            ('lock_post', 'Can lock posts'),
+        )
