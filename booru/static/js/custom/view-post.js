@@ -121,7 +121,7 @@ class ViewPost {
 
         if (resp.ok) {
             // Show a success message
-            let message = new OverlayMessage();
+            let message = new OverlaySuccess();
             message.show('Successfully locked post.', 'Success');
         }
 
@@ -150,7 +150,7 @@ class ViewPost {
 
         if (resp.ok) {
             // Show a success message
-            let message = new OverlayMessage();
+            let message = new OverlaySuccess();
             message.show('Successfully unlocked post.', 'Success');
         }
 
@@ -179,7 +179,7 @@ class ViewPost {
 
         if (resp.ok) {
             // Show a success message
-            let message = new OverlayMessage();
+            let message = new OverlaySuccess();
             message.show('Successfully flagged post for deletion.', 'Success');
         }
 
@@ -208,7 +208,7 @@ class ViewPost {
 
         if (resp.ok) {
             // Show a success message
-            let message = new OverlayMessage();
+            let message = new OverlaySuccess();
             message.show('Successfully removed flag for deletion.', 'Success');
         }
 

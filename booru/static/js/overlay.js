@@ -168,3 +168,25 @@ class OverlayConfirm extends OverlayMessage {
         });
     }
 }
+
+class OverlaySuccess extends OverlayMessage {
+    constructor(elementId) {
+        super(elementId);
+    }
+
+    get icon() {
+        return 'ui-icon-check'
+    }
+
+    show(message, title = 'Success', ...args) {
+        let successButton = new OverlayButton('Okay', () => {
+            // Refresh the page.
+            window.location.reload();
+        });
+
+        super.show(message, title, successButton, ...args);
+
+        // Add the success class to the message box.
+        $(this.element).find('.message').addClass('success');
+    }
+}
