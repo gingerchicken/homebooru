@@ -125,10 +125,8 @@ def view(request, post_id):
                 return HttpResponse(status=403, content='You do not have permission to lock posts.')
 
             # TODO make this a form or something - this is a bit of a hack
-            v = str(request.POST['locked']).lower() == 'true'
-
             # Update the post's locked
-            post.locked = v
+            post.locked = boorutils.bool_from_str(request.POST['locked'])
 
         post.save()
         return HttpResponse(status=203)
