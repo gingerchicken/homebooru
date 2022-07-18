@@ -43,7 +43,7 @@
 				<a href="#" onclick="Cookie.create('resize-original',1); Cookie.create('resize-notification',1); Homebooru.Posts.setImageUrl('<%= originalUrl %>'); $('#resized_notice').hide(); return false;"><b>Always view original</b></a> | <a href="#" onclick="Cookie.create('resize-notification',1); $('#resized_notice').hide(); return false;"><b>Do not show this message</b></a>.
 			</div>
 		{% endif %}
-		<div class="alert alert-info" style="width: 728px;">
+		<div class="alert alert-info">
 			<a href="{% if next %}/post/{{next.id}}?tags={{search_param}}{% else %}#{% endif %}">Next</a> <a href="{% if previous %}/post/{{previous.id}}?tags={{search_param}}{% else %}#{% endif %}" style="float:right;">Previous</a>
 		</div>
 
