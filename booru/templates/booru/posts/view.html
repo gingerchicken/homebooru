@@ -43,7 +43,7 @@
 				<a href="#" onclick="Cookie.create('resize-original',1); Cookie.create('resize-notification',1); Homebooru.Posts.setImageUrl('<%= originalUrl %>'); $('#resized_notice').hide(); return false;"><b>Always view original</b></a> | <a href="#" onclick="Cookie.create('resize-notification',1); $('#resized_notice').hide(); return false;"><b>Do not show this message</b></a>.
 			</div>
 		{% endif %}
-		<div class="alert alert-info" style="width: 728px;">
+		<div class="alert alert-info">
 			<a href="{% if next %}/post/{{next.id}}?tags={{search_param}}{% else %}#{% endif %}">Next</a> <a href="{% if previous %}/post/{{previous.id}}?tags={{search_param}}{% else %}#{% endif %}" style="float:right;">Previous</a>
 		</div>
 
@@ -53,13 +53,13 @@
 					<div id="note-container"></div>
 					<div id="image-container">
 						{% if post.is_video == 1 %}
-							<video src="{{post.media_url}}" style="width:100%; max-width: 1000px;" controls>
+							<video src="/{{post.media_url}}" class="content" controls>
 								<source id="image-video-source" type="video/mp4">
 
 								Your browser does not support HTML5 video.
 							</video>
 						{% else %}
-							<img id="image" src="/{% if post.sample and not resize %}{{post.sample_url}}{% else %}{{post.media_url}}{% endif %}" alt="{% for tag in post.tags.all %}{{tag.tag}} {% endfor %}" {% if post.sample %} data-original-width="{{post.width}}" data-original-height="{{post.height}}" {% endif %}>
+							<img id="image" class="content" src="/{% if post.sample and not resize %}{{post.sample_url}}{% else %}{{post.media_url}}{% endif %}" alt="{% for tag in post.tags.all %}{{tag.tag}} {% endfor %}" {% if post.sample %} data-original-width="{{post.width}}" data-original-height="{{post.height}}" {% endif %}>
 						{% endif %}
 					</div>
 					<br>
