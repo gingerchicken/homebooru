@@ -53,7 +53,7 @@
 					<div id="note-container"></div>
 					<div id="image-container">
 						{% if post.is_video == 1 %}
-							<video src="{{post.media_url}}" style="width:100%; max-width: 1000px;" controls>
+							<video src="/{{post.media_url}}" class="content" controls>
 								<source id="image-video-source" type="video/mp4">
 
 								Your browser does not support HTML5 video.
