@@ -27,9 +27,9 @@
 		<li><a href="/{{post.media_url}}" target="_blank" style="font-weight: bold;">Original</a></li>
 		<div id="moderation-options" style="display: none;">
 			<li><a href="#" onclick="view.delete();">Delete</a></li>
-			{% if post.delete_flag %}
-				<li><a href="#" onclick="view.unflag(); return false;">Unflag for deletion</a></li>
-			{% else %}
+			{% if not delete_flag %}
+				{% comment %} <li><a href="#" onclick="view.unflag(); return false;">Unflag for deletion</a></li>
+			{% else %} {% endcomment %}
 				<li><a href="#" onclick="view.flag(); return false;">Flag for deletion</a></li>
 			{% endif %}
 			<li><a href="#" onclick="postVote('up'); addFav({{post.id}}); return false;">Add to favorites</a></li>

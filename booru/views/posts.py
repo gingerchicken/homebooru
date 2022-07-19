@@ -76,6 +76,9 @@ def view(request, post_id):
         # TODO make sure this is correct after adding pagination
         proximate_posts = post.get_proximate_posts(Post.search(search_phrase))
         
+        # Check if the post is flagged if the user is auth'd
+        delete_flag = PostFlag.objects.filter(post=post, user=request.user).exists() if request.user.is_authenticated else False
+
         # Render the view.html template with the post
         return render(request, 'booru/posts/view.html', {
             'post': post,
@@ -83,7 +86,8 @@ def view(request, post_id):
             'resize': resize,
             'search_param': search_phrase,
             'next': proximate_posts['newer'],
-            'previous': proximate_posts['older']
+            'previous': proximate_posts['older'],
+            'delete_flag': delete_flag
         })
     
     if request.method == 'DELETE':
@@ -126,6 +130,7 @@ def view(request, post_id):
             # Send a 403
             return HttpResponse(status=403, content='Post is locked.')
 
+        # TODO add way to remove a delete flag
         # Check if we should flag the post for deletion
         if 'delete_flag' in request.POST:
             # Check if the user can create post flags
@@ -146,7 +151,6 @@ def view(request, post_id):
             )
 
             flag.save()
-            
 
         post.save()
         return HttpResponse(status=203)
