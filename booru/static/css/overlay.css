@@ -67,6 +67,16 @@
 	margin-left: 2.5px;
 }
 
+/* Text Input */
+#overlay .message-box .input-box {
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+#overlay .message-box .input-box .text-input > input {
+	width: 100%;
+}
+
 /* Buttons */
 #overlay .message-box .buttons {
 	min-height: 5%;

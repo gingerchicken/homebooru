@@ -190,3 +190,86 @@ class OverlaySuccess extends OverlayMessage {
         $(this.element).find('.message').addClass('success');
     }
 }
+
+class OverlayInput extends OverlayMessage {
+    constructor(elementId, verify = () => true) {
+        super(elementId);
+
+        this.verify = verify;
+    }
+
+    get icon() {
+        return 'ui-icon-help';
+    }
+
+    /**
+     * Shows the input overlay.
+     * @param {String} question message question
+     * @param {String} title message title
+     * @param  {...any} args
+     * @returns {Promise<String>} The inputted text
+     */
+    async show(question, title = 'Reason', failMessage = 'Invalid input, check that what you entered and try again.', ...args) {
+        return new Promise((resolve, reject) => {
+            let cancelButton = new OverlayButton('Cancel', () => {
+                this.hide();
+
+                reject();
+            });
+    
+            let okButton = new OverlayButton('Okay', () => {
+                // Get the text.
+                let text = this.toString();
+
+                // Verify the text.
+                if (!this.verify(text)) {
+                    // Show the error.
+
+                    // Create an Okay button that re-shows this overlay.
+                    let okayButton = new OverlayButton('Okay', () => {
+                        this.show(question, title, ...args);
+                    });
+
+                    let error = new OverlayError();
+                    error.show(failMessage, 'Error', okayButton);
+
+                    return;
+                }
+
+                // Hide the overlay.
+                this.hide();
+
+                // Resolve the promise.
+                resolve(text);
+            });
+
+            // Display the original message
+            super.show(question, title, okButton, cancelButton, ...args);
+
+            // Add the input box.
+            let inputBox = document.createElement('div');
+            inputBox.className = 'input-box';
+
+            // Create a div for the input.
+            let inputDiv = document.createElement('div');
+            inputDiv.className = 'text-input';
+
+            // Add the input.
+            let input = document.createElement('input');
+            input.type = 'text';
+
+            // Add the input to the div.
+            inputDiv.appendChild(input);
+
+            // Add the div to the input box.
+            inputBox.appendChild(inputDiv);
+
+            // Append the input box above the buttons
+            $(this.element).find('.buttons').before(inputBox);
+        });
+    }
+
+    toString() {
+        return $(this.element).find('.text-input input').val();
+    }
+}

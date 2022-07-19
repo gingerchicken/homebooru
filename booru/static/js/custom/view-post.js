@@ -162,54 +162,36 @@ class ViewPost {
      * @returns {Promise<Response>} response
     */
     async flag() {
-        // Check if the user wants to flag the post
-        let confirm = new OverlayConfirm();
+        let validate = (str) => {
+            // Strip the string
+            str = str.trim();
 
-        // Get the confirmation
+            // Check if the string is empty
+            return (str.length > 0);
+        };
+
+        let overlay = new OverlayInput(undefined, validate);
+
+        let reason;
         try {
-            await confirm.show('Are you sure you want to flag this post for deletion?');
+            reason = await overlay.show(
+                'Enter a reason for flagging this post:',
+                'Flag Post',
+                'Invalid reason, please try again.'
+            );
         } catch (e) {
             return;
         }
 
         // Send the request to the server
         let resp = await this.edit({
-            delete_flag: true
+            delete_flag: reason
         });
 
         if (resp.ok) {
             // Show a success message
             let message = new OverlaySuccess();
-            message.show('Successfully flagged post for deletion.', 'Success');
-        }
-
-        return resp;
-    }
-
-    /**
-     * Unflag the post for deletion
-     * @returns {Promise<Response>} response
-    */
-    async unflag() {
-        // Check if the user wants to unflag the post
-        let confirm = new OverlayConfirm();
-
-        // Get the confirmation
-        try {
-            await confirm.show('Are you sure you want to unflag this post for deletion?');
-        } catch (e) {
-            return;
-        }
-
-        // Send the request to the server
-        let resp = await this.edit({
-            delete_flag: false
-        });
-
-        if (resp.ok) {
-            // Show a success message
-            let message = new OverlaySuccess();
-            message.show('Successfully removed flag for deletion.', 'Success');
+            message.show('Successfully flagged post.', 'Success');
         }
 
         return resp;
