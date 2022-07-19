@@ -1,12 +1,27 @@
 class ViewPost {
-    constructor(csrfToken) {
+    /**
+     * Constructor for post viewer front-end
+     * @param {String} csrfToken csrf token 
+     * @param {Number} userId user id
+     */
+    constructor(csrfToken, userId = null) {
         this.csrfToken = csrfToken;
+        this.userId = userId;
+    }
+
+    get #isAuthorised() {
+        return this.userId !== null;
     }
 
     get headers() {
         return {
             'X-CSRFToken': this.csrfToken
         }
+    }
+
+    get profileUrl() {
+        // TODO I think this should link back to the backend but whatever for now.
+        return `/accounts/profile/${this.userId}`;
     }
 
     /**
@@ -60,6 +75,29 @@ class ViewPost {
         }
     }
 
+    // TODO add this to some units
+    async #getStringError(resp) {
+        // Get the msg
+        let msg = await resp.text();
+
+        if (msg.length !== 0) return false;
+
+        switch (resp.status) {
+            case 400:
+                msg = 'Malformed request.';
+                break;
+            case 403:
+                msg = 'You do not have permission to edit this post.';
+                break;
+            case 404:
+                msg = 'The post was not found.';
+                break;
+            default:
+                msg = 'An unknown error occurred.';
+                break;
+        }
+    }
+
     /**
      * Edit the post
      * @param {Object} data post data
@@ -74,29 +112,17 @@ class ViewPost {
             let error = new OverlayError();
 
             let msg = await resp.text();
-
-            // TODO add this to the request function
-            if (msg.length === 0) {
-                switch (resp.status) {
-                    case 400:
-                        msg = 'Malformed request.';
-                        break;
-                    case 403:
-                        msg = 'You do not have permission to edit this post.';
-                        break;
-                    case 404:
-                        msg = 'The post was not found.';
-                        break;
-                    default:
-                        msg = 'An unknown error occurred.';
-                        break;
-                }
-            }
-
-            error.show(msg);
+            error.show(this.#getStringError(resp) || msg);
         }
 
         return resp;
+    }
+
+    get postId() {
+        // Get the last directory in the url
+        let path = location.pathname.split('/');
+
+        return Number(path[path.length - 1]);
     }
 
     /**
@@ -193,6 +219,42 @@ class ViewPost {
             let message = new OverlaySuccess();
             message.show('Successfully flagged post.', 'Success');
         }
+
+        return resp;
+    }
+
+    /**
+     * Favourite the post
+     * @returns {Promise<Response>} response
+    */
+    async favourite() {
+        // Ask the user if they're sure they want to favourite the post
+        let confirm = new OverlayConfirm();
+
+        // Get the confirmation
+        try {
+            await confirm.show('Are you sure you want to favourite this post?');
+        } catch (e) {
+            return;
+        }
+
+        // Send the request to the server
+        let resp = await this.request('POST', this.profileUrl + '/favourites', {
+            post_id: this.postId
+        });
+
+        if (resp.ok) {
+            // Show a success message
+            let message = new OverlaySuccess();
+            message.show('Successfully added this post to your favourites.', 'Success');
+            return resp;
+        }
+
+        // Show an error if it was not accepted
+        let error = new OverlayError();
+        let msg = (await resp.text()).trim() || this.#getStringError(resp);
+        
+        error.show(msg);
 
         return resp;
     }

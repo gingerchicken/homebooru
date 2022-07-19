@@ -3,6 +3,8 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 
 from booru.models.profile import Profile
+from booru.models.posts import Post
+import booru.tests.testutils as testutils
 
 class LoginPageTest(TestCase):
     def setUp(self):
@@ -307,3 +309,143 @@ class LogoutTest(TestCase):
         # Check that they get redirected to the homepage
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse('index'))
+
+class PostFavouritesTest(TestCase):
+    """Tests for the add post to favourites view"""
+
+    temp_storage = testutils.TempStorage()
+
+    def setUp(self):
+        # Use the temp storage
+        self.temp_storage.setUp()
+
+        # Create a user
+        self.fred = User.objects.create_user(
+            username='fred',
+            password='SomethingExtrem31ySecure!'
+        )
+        self.fred.save()
+
+        # Create a post
+        self.post = Post.create_from_file(testutils.FELIX_PATH)
+        self.post.save()
+
+        # Log the user in
+        self.client.login(username='fred', password='SomethingExtrem31ySecure!')
+
+    def tearDown(self):
+        self.temp_storage.tearDown()
+    
+    def send_request(self, user_id = None, post_id = None):
+        """Send a request to the add post to favourites view"""
+
+        # Defaults to the current user and post
+        user_id = user_id or self.fred.id
+        post_id = post_id or self.post.id
+
+        return self.client.post(reverse('favourites', kwargs={'user_id': user_id}), {'post_id': post_id})
+
+    def get_favs(self):
+        """Get the favourites for the user"""
+
+        # Get the profile
+        profile = Profile.create_or_get(self.fred)
+
+        # Get the favourites
+        return profile.favourites.all()
+
+    def test_add_favourite(self):
+        """Test that a user can add a post to their favourites"""
+
+        # Send a request to add the post to favourites
+        response = self.send_request()
+
+        # Check that the post is added to the favourites
+        self.assertTrue(self.get_favs().filter(id=self.post.id).exists())
+
+        # Check that the response is a 200
+        self.assertEqual(response.status_code, 200)
+
+    def test_rejects_invalid_post_id(self):
+        """Rejects posts with invalid ids"""
+
+        invalid_ids = [
+            432894327
+        ]
+
+        for id in invalid_ids:
+            response = self.send_request(post_id=id)
+
+            # Check that the response is a 404
+            self.assertEqual(response.status_code, 404, 'Didn\'t reject: ' + str(id))
+
+            # Check that the favourite is not added
+            self.assertFalse(self.get_favs().filter(id=id).exists())
+        
+    def test_rejects_invalid_user_id(self):
+        """Rejects users with invalid ids"""
+
+        invalid_ids = [
+            432894327
+        ]
+
+        for id in invalid_ids:
+            response = self.send_request(user_id=id)
+
+            # Check that the response is a 404
+            self.assertEqual(response.status_code, 404, 'Didn\'t reject: ' + str(id))
+
+            # Check that the favourite is not added
+            self.assertFalse(self.get_favs().filter(id=id).exists())
+    
+    def test_rejects_non_logged_in_user(self):
+        """Rejects non logged in users"""
+
+        # Log the user out
+        self.client.logout()
+
+        # Send a request to add the post to favourites
+        response = self.send_request()
+
+        # Check that it is a 403
+        self.assertEqual(response.status_code, 403)
+
+        # Check that the favourite is not added
+        self.assertFalse(self.get_favs().filter(id=self.post.id).exists())
+    
+    def test_rejects_non_owner(self):
+        """Rejects non-owner users"""
+
+        # Create a user called fred
+        self.fred2 = User.objects.create_user(
+            username='fred2',
+            password='SomethingExtrem31ySecure!'
+        )
+        self.fred2.save()
+
+        # Log the user in
+        self.client.login(username='fred2', password='SomethingExtrem31ySecure!')
+
+        # Send a request to add the post to favourites
+        response = self.send_request()
+
+        # Check that it is a 403
+        self.assertEqual(response.status_code, 403)
+
+        # Check that the favourite is not added
+        self.assertFalse(self.get_favs().filter(id=self.post.id).exists())
+    
+    def test_rejects_duplicate_favourite(self):
+        """Rejects duplicate favourites"""
+
+        # Add the post to favourites
+        self.send_request()
+
+        # Send a request to add the post to favourites again
+        response = self.send_request()
+
+        # Check that it is a 409
+        self.assertEqual(response.status_code, 409)
+
+        # Check that the favourite is not added
+        self.assertEqual(self.get_favs().filter(id=self.post.id).count(), 1)
