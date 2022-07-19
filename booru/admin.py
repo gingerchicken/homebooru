@@ -6,6 +6,9 @@ from django.contrib import admin
 from .models import Post
 admin.site.register(Post)
 
+from .models import PostFlag
+admin.site.register(PostFlag)
+
 from .models import Rating
 admin.site.register(Rating)
 

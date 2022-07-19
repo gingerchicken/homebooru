@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.shortcuts import render
 
 from booru.models.tags import Tag
-from booru.models import Post, Rating
+from booru.models import Post, Rating, PostFlag
 from booru.pagination import Paginator
 
 from .filters import *
@@ -128,13 +128,25 @@ def view(request, post_id):
 
         # Check if we should flag the post for deletion
         if 'delete_flag' in request.POST:
-            # Check if the user can flag the post for deletion
-            if post.owner != user and not user.has_perm('booru.flag_delete'):
+            # Check if the user can create post flags
+            if not user.has_perm('booru.add_postflag'):
                 # Send a 403
                 return HttpResponse(status=403, content='You do not have permission to flag posts for deletion.')
+            
+            # Check that the user has not already flagged the post
+            if PostFlag.objects.filter(post=post, user=user).exists():
+                # Send a 409
+                return HttpResponse(status=409, content='You have already flagged this post for deletion.')
 
-            # Update the post's flag_delete
-            post.delete_flag = boorutils.bool_from_str(request.POST['delete_flag'])
+            # Create a post flag
+            flag = PostFlag(
+                post=post,
+                user=user,
+                reason=str(request.POST['delete_flag'])
+            )
+
+            flag.save()
+            
 
         post.save()
         return HttpResponse(status=203)

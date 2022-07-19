@@ -81,9 +81,6 @@ class Post(models.Model):
     # Post locked
     locked = models.BooleanField(default=False)
 
-    # Delete flag
-    delete_flag = models.BooleanField(default=False)
-
     def save(self, *args, **kwargs):
         """Saves the post to the database."""
 
@@ -430,10 +427,42 @@ class Post(models.Model):
             'older': older,
             'newer': newer
         }
-    
+
+    # Delete flag
+    @property
+    def delete_flag(self):
+        """Gets if the post is marked for deletion"""
+        
+        # Get the post flags
+        flags = PostFlag.objects.filter(post=self)
+
+        # Return if there are any flags
+        return flags.exists()
+
     class Meta:
         # Create a can lock perm
         permissions = (
             ('lock_post', 'Can lock posts'),
-            ('flag_delete', 'Can flag posts for deletion'),
         )
+
+class PostFlag(models.Model):
+    """A flag for a post"""
+
+    # The post that was flagged
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+
+    # The user that flagged the post
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    # The reason for the flag
+    reason = models.TextField(default='')
+
+    # The date the flag was created
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user}'s flag for {self.post} ('{self.reason}')"
+    
+    class Meta:
+        # Make sure that only one flag per user per post can exist
+        unique_together = ('post', 'user')
