@@ -10,6 +10,7 @@ urlpatterns = [
     path('browse', views.browse, name='browse'),
     path('upload', views.upload, name='upload'),
     path('post/<int:post_id>', views.view, name='view'),
+    path('post/<int:post_id>/flag', views.post_flag, name='post_flag'),
 
     # Tags
     path('tags', views.tags, name='tags'),

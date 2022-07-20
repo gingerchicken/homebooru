@@ -362,7 +362,9 @@ class PostFlagDeleteTest(TestCase):
         """Sends a request to the post flag delete page"""
 
         return self.client.post(
-            '/post/' + str(post_id), {'delete_flag': delete}
+            reverse('post_flag', kwargs={'post_id': post_id}), {
+                'reason': str(delete)
+            }
         )
     
     def test_post_flag_delete_as_anonymous(self):
@@ -394,7 +396,7 @@ class PostFlagDeleteTest(TestCase):
         resp = self.send_request(self.post.id)
 
         # Check the response status code
-        self.assertEqual(resp.status_code, 203, resp.content.decode('utf-8'))
+        self.assertEqual(resp.status_code, 201, resp.content.decode('utf-8'))
 
         # Get the post again
         post = Post.objects.get(id=self.post.id)
@@ -406,8 +408,8 @@ class PostFlagDeleteTest(TestCase):
         # Give user permission to flag posts for deletion
         self.givePermissions(self.user)
 
-        # Remove the booru.change_post permission
-        permission = Permission.objects.get(codename='change_post')
+        # Remove the booru.add_postflag permission
+        permission = Permission.objects.get(codename='add_postflag')
         self.user.user_permissions.remove(permission)
         self.user.save()
 
@@ -431,10 +433,6 @@ class PostFlagDeleteTest(TestCase):
 
         # Create another user
         user2 = User.objects.create_user(username='test2', password='huevo')
-        user2.save()
-
-        # Give user2 permission to change posts
-        user2.user_permissions.add(Permission.objects.get(codename='change_post'))
         user2.save()
 
         # Login
@@ -468,7 +466,7 @@ class PostFlagDeleteTest(TestCase):
         resp = self.send_request(self.post.id, delete='Custom reason')
 
         # Check the response status code
-        self.assertEqual(resp.status_code, 203)
+        self.assertEqual(resp.status_code, 201)
 
         # Get the post from the database
         post = Post.objects.get(id=self.post.id)
@@ -496,7 +494,7 @@ class PostFlagDeleteTest(TestCase):
         resp = self.send_request(self.post.id, 'first reason')
 
         # Check the response status code
-        self.assertEqual(resp.status_code, 203)
+        self.assertEqual(resp.status_code, 201)
 
         # Send the request again
         resp = self.send_request(self.post.id, 'second reason')

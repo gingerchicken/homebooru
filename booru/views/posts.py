@@ -130,28 +130,6 @@ def view(request, post_id):
             # Send a 403
             return HttpResponse(status=403, content='Post is locked.')
 
-        # TODO add way to remove a delete flag
-        # Check if we should flag the post for deletion
-        if 'delete_flag' in request.POST:
-            # Check if the user can create post flags
-            if not user.has_perm('booru.add_postflag'):
-                # Send a 403
-                return HttpResponse(status=403, content='You do not have permission to flag posts for deletion.')
-            
-            # Check that the user has not already flagged the post
-            if PostFlag.objects.filter(post=post, user=user).exists():
-                # Send a 409
-                return HttpResponse(status=409, content='You have already flagged this post for deletion.')
-
-            # Create a post flag
-            flag = PostFlag(
-                post=post,
-                user=user,
-                reason=str(request.POST['delete_flag'])
-            )
-
-            flag.save()
-
         post.save()
         return HttpResponse(status=203)
 
@@ -280,3 +258,45 @@ def upload(request):
 
         # Redirect to the view page
         return HttpResponseRedirect(reverse('view', kwargs={'post_id': post.id}))
+
+def post_flag(request, post_id):
+    # Get the post from the post_id
+    post = None
+    try:
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        return HttpResponse(status=404)
+    
+    if request.method == 'POST':
+        # Get the user
+        user = request.user
+
+        # Check if the user is logged in
+        if not user.is_authenticated:
+            return HttpResponse(status=403, content='You must be logged in to flag a post.')
+        
+        # Try and create the post flag
+        # Check if the user can create post flags
+        if not user.has_perm('booru.add_postflag'):
+            # Send a 403
+            return HttpResponse(status=403, content='You do not have permission to flag posts for deletion.')
+        
+        # Check that the user has not already flagged the post
+        if PostFlag.objects.filter(post=post, user=user).exists():
+            # Send a 409
+            return HttpResponse(status=409, content='You have already flagged this post for deletion.')
+
+        # Get the reason
+        reason = request.POST.get('reason', '')
+
+        # Create a post flag
+        flag = PostFlag(
+            post=post,
+            user=user,
+            reason=reason
+        )
+
+        flag.save()
+
+        # Send a 201
+        return HttpResponse(status=201)

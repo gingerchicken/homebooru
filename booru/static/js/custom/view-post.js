@@ -209,16 +209,24 @@ class ViewPost {
             return;
         }
 
-        // Send the request to the server
-        let resp = await this.edit({
-            delete_flag: reason
+        // POST the data to the server
+        let resp = await this.request('POST', `${location.pathname}/flag`, {
+            reason
         });
 
         if (resp.ok) {
             // Show a success message
             let message = new OverlaySuccess();
             message.show('Successfully flagged post.', 'Success');
+
+            return resp;
         }
+
+        // Show an error message
+        let error = new OverlayError();
+        let msg = (await resp.text()) || this.#getStringError(resp);
+
+        error.show(msg);
 
         return resp;
     }
