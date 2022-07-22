@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.shortcuts import render
 
 from booru.models.tags import Tag
-from booru.models import Post, Rating
+from booru.models import Post, Rating, PostFlag
 from booru.pagination import Paginator
 
 from .filters import *
@@ -76,6 +76,9 @@ def view(request, post_id):
         # TODO make sure this is correct after adding pagination
         proximate_posts = post.get_proximate_posts(Post.search(search_phrase))
         
+        # Check if the post is flagged if the user is auth'd
+        delete_flag = PostFlag.objects.filter(post=post, user=request.user).exists() if request.user.is_authenticated else False
+
         # Render the view.html template with the post
         return render(request, 'booru/posts/view.html', {
             'post': post,
@@ -83,7 +86,8 @@ def view(request, post_id):
             'resize': resize,
             'search_param': search_phrase,
             'next': proximate_posts['newer'],
-            'previous': proximate_posts['older']
+            'previous': proximate_posts['older'],
+            'delete_flag': delete_flag
         })
     
     if request.method == 'DELETE':
@@ -100,6 +104,34 @@ def view(request, post_id):
 
         # Redirect to the home page
         return HttpResponseRedirect(reverse('index'))
+
+    if request.method == 'POST':
+        # Get the user
+        user = request.user
+
+        # # Check if the user has permission to edit the post
+        if user != post.owner and not user.has_perm('booru.change_post'):
+            # Send a 403
+            return HttpResponse(status=403)
+
+        # TODO there is probably a better way to do this
+
+        # Check if we should update the post's locked
+        if 'locked' in request.POST:
+            # Check if the user can lock the post
+            if not user.has_perm('booru.lock_post'):
+                # Send a 403
+                return HttpResponse(status=403, content='You do not have permission to lock posts.')
+
+            # TODO make this a form or something - this is a bit of a hack
+            # Update the post's locked
+            post.locked = boorutils.bool_from_str(request.POST['locked'])
+        elif post.locked: # Check if the post is locked (as we wouldn't have locked it if it wasn't)
+            # Send a 403
+            return HttpResponse(status=403, content='Post is locked.')
+
+        post.save()
+        return HttpResponse(status=203)
 
 def upload(request):
     # Check if it is a GET request
@@ -226,3 +258,67 @@ def upload(request):
 
         # Redirect to the view page
         return HttpResponseRedirect(reverse('view', kwargs={'post_id': post.id}))
+
+def post_flag(request, post_id):
+    # Login checks first
+    # Get the user
+    user = request.user
+
+    # Check if the user is logged in
+    if not user.is_authenticated:
+        return HttpResponse(status=403, content='You must be logged in to manage post flags.')
+
+    # Get the post from the post_id
+    post = None
+    try:
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        return HttpResponse(status=404)
+
+    if request.method == 'POST':
+        # Try and create the post flag
+        # Check if the user can create post flags
+        if not user.has_perm('booru.add_postflag'):
+            # Send a 403
+            return HttpResponse(status=403, content='You do not have permission to flag posts for deletion.')
+        
+        # Check that the user has not already flagged the post
+        if PostFlag.objects.filter(post=post, user=user).exists():
+            # Send a 409
+            return HttpResponse(status=409, content='You have already flagged this post for deletion.')
+
+        # Get the reason
+        reason = request.POST.get('reason', '')
+
+        # Create a post flag
+        flag = PostFlag(
+            post=post,
+            user=user,
+            reason=reason
+        )
+
+        flag.save()
+
+        # Send a 201
+        return HttpResponse(status=201)
+    
+    if request.method == 'DELETE':
+        # Try and create the post flag
+        # Check if the user can remove post flags
+        if not user.has_perm('booru.delete_postflag'):
+            # Send a 403
+            return HttpResponse(status=403, content='You do not have permission to unflag posts for deletion.')
+        
+        # Get the potential flags
+        flags = PostFlag.objects.filter(post=post, user=user)
+
+        # Check that the user has not already flagged the post
+        if not flags.exists():
+            # Send a 404
+            return HttpResponse(status=404, content='You have not flagged this post for deletion.')
+
+        # Delete the post flag
+        flags.delete()
+
+        # Send a 200
+        return HttpResponse(status=200)

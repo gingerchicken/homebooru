@@ -193,3 +193,8 @@ def is_valid_email(email : str):
 
     # Use the regex to check if the email is valid
     return re.match(regex, email) is not None
+
+def bool_from_str(value : str) -> bool:
+    """Converts a string to a boolean"""
+
+    return str(value).lower() == 'true'

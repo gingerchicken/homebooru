@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 import homebooru.settings
 import booru.boorutils as boorutils
 from booru.models.profile import Profile as ProfileModel
+from booru.models.posts import Post
 
 from .filters import *
 
@@ -106,3 +107,54 @@ def logout(request):
 
     # Redirect
     return HttpResponseRedirect(homebooru.settings.LOGOUT_REDIRECT_URL)
+
+def favourites(request, user_id : int):
+    user = None
+
+    # Get the user
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        pass
+
+    # If the user is None, send an error message
+    if user is None:
+        return HttpResponse('User does not exist', status=404)
+
+    # Get the user's profile
+    profile = ProfileModel.create_or_get(user)
+    
+    if request.method == "POST":
+        # Get the post id
+        post_id = request.POST.get('post_id')
+
+        # Make sure the post exists
+        try:
+            # Make sure it is a number
+            post_id = int(post_id)
+
+            # Get the post
+            post = Post.objects.get(id=post_id)
+
+        except ValueError:
+            return HttpResponse('Invalid post id.', status=400)
+
+        except Post.DoesNotExist:
+            return HttpResponse('Post does not exist.', status=404)
+        
+        # Check if the user sending the request is the owner of the post
+        if request.user != user:
+            return HttpResponse('You cannot favourite posts for other users.', status=403)
+
+        # Check if the post is already in the favourites
+        if profile.favourites.filter(id=post_id).exists():
+            return HttpResponse('Post already in favourites.', status=409)
+
+        # Add the post to the user's favourites
+        profile.favourites.add(post)
+
+        # Save the profile
+        profile.save()
+
+        # Return 200
+        return HttpResponse(status=200)

@@ -27,10 +27,18 @@
 		<li><a href="/{{post.media_url}}" target="_blank" style="font-weight: bold;">Original</a></li>
 		<div id="moderation-options" style="display: none;">
 			<li><a href="#" onclick="view.delete();">Delete</a></li>
-			<li><div id="pfd"><a href="#" onclick="pflag({{post.id}}); return false;">Flag for deletion</a></div></li>
-			<li><a href="#" onclick="postVote('up'); addFav({{post.id}}); return false;">Add to favorites</a></li>
-			<li><a href="#" onclick="Homebooru.Pools.addImage({{post.id}}); return false;">Add to Pool</a></li>
-			<li><a href="#" onclick="Homebooru.Posts.lockPost(); return false;">Lock</a></li>
+			{% if delete_flag %}
+				<li><a href="#" onclick="view.unflag(); return false;">Unflag for deletion</a></li>
+			{% else %}
+				<li><a href="#" onclick="view.flag(); return false;">Flag for deletion</a></li>
+			{% endif %}
+			<li><a href="#" onclick="view.favourite(); return false;">Add to favorites</a></li>
+			<li><a href="#" onclick="view.pool(); return false;">Add to Pool</a></li>
+			{% if post.locked %}
+				<li><a href="#" onclick="view.unlock(); return false;">Unlock</a></li>
+			{% else %}
+				<li><a href="#" onclick="view.lock(); return false;">Lock</a></li>
+			{% endif %}
 		</div>
 	</div>
 {% endblock %}
@@ -84,6 +92,6 @@
 	<script type="text/javascript" src="{% static 'js/custom/view-post.js' %}"></script>
 
 	<script>
-		const view = new ViewPost('{{ csrf_token }}');
+		const view = new ViewPost('{{ csrf_token }}'{% if user.is_authenticated %}, {{ user.id }}{% endif %});
 	</script>
 {% endblock %}
