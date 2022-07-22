@@ -517,3 +517,136 @@ class PostFlagDeleteTest(TestCase):
         # Check that the flag has the correct values
         self.assertEqual(flag.user, self.user)
         self.assertEqual(flag.reason, 'first reason')
+
+class PostDeleteFlagTest(TestCase):
+    """Tests for the post delete flag view"""
+
+    temp_storage = testutils.TempStorage()
+
+    def setUp(self):
+        self.temp_storage.setUp()
+
+        # Create a user
+        self.user = User.objects.create_user(username='test', password='huevo')
+        self.user.save()
+
+        # Create a post
+        self.post = Post.create_from_file(
+            testutils.FELIX_PATH
+        )
+        self.post.save()
+
+        # Flag the post for deletion
+        self.flag = PostFlag(post=self.post, user=self.user, reason='test')
+        self.flag.save()
+
+        # Update the post
+        self.post = Post.objects.get(id=self.post.id)
+
+        # Make sure it is flagged for deletion
+        self.assertTrue(self.post.delete_flag)
+    
+    def tearDown(self):
+        self.temp_storage.tearDown()
+
+    def send_request(self, post_id):
+        """Sends a request to the post delete flag view"""
+
+        # Send the request
+        return self.client.delete(
+            reverse('post_flag', kwargs={'post_id': post_id})
+        )
+    
+    def givePermissions(self, user):
+        """Gives the user permissions to flag posts for deletion"""
+
+        # Give the user permission to flag posts for deletion
+        permission = Permission.objects.get(codename='delete_postflag')
+        user.user_permissions.add(permission)
+        user.save()
+    
+    def test_disallows_anonymous(self):
+        # Send the request
+        resp = self.send_request(self.post.id)
+
+        # Sends a 403
+        self.assertEqual(resp.status_code, 403)
+
+        # Get the post from the database
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post was not flagged for deletion
+        self.assertTrue(post.delete_flag)
+    
+    def test_disallows_users_without_perm(self):
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Send the request
+        resp = self.send_request(self.post.id)
+
+        # Sends a 403
+        self.assertEqual(resp.status_code, 403)
+
+        # Get the post from the database
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post was not flagged for deletion
+        self.assertTrue(post.delete_flag)
+
+    def test_disallows_users_without_flag_delete_perm(self):
+        # Create another user
+        user2 = User.objects.create_user(username='test2', password='huevo')
+        user2.save()
+
+        # Login
+        self.assertTrue(self.client.login(username='test2', password='huevo'))
+
+        # Send the request
+        resp = self.send_request(self.post.id)
+
+        # Sends a 403
+        self.assertEqual(resp.status_code, 403)
+
+        # Get the post from the database
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post was not flagged for deletion
+        self.assertTrue(post.delete_flag)
+    
+    def test_allows_users_with_perm(self):
+        # Give the user permission to flag posts for deletion
+        self.givePermissions(self.user)
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Send the request
+        resp = self.send_request(self.post.id)
+
+        # Sends a 201
+        self.assertEqual(resp.status_code, 200)
+
+        # Get the post from the database
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post was not flagged for deletion
+        self.assertFalse(post.delete_flag)
+    
+    def test_no_flag(self):
+        """Rejects when there is no flag to be deleted"""
+
+        # Remove the flag
+        self.flag.delete()
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Give perms
+        self.givePermissions(self.user)
+
+        # Send the request
+        resp = self.send_request(self.post.id)
+
+        # Sends a 404
+        self.assertEqual(resp.status_code, 404)

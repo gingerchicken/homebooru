@@ -267,14 +267,14 @@ def post_flag(request, post_id):
     except Post.DoesNotExist:
         return HttpResponse(status=404)
     
-    if request.method == 'POST':
-        # Get the user
-        user = request.user
+    # Get the user
+    user = request.user
 
-        # Check if the user is logged in
-        if not user.is_authenticated:
-            return HttpResponse(status=403, content='You must be logged in to flag a post.')
-        
+    # Check if the user is logged in
+    if not user.is_authenticated:
+        return HttpResponse(status=403, content='You must be logged in to manage post flags.')
+
+    if request.method == 'POST':
         # Try and create the post flag
         # Check if the user can create post flags
         if not user.has_perm('booru.add_postflag'):
@@ -300,3 +300,24 @@ def post_flag(request, post_id):
 
         # Send a 201
         return HttpResponse(status=201)
+    
+    if request.method == 'DELETE':
+        # Try and create the post flag
+        # Check if the user can remove post flags
+        if not user.has_perm('booru.delete_postflag'):
+            # Send a 403
+            return HttpResponse(status=403, content='You do not have permission to unflag posts for deletion.')
+        
+        # Get the potential flags
+        flags = PostFlag.objects.filter(post=post, user=user)
+
+        # Check that the user has not already flagged the post
+        if not flags.exists():
+            # Send a 404
+            return HttpResponse(status=404, content='You have not flagged this post for deletion.')
+
+        # Delete the post flag
+        flags.delete()
+
+        # Send a 200
+        return HttpResponse(status=200)
