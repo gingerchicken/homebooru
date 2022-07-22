@@ -4,6 +4,7 @@ djangorestframework
 
 # Production
 gunicorn
+django-pipeline         # CSS/JS minification
 
 # Testing
 coverage

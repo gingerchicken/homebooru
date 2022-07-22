@@ -89,7 +89,7 @@ if [ "$DEBUG" = "False" ]; then
     export COLLECT_STATIC=True
 
     # Collect static files
-    python manage.py collectstatic --noinput
+    python manage.py collectstatic --noinput --clear
     
     # Disable
     export COLLECT_STATIC=False
