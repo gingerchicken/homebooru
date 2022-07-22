@@ -33,11 +33,7 @@ def add_resource(path : str, pipeline_resource_type : str):
     }
 
 def add_resources(static_path : str, resource_type : str):
-    """
-    Adds a folder of resources to the pipeline config.
-    
-    Note, it ignores third-party files (i.e. files in a folder called 'third-party')
-    """
+    """Adds a folder of resources to the pipeline config"""
 
     # Get the type of resource
     r_type = {
@@ -59,9 +55,6 @@ def add_resources(static_path : str, resource_type : str):
 
         # Make the path relative to the the static directory
         path = path.relative_to(static_path)
-
-        # Make sure it isn't in the thirdparty directory
-        if path.parts[1] == 'thirdparty': continue
 
         # Add the resource
         add_resource(str(path), r_type)
