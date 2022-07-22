@@ -4,7 +4,7 @@ services:
   db:
     image: postgres
     volumes:
-      - ./data/db:/var/lib/postgresql/data
+      - ${ACTUAL_DB_PATH}:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
@@ -12,7 +12,6 @@ services:
   web:
     build: .
     volumes:
-      - .:/code
       - ${ACTUAL_STORAGE_PATH}:${BOORU_STORAGE_PATH}
       - ${ACTUAL_STATIC_PATH}:${STATIC_ROOT}
     environment:
