@@ -8,10 +8,6 @@ jobs:
     name: test compose action
     steps:
       - uses: actions/checkout@v3
-      - name: "Create .env file"
-        run: |
-          echo -e "\nUNIT_TEST=True" >> .env
-          echo -e "\DEBUG=True" >> .env
       - name: "Build docker-compose stack"
         run: |
           cd .debug
