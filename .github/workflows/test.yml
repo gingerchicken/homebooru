@@ -8,14 +8,13 @@ jobs:
     name: test compose action
     steps:
       - uses: actions/checkout@v3
-      - name: "Switch to debug container"
-        run: |
-          cd .debug
       - name: "Create .env file"
         run: |
           echo -e "\nUNIT_TEST=True" >> .env
           echo -e "\DEBUG=True" >> .env
       - name: "Build docker-compose stack"
-        run: docker-compose up -d --build
+        run: |
+          cd .debug
+          docker-compose up -d --build
       - name: "Attach to test container"
         run: docker container attach homebooru_web_1
