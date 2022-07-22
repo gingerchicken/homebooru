@@ -8,6 +8,9 @@ jobs:
     name: test compose action
     steps:
       - uses: actions/checkout@v3
+      - name: "Switch to debug container"
+        run: |
+          cd debug
       - name: "Create .env file"
         run: |
           echo -e "\nUNIT_TEST=True" >> .env
