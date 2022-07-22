@@ -14,6 +14,9 @@ RUN apt install -y ffmpeg
 # Install magiclib
 RUN apt install -y libmagic1
 
+# Install yuglify (via npm)
+RUN apt install -y npm && npm install -g yuglify
+
 # Copy across the requirements.txt file and install the requirements
 COPY requirements.txt .
 RUN pip install -r requirements.txt

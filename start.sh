@@ -89,7 +89,7 @@ if [ "$DEBUG" = "False" ]; then
     export COLLECT_STATIC=True
 
     # Collect static files
-    python manage.py collectstatic --noinput
+    python manage.py collectstatic --noinput --clear | grep "static files" # This grep just prints out how many files were collected
     
     # Disable
     export COLLECT_STATIC=False

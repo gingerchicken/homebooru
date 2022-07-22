@@ -1,16 +1,17 @@
 # Django
-Django==4.0.5
-djangorestframework
+Django==4.0.5           # Django
+djangorestframework     # REST framework for Django
 
 # Production
-gunicorn
+gunicorn                # WSGI server
+django-pipeline         # CSS/JS minification
 
 # Testing
-coverage
+coverage                # Code coverage
 
 # Postgres
-psycopg2-binary
+psycopg2-binary         # Postgresql driver
 
 # Data processing
-ffmpegio
-python-magic
+ffmpegio                # ffmpeg wrapper
+python-magic            # Magic file type detection
