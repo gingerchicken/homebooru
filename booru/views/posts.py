@@ -260,19 +260,20 @@ def upload(request):
         return HttpResponseRedirect(reverse('view', kwargs={'post_id': post.id}))
 
 def post_flag(request, post_id):
-    # Get the post from the post_id
-    post = None
-    try:
-        post = Post.objects.get(id=post_id)
-    except Post.DoesNotExist:
-        return HttpResponse(status=404)
-    
+    # Login checks first
     # Get the user
     user = request.user
 
     # Check if the user is logged in
     if not user.is_authenticated:
         return HttpResponse(status=403, content='You must be logged in to manage post flags.')
+
+    # Get the post from the post_id
+    post = None
+    try:
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        return HttpResponse(status=404)
 
     if request.method == 'POST':
         # Try and create the post flag
