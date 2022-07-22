@@ -49,7 +49,7 @@ $ docker-compose down
 ```
 
 #### Enabling the Debug Web Server
-As you may have read earlier, the debug environment is setup to run unit tests and close the server after the tests are complete, however sometimes you might want a more live/real-time server. To enable this, simply set `UNIT_TEST` to `False` in the `.env` file like so:
+As you may have read earlier, the debug environment is setup to run unit tests and close the server after the tests are complete, however sometimes you might want a more live/real-time server. To enable this, simply set `UNIT_TEST` to `False` in the [**debug** `.env`](.debug/.env) file like so:
 
 ```env
 UNIT_TEST=False
