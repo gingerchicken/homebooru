@@ -232,6 +232,41 @@ class ViewPost {
     }
 
     /**
+     * Unflag the post
+     * @returns {Promise<Response>} response
+     */
+    async unflag() {
+        // Check if the user wants to unflag the post
+        let confirm = new OverlayConfirm();
+
+        // Get the confirmation
+        try {
+            await confirm.show('Are you sure you want to unflag this post?');
+        } catch (e) {
+            return;
+        }
+
+        // Send the request to the server
+        let resp = await this.request('DELETE', `${location.pathname}/flag`);
+
+        if (resp.ok) {
+            // Show a success message
+            let message = new OverlaySuccess();
+            message.show('Successfully unflagged post.', 'Success');
+
+            return resp;
+        }
+
+        // Show an error message
+        let error = new OverlayError();
+        let msg = (await resp.text()) || this.#getStringError(resp);
+
+        error.show(msg);
+
+        return resp;
+    }
+
+    /**
      * Favourite the post
      * @returns {Promise<Response>} response
     */
