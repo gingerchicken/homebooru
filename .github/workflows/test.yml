@@ -13,4 +13,4 @@ jobs:
           cd .debug
           docker-compose up -d --build
       - name: "Attach to test container"
-        run: docker container attach homebooru_web_1
+        run: docker container attach debug_web_1
