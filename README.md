@@ -40,5 +40,21 @@ web:
 
 *Feel free to disable the nginx image while debugging, but I recommend keeping it enabled for production.*
 
+#### Live Reloading
+By default, I prepared homebooru to be as ready as possible for production. This means that you will need to tweak the `docker-compose.yml` file to make sure that the server is reloaded when you make changes to the code. You can do this by passing through the workspace folder to `/code/` in the docker container.
+
+You can do this by adding the following configuration to the `docker-compose.yml` file in the `web` section:
+
+```yml
+web:
+    ...
+    volumes:
+      ...
+      - .:/code
+      ...
+```
+
+> Please bare in mind, if you have the default `.env` file, i.e. you haven't changed the "**ACTUAL_*something*_PATH**" variables, then this will pass through the database folder etc., which is not brilliant and should **NEVER** be used in production.
+
 #### Unit testing
 If you want to test the server, you simply need to define an environment variable `UNIT_TEST` to `True` in the `.env` file and restart the docker compose, instead of starting the application, it should instead run the unit tests.
