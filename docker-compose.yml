@@ -26,14 +26,6 @@ services:
       - ROLL_SECRET=${ROLL_SECRET}
       - SECRET_KEY=${SECRET_KEY} # Feel free to change this in production to something static and secure!
 
-      # Debugging
-      - BOORU_SHOW_FFMPEG_OUTPUT=${BOORU_SHOW_FFMPEG_OUTPUT}
-      - DEBUG=${DEBUG}
-
-      # Unit Testing
-      - UNIT_TEST=${UNIT_TEST}
-      - UNIT_TEST_DISPLAY_COVERAGE=${UNIT_TEST_DISPLAY_COVERAGE}
-
       # Booru
       - BOORU_STORAGE_PATH=${BOORU_STORAGE_PATH}
 
