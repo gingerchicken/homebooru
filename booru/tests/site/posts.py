@@ -650,3 +650,48 @@ class PostDeleteFlagTest(TestCase):
 
         # Sends a 404
         self.assertEqual(resp.status_code, 404)
+    
+    def test_multiple_flags(self):
+        """Deletes only the user's flag"""
+
+        # Create another user
+        user2 = User.objects.create_user(username='test2', password='huevo')
+        user2.save()
+
+        # Flag the post for deletion
+        flag2 = PostFlag(post=self.post, user=user2, reason='test')
+        flag2.save()
+
+        # Update the post
+        self.post = Post.objects.get(id=self.post.id)
+
+        # Make sure it is flagged for deletion
+        self.assertTrue(self.post.delete_flag)
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Give perms
+        self.givePermissions(self.user)
+
+        # Send the request
+        resp = self.send_request(self.post.id)
+
+        # Sends a 200
+        self.assertEqual(resp.status_code, 200)
+
+        # Get the post from the database
+        post = Post.objects.get(id=self.post.id)
+
+        # Check that it is still flagged for deletion
+        self.assertTrue(post.delete_flag)
+
+        # Check that there is only one flag
+        self.assertEqual(PostFlag.objects.count(), 1)
+
+        # Get the last flag
+        flag = PostFlag.objects.last()
+
+        # Check that it is the correct one (i.e. the one from the second user)
+        self.assertEqual(flag.user, user2)
+        self.assertEqual(flag.reason, 'test')
