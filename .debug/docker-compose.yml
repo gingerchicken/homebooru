@@ -1,0 +1,43 @@
+version: "3.9"
+   
+services:
+  db:
+    image: postgres
+    # No persistent storage since this shouldn't be used anywhere where data is important.
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+  web:
+    build: ../
+    ports:
+      - "8000:8000" # Allow a direct connection to port 8000 from the host machine.
+    volumes:
+      - ../:/code # Pass the current directory to the container.
+    environment:
+      # Database
+      - POSTGRES_NAME=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - LOAD_FIXTURES=${LOAD_FIXTURES}
+      - DB_MIGRATE=${DB_MIGRATE}
+
+      # Secret
+      - ROLL_SECRET=False
+      - SECRET_KEY=${SECRET_KEY}
+
+      # Debugging
+      - BOORU_SHOW_FFMPEG_OUTPUT=${BOORU_SHOW_FFMPEG_OUTPUT}
+      - DEBUG=True
+
+      # Unit Testing
+      - UNIT_TEST=${UNIT_TEST}
+      - UNIT_TEST_DISPLAY_COVERAGE=${UNIT_TEST_DISPLAY_COVERAGE}
+
+      # Booru
+      - BOORU_STORAGE_PATH=/storage/
+
+      # Static
+      - INSTALL_JQUERY=${INSTALL_JQUERY}
+    depends_on:
+      - db

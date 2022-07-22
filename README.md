@@ -23,38 +23,34 @@ By default, since the PostgreSQL database should be locked off from the rest of 
 If you have any suggestions for improvements, please open an issue on the [GitHub repository](https://github.com/gingerchicken/homebooru). If you have a bit of knowledge with Python and Django, feel free to fork the repository and submit a pull request for new features. Before contributing to the project, I would recommend reading some of the [Miscellaneous Project Information](/docs/MISC.md) to understand why certain things are implemented in certain ways and maybe what ethics you should work with when contributing (such as the low JavaScript dependence).
 
 ### Debug Environment
+To make it easier to debug, I have created a `docker-compose.yml` file alongside a `.env` file, in the [`.debug`](.debug) directory.
 
-#### Enabling Django Debugging
-In production, this should **NOT** be enabled - therefore I made sure that the `DEBUG` environment variable is set to `False` in the `.env` file by default. If you do want more information, you can enable it by setting the `DEBUG` environment variable to `True`.
+This file is similar to the main `docker-compose.yml` file, but with the following differences:
 
-#### Accessing the Debugging Server
-As I prepared the `docker-compose.yml` file for the server, I did not make the Django server accessible from the "direct" outside world, but instead through a reverse proxy.
+- Persistent volumes are not used (i.e. no `volumes` section)
+- The `nginx` container is not used.
+- By default, **the container will only run unit tests** - (this is mainly to encourage contributors to write tests for their own code).
+- Direct pass-through to the Django debug server is enabled. (by default, the port is set to `8000`)
 
-Therefore, to get direct access to the server, you will need to add the following to the `docker-compose.yml` file in the `web` section:
+That all sounds great, but how do I use this environment? This is very straight forward - just run the following command:
 
-```yml
-web:
-  ports:
-    - "8000:8000"
+```bash
+# Move to the .debug directory
+$ cd .debug
+
+# Run the debug environment
+$ docker-compose up --build
 ```
 
-*Feel free to disable the nginx image while debugging, but I recommend keeping it enabled for production.*
+And to stop the environment, run the following command (while in the .debug directory, of course):
 
-#### Live Reloading
-By default, I prepared homebooru to be as ready as possible for production. This means that you will need to tweak the `docker-compose.yml` file to make sure that the server is reloaded when you make changes to the code. You can do this by passing through the workspace folder to `/code/` in the docker container.
-
-You can do this by adding the following configuration to the `docker-compose.yml` file in the `web` section:
-
-```yml
-web:
-    ...
-    volumes:
-      ...
-      - .:/code
-      ...
+```bash
+$ docker-compose down
 ```
 
-> Please bare in mind, if you have the default `.env` file, i.e. you haven't changed the "**ACTUAL_*something*_PATH**" variables, then this will pass through the database folder etc., which is not brilliant and should **NEVER** be used in production.
+#### Enabling the Debug Web Server
+As you may have read earlier, the debug environment is setup to run unit tests and close the server after the tests are complete, however sometimes you might want a more live/real-time server. To enable this, simply set `UNIT_TEST` to `False` in the [**debug** `.env`](.debug/.env) file like so:
 
-#### Unit testing
-If you want to test the server, you simply need to define an environment variable `UNIT_TEST` to `True` in the `.env` file and restart the docker compose, instead of starting the application, it should instead run the unit tests.
+```env
+UNIT_TEST=False
+```

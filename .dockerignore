@@ -1,1 +1,12 @@
+# Contains data
 /data
+
+# Potentially contains config files
+/.debug
+*.env
+.nginx
+docker-compose.yml
+
+# Unneeded git files
+/.git
+/.github
