@@ -30,6 +30,7 @@ services:
       - BOORU_STORAGE_PATH=${BOORU_STORAGE_PATH}
 
       # Production
+      - DEBUG=False
       - WORKERS=${GUNICORN_WORKERS}
 
       # Static

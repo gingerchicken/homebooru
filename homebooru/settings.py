@@ -149,26 +149,31 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = Path(os.environ.get('STATIC_ROOT', '/static/'))
 
-# Pipeline Configuration (Compressing and minifying static files)
-# https://django-pipeline.readthedocs.io/en/latest/
+if not DEBUG:
+    # Pipeline Configuration (Compressing and minifying static files)
+    # https://django-pipeline.readthedocs.io/en/latest/
 
-# Configure Django with django-pipeline
-STATICFILES_STORAGE = 'pipeline.storage.PipelineManifestStorage'
-STATICFILES_FINDERS = [
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    # Make them visible in the above scope
+    # TODO review if this is the best way to do this
+    global STATICFILES_STORAGE, STATICFILES_FINDERS, PIPELINE
 
-    # Compressor
-    'pipeline.finders.PipelineFinder'
-]
+    # Configure Django with django-pipeline
+    STATICFILES_STORAGE = 'pipeline.storage.PipelineManifestStorage'
+    STATICFILES_FINDERS = [
+        'django.contrib.staticfiles.finders.FileSystemFinder',
+        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 
-INSTALLED_APPS += [
-    'pipeline'
-]
+        # Compressor
+        'pipeline.finders.PipelineFinder'
+    ]
 
-# Configure Pipeline
-from .pipeline import config as PIPELINE
-PIPELINE['PIPELINE_ENABLED'] = not DEBUG # (Make sure to only enable in production)
+    INSTALLED_APPS += [
+        'pipeline'
+    ]
+
+    # Configure Pipeline
+    from .pipeline import config as PIPELINE
+    PIPELINE['PIPELINE_ENABLED'] = True # (Make sure to only enable in production)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
