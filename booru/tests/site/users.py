@@ -125,7 +125,7 @@ class RegisterTest(TestCase):
         self.assertFalse(User.objects.filter(username='fred').exists())
 
         # Check that an error message is shown
-        self.assertIn(response.context.get('error'), 'Password is not valid')
+        self.assertIn('Password is not valid', response.context.get('error'))
 
         # Check that the username persists
         self.assertEqual(response.context.get('username'), 'fred')
@@ -217,7 +217,7 @@ class RegisterTest(TestCase):
             response = self.register('fred', password, password, 'test@gmail.com')
 
             # Check that an error message is shown
-            self.assertIn(response.context.get('error'), 'Password is not valid')
+            self.assertIn('Password is not valid', response.context.get('error'))
 
             # Check that the username and email persist
             self.assertEqual(response.context.get('username'), 'fred')

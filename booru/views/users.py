@@ -60,7 +60,7 @@ def register(request):
         
         # Check if the password is valid
         if not boorutils.is_valid_password(password):
-            return render(request, 'booru/users/register.html', {'error': 'Password is not valid', 'username': username, 'email': email}, status=400)
+            return render(request, 'booru/users/register.html', {'error': 'Password is not valid, make sure it: includes at least one digit, contains a special character and is longer than 6 characters long.', 'username': username, 'email': email}, status=400)
 
         # Check if the username is valid
         if User.objects.filter(username=username).exists():
