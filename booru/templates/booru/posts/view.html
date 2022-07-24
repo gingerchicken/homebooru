@@ -68,6 +68,22 @@
 							</video>
 						{% else %}
 							<img id="image" class="content" src="/{% if post.sample and not resize %}{{post.sample_url}}{% else %}{{post.media_url}}{% endif %}" alt="{% for tag in post.tags.all %}{{tag.tag}} {% endfor %}" {% if post.sample %} data-original-width="{{post.width}}" data-original-height="{{post.height}}" {% endif %}>
+							<div id="image-overlay" style="display:none;">
+								<img media-src="/{{ post.media_url }}">
+								<div class="image-close">
+									<a href="#" onclick="return hideImageOverlay();">
+										<span class="ui-icon ui-icon-close option"></span>
+									</a>
+								</div>
+								<div class="image-tools">
+									<a href="#" onclick="return openOriginal('/{{ post.media_url }}');">
+										<span class="ui-icon ui-icon-arrow-4-diag option"></span>
+									</a>
+									<a onclick="return downloadOriginal('/{{ post.media_url }}');">
+										<span class="ui-icon ui-icon-arrowthick-1-s option"></span>
+									</a>
+								</div>
+							</div>
 						{% endif %}
 					</div>
 					<br>
@@ -90,11 +106,14 @@
 {% block head %}
 	<!-- Post Moderation -->
 	<script type="text/javascript" src="{% static 'js/custom/view-post.js' %}"></script>
+	<!-- Post Elements -->
+	<script type="text/javascript" src="{% static 'js/custom/view-post-elements.js' %}"></script>
 
 	<!-- View Post Stylesheet -->
 	<link rel="stylesheet" type="text/css" href="{% static 'css/custom/view-post.css' %}">
 
 	<script>
+		// Setup the post view
 		const view = new ViewPost('{{ csrf_token }}'{% if user.is_authenticated %}, {{ user.id }}{% endif %});
 	</script>
 {% endblock %}
