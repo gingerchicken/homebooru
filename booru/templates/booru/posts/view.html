@@ -71,15 +71,15 @@
 							<div id="image-overlay" style="display:none;">
 								<img media-src="/{{ post.media_url }}">
 								<div class="image-close">
-									<a href="#" onclick="return hideImageOverlay();">
+									<a title="Close" onclick="return hideImageOverlay();">
 										<span class="ui-icon ui-icon-close option"></span>
 									</a>
 								</div>
 								<div class="image-tools">
-									<a href="#" onclick="return openOriginal('/{{ post.media_url }}');">
+									<a title="Open Original" onclick="return openOriginal('/{{ post.media_url }}');">
 										<span class="ui-icon ui-icon-arrow-4-diag option"></span>
 									</a>
-									<a onclick="return downloadOriginal('/{{ post.media_url }}');">
+									<a title="Download" onclick="return downloadOriginal('/{{ post.media_url }}');">
 										<span class="ui-icon ui-icon-arrowthick-1-s option"></span>
 									</a>
 								</div>
