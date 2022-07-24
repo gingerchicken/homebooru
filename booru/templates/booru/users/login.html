@@ -11,7 +11,7 @@
         <form method="post">
             {% csrf_token %}
             Username:
-            <input type="text" name="username" value="" style="width: 100%;">
+            <input type="text" name="username" value="{{username}}" style="width: 100%;">
             Password:
             <input type="password" name="password" value="" style="width: 100%;">
             {% if error %}
