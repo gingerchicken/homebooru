@@ -1,0 +1,18 @@
+/* Post View */
+#image-container {
+	/* Align the divs center */
+	display: flex;
+	justify-content: center;
+}
+
+#image-container > .content {
+	margin: 5px;
+
+	/* Make sure that the image only spans the maximum height meaning it should fit on the screen */
+	/* Height should be 100vh - (all that is above) */
+	max-height: 100vh;
+	max-width: 100%;
+
+	/* Make the image's border visible */
+	outline: 1px solid #f0f0f0;
+}

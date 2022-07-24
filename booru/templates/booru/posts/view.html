@@ -88,8 +88,11 @@
 {% endblock %}
 
 {% block head %}
-	<!-- Include Post Moderation -->
+	<!-- Post Moderation -->
 	<script type="text/javascript" src="{% static 'js/custom/view-post.js' %}"></script>
+
+	<!-- View Post Stylesheet -->
+	<link rel="stylesheet" type="text/css" href="{% static 'css/custom/view-post.css' %}">
 
 	<script>
 		const view = new ViewPost('{{ csrf_token }}'{% if user.is_authenticated %}, {{ user.id }}{% endif %});
