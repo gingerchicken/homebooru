@@ -38,12 +38,11 @@ services:
     depends_on:
       - db
   nginx:
-    image: nginx
+    build: .nginx/
     ports:
       - "80:80"
     volumes:
       - ${ACTUAL_STORAGE_PATH}:/storage/
       - ${ACTUAL_STATIC_PATH}:/static/
-      - ./.nginx:/etc/nginx/conf.d/booru.conf
     depends_on:
       - web
