@@ -58,3 +58,13 @@ server {
         try_files $uri @django_proxy;
     }
 }
+
+# Redirect to the HTTPS version of the site
+server {
+    listen       80;
+    server_name  localhost;
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}

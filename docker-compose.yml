@@ -41,6 +41,7 @@ services:
     build: .nginx/
     ports:
       - "443:443"
+      - "80:80"
     volumes:
       - ${ACTUAL_STORAGE_PATH}:/storage/
       - ${ACTUAL_STATIC_PATH}:/static/
