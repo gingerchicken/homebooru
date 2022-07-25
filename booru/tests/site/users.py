@@ -32,8 +32,11 @@ class LoginPageTest(TestCase):
         })
 
         # Check that the user is still logged out
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 400)
         self.assertEqual(response.context.get('user').is_authenticated, False)
+
+        # Check that the username persists
+        self.assertEqual(response.context.get('username'), 'fred')
 
         # Make sure the context has an error message
         self.assertIn(response.context.get('error'), 'Invalid credentials')
@@ -122,8 +125,14 @@ class RegisterTest(TestCase):
         self.assertFalse(User.objects.filter(username='fred').exists())
 
         # Check that an error message is shown
-        self.assertIn(response.context.get('error'), 'Password is not valid')
-    
+        self.assertIn('Password is not valid', response.context.get('error'))
+
+        # Check that the username persists
+        self.assertEqual(response.context.get('username'), 'fred')
+
+        # Check that the email persists
+        self.assertEqual(response.context.get('email'), 'test@gmail.com')
+
     def test_register_no_conf_password(self):
         """Test that the register doesn't create a user if no confirmation password is given"""
         # Try to register a user with no confirmation password
@@ -141,6 +150,9 @@ class RegisterTest(TestCase):
         # Check that an error message is shown
         self.assertIn(response.context.get('error'), 'Passwords do not match')
     
+        # email and username persisted
+        self.assertEqual(response.context.get('username'), 'fred')
+
     def test_register_no_email(self):
         """Test that no email is acceptable"""
 
@@ -179,6 +191,9 @@ class RegisterTest(TestCase):
         # Make sure that the newly given information doesn't change the user
         self.assertEqual(User.objects.get(username='fred').email, '')
 
+        # Email persists
+        self.assertEqual(response.context.get('email'), 'test@gmail.com')
+
     def test_reject_invalid_usernames(self):
         invalid_usernames = [
             'a', 'aa', 'a' * 5000, 'b@ss', 'noob!'
@@ -202,8 +217,12 @@ class RegisterTest(TestCase):
             response = self.register('fred', password, password, 'test@gmail.com')
 
             # Check that an error message is shown
-            self.assertIn(response.context.get('error'), 'Password is not valid')
-    
+            self.assertIn('Password is not valid', response.context.get('error'))
+
+            # Check that the username and email persist
+            self.assertEqual(response.context.get('username'), 'fred')
+            self.assertEqual(response.context.get('email'), 'test@gmail.com')
+
     def test_reject_duplicate_email(self):
         """Test that a user cannot register with an email that already exists"""
 
@@ -220,6 +239,9 @@ class RegisterTest(TestCase):
 
         # Check that an error message is shown
         self.assertIn(response.context.get('error'), 'Email already exists')
+
+        # Check that the username persists
+        self.assertEqual(response.context.get('username'), 'fred2')
     
     def test_reject_invalid_email(self):
         """Test rejects invalid emails"""
@@ -236,6 +258,9 @@ class RegisterTest(TestCase):
 
             # Check that the error context is correct
             self.assertIn(response.context.get('error'), 'Email is not valid')
+
+            # Check that the username persists
+            self.assertEqual(response.context.get('username'), 'fred')
 
 class ProfileTest(TestCase):
     def test_user_not_found(self):
