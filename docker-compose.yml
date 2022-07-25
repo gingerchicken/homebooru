@@ -38,12 +38,18 @@ services:
     depends_on:
       - db
   nginx:
-    image: nginx
+    build: .nginx/
     ports:
+      - "443:443"
       - "80:80"
     volumes:
       - ${ACTUAL_STORAGE_PATH}:/storage/
       - ${ACTUAL_STATIC_PATH}:/static/
-      - ./.nginx:/etc/nginx/conf.d/booru.conf
+      - .nginx/conf/:/etc/nginx/conf.d/booru.conf # Allows for custom nginx config
+
+      # SSL/TLS Certificates (Uncomment if you want to use your own SSL/TLS certs)
+      # - ${SSL_KEY_PATH}:/certs/booru.key
+      # - ${SSL_CERT_PATH}:/certs/booru.crt
+      # - ${SSL_DH_PATH}:/certs/dhparam.pem
     depends_on:
       - web

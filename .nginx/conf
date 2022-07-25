@@ -1,6 +1,10 @@
 server {
-    listen       80;
+    listen       443 ssl;
     server_name  localhost;
+
+    # Include ssl configuration
+    include snippets/ssl-signed.conf;
+    include snippets/ssl-params.conf;
 
     # Maximum size of the request body to be 8G
     client_max_body_size 8G;
@@ -52,5 +56,15 @@ server {
     location / {
         # Try to serve the requested page as a static file first.
         try_files $uri @django_proxy;
+    }
+}
+
+# Redirect to the HTTPS version of the site
+server {
+    listen       80;
+    server_name  localhost;
+
+    location / {
+        return 301 https://$host$request_uri;
     }
 }
