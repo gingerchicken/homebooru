@@ -39,5 +39,8 @@ services:
 
       # Static
       - INSTALL_JQUERY=${INSTALL_JQUERY}
+
+      # Scanning
+      - DIRECTORY_SCAN_ENABLED=${DIRECTORY_SCAN_ENABLED}
     depends_on:
       - db

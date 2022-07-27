@@ -59,6 +59,12 @@ INSTALLED_APPS = [
     'booru.management.commands.createsecretkey',
 ]
 
+DIRECTORY_SCAN_ENABLED = os.environ.get('DIRECTORY_SCAN_ENABLED', 'False').lower() == 'true'
+if DIRECTORY_SCAN_ENABLED:
+    INSTALLED_APPS += [
+        'scanner.apps.ScannerConfig',
+    ]
+
 # Show static files in debug mode
 COLLECT_STATIC = os.environ.get('COLLECT_STATIC', 'False').lower() == 'true'
 if DEBUG or COLLECT_STATIC:
