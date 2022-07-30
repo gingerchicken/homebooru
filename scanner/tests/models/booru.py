@@ -108,3 +108,5 @@ class SaveBooruTest(TestCase):
 
             # Make sure it doesn't raise an error
             booru.save()
+
+            i += 1

@@ -1,8 +1,10 @@
 import base64
 
 # I have encoded them since I don't want to associate with them!
+# Please be aware that I do not moderate these sites nor do I have control of what content is on them.
 VALID_BOORUS = [
-    'aHR0cHM6Ly9zYWZlYm9vcnUub3JnLw=='
+    'aHR0cHM6Ly9zYWZlYm9vcnUub3JnLw==',
+    'aHR0cHM6Ly9nZWxib29ydS5jb20v'
 ]
 
 # Decode them
