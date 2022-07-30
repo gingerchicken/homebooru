@@ -16,6 +16,7 @@ FELIX_PATH = pathlib.Path(CONTENT_PATH / 'felix.jpg')
 GATO_PATH  = pathlib.Path(CONTENT_PATH / 'gato.png')
 VIDEO_PATH = pathlib.Path(CONTENT_PATH / 'ana_cat.mp4')
 SAMPLEABLE_PATH = pathlib.Path(CONTENT_PATH / 'sampleable_image.jpg')
+BOORU_IMAGE = pathlib.Path(CONTENT_PATH / 'booru_image.jpg')
 
 # Erroneous
 NON_IMAGE_PATH = pathlib.Path(CONTENT_PATH / 'test.txt')
