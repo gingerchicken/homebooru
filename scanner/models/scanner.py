@@ -180,3 +180,40 @@ class Scanner(models.Model):
         # All checks passed, return true
         return True
 
+    def search_file(self, path : str) -> bool:
+        """Searches for a file"""
+
+        # Get the md5 hash for the file
+        md5 = boorutils.get_file_checksum(path)
+
+        # Get the results
+        results = SearchResult.objects.filter(md5=md5, found=True)
+
+        bs = [i for i in self.boorus]
+
+        # Check that we have work to do
+        for result in results:
+            # Get the booru
+            booru = result.booru
+
+            # Ignore the check if the booru is not in the list
+            if booru not in bs: continue
+
+            # Ignore check if the result is stale
+            if result.stale: continue
+            
+            # Remove the booru from the list
+            bs.remove(booru)
+        
+        new_find = False
+        for booru in bs:
+            # Search the booru
+            result = booru.search_booru_md5(md5)
+
+            # Save the result
+            result.save()
+
+            # If we found a result, then mark that we found a new result
+            new_find = result.found or new_find
+        
+        return new_find

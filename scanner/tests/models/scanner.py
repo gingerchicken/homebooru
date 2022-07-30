@@ -11,6 +11,7 @@ import homebooru.settings
 
 import shutil
 import os
+import datetime
 
 class BoorusTest(TestCase):
     def setUp(self):
@@ -366,3 +367,229 @@ class ScannerShouldSearchTest(TestCase):
         result.save()
 
         self.assertFalse(self.scanner.should_search_file(booru_testutils.FELIX_PATH))
+
+class ScannerSearchFileTest(TestCase):
+    def setUp(self):
+        self.scanner = Scanner(name='test_scanner', path=booru_testutils.CONTENT_PATH)
+        self.scanner.save()
+
+        # Create a booru
+        self.booru = Booru(url=scanner_testutils.VALID_BOORUS[0], name='imagebooru')
+        self.booru.save()
+
+        self.booru_image = booru_testutils.BOORU_IMAGE
+    
+    def test_new_found(self):
+        """Returns expected results for a new file"""
+
+        # Scan and add the results to the database
+        self.assertTrue(self.scanner.search_file(self.booru_image))
+
+        # Check the results
+        results = SearchResult.objects.filter(booru=self.booru)
+
+        # Make sure there is one result
+        self.assertEqual(len(results), 1)
+
+        # Get the first result
+        result = results.first()
+
+        # Make sure that it is is found
+        self.assertTrue(result.found)
+
+        # Make sure that the result isn't None
+        self.assertIsNotNone(result, 'Didn\'t return a result')
+
+        # Make sure that the result has tags
+        self.assertGreater(len(result.tags), 0)
+
+        # Make sure that the tags contain the correct tags
+        for tag in ['astolfo_(fate)', '1boy', 'pink_hair']:
+            self.assertIn(tag, result.tags)
+
+        # Make sure that the result has a rating
+        self.assertEqual(result.raw_rating, 'safe')
+    
+    def test_override_stale(self):
+        """Overrides stale results with fresh results"""
+
+        # Create a stale result
+        result = SearchResult(
+            booru=self.booru,
+            md5=boorutils.get_file_checksum(self.booru_image),
+            found=True,
+            raw_rating='safe',
+            source='https://example.com/',
+            tags='common_tag'
+        )
+    
+        result.save()
+
+        # Make it stale
+        result.created = datetime.datetime(2000, 1, 1).astimezone()
+        result.save()
+
+        # Make sure it is stale
+        self.assertTrue(result.stale)
+
+        # Scan and add the results to the database
+        self.assertTrue(self.scanner.search_file(self.booru_image))
+
+        # Check the results
+        results = SearchResult.objects.filter(booru=self.booru)
+
+        # Make sure there is one result
+        self.assertEqual(len(results), 1)
+
+        # Get the first result
+        result = results.first()
+
+        # Make sure that it is is found
+        self.assertTrue(result.found)
+
+        # Make sure that the result isn't None
+        self.assertIsNotNone(result, 'Didn\'t return a result')
+
+        # Make sure that the result has different tags
+        self.assertNotEqual(result.tags, 'common_tag')
+
+        # Make sure that it has expected tags
+        for tag in ['astolfo_(fate)', '1boy', 'pink_hair']:
+            self.assertIn(tag, result.tags)
+        
+        # Make sure that the old tag is not in the new tags
+        self.assertNotIn('common_tag', result.tags)
+
+        # Make sure that the result has a rating
+        self.assertEqual(result.raw_rating, 'safe')
+        
+        # Make sure that it doesn't have a source
+        self.assertEqual(result.source, None)
+
+    def test_override_non_found(self):
+        """Overrides when found is false"""
+
+        # Create a result
+        result = SearchResult(
+            booru=self.booru,
+            md5=boorutils.get_file_checksum(self.booru_image),
+            found=False,
+        )
+        result.save()
+
+        # Scan and add the results to the database
+        self.assertTrue(self.scanner.search_file(self.booru_image))
+
+        # Check the results
+        results = SearchResult.objects.filter(booru=self.booru)
+
+        # Make sure there is one result
+        self.assertEqual(len(results), 1)
+
+        # Get the first result
+        result = results.first()
+
+        # Make sure that it is is found
+        self.assertTrue(result.found)
+
+        # Make sure that the result has tags
+        self.assertGreater(len(result.tags), 0)
+
+        # Make sure that the tags contain the correct tags
+        for tag in ['astolfo_(fate)', '1boy', 'pink_hair']:
+            self.assertIn(tag, result.tags)
+        
+        # Make sure that the result has a rating
+        self.assertEqual(result.raw_rating, 'safe')
+
+    def test_ignores_non_stale(self):
+        """Ignores checks for non-stale result"""
+
+        # Create a result
+        result = SearchResult(
+            booru=self.booru,
+            md5=boorutils.get_file_checksum(self.booru_image),
+            found=True,
+            raw_rating='explicit',
+            source='https://example.com/',
+            tags='common_tag'
+        )
+        result.save()
+
+        # Scan and add the results to the database
+        self.assertFalse(self.scanner.search_file(self.booru_image))
+
+        # Check the results
+        results = SearchResult.objects.filter(booru=self.booru)
+
+        # Make sure there is one result
+        self.assertEqual(len(results), 1)
+
+        # Get the first result
+        result = results.first()
+
+        # Make sure that it is is found
+        self.assertTrue(result.found)
+
+        # Make sure that the result has tags
+        self.assertGreater(len(result.tags), 0)
+
+        # Make sure that it has expected the tag
+        self.assertEqual(result.tags, 'common_tag')
+
+        # Check the source
+        self.assertEqual(result.source, 'https://example.com/')
+
+        # Make sure that the result has a rating
+        self.assertEqual(result.raw_rating, 'explicit')
+    
+    def test_ignores_other_boorus(self):
+        """Ignores boorus that are not its own"""
+
+        # Create another booru
+        other_booru = Booru(url=scanner_testutils.VALID_BOORUS[1], name='imagebooru 2')
+        other_booru.save()
+
+        # Create a result
+        result = SearchResult(
+            booru=other_booru,
+            md5=boorutils.get_file_checksum(self.booru_image),
+            found=True,
+            raw_rating='safe',
+            source='https://example.com/',
+            tags='common_tag'
+        )
+        result.save()
+
+        # Scan and add the results to the database
+        self.assertTrue(self.scanner.search_file(self.booru_image))
+
+        # Check the results
+        results = SearchResult.objects.filter(booru=self.booru)
+
+        # Make sure there is one result
+        self.assertEqual(len(results), 1)
+
+        # Get the first result
+        result = results.first()
+
+        # Make sure that it is is found
+        self.assertTrue(result.found)
+
+        # Make sure that the result has the astolfo tag
+        self.assertIn('astolfo_(fate)', result.tags)
+
+        # Check that the other result was not touched
+        results = SearchResult.objects.filter(booru=other_booru)
+
+        # Make sure there is one result
+        self.assertEqual(len(results), 1)
+
+        # Get the first result
+        result = results.first()
+
+        # Make sure that it is is found
+        self.assertTrue(result.found)
+
+        # Make sure that the result has the other tag
+        self.assertIn('common_tag', result.tags)
