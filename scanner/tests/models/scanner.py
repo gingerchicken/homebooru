@@ -49,6 +49,15 @@ class BoorusTest(TestCase):
         for booru in expected_boorus:
             self.assertTrue(booru in actual_boorus)
 
+class ScannerStrTest(TestCase):
+    def setUp(self):
+        self.scanner = Scanner(name='test_scanner', path=booru_testutils.CONTENT_PATH)
+        self.scanner.save()
+
+    def test_str(self):
+        """Returns the name of the scanner"""
+        self.assertEqual(str(self.scanner), 'test_scanner')
+
 class DefaultTagsTest(TestCase):
     def setUp(self):
         self.og_setting = homebooru.settings.SCANNER_USE_DEFAULT_TAGS

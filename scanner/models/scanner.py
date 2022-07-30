@@ -53,3 +53,7 @@ class Scanner(models.Model):
             tags.append(Tag.create_or_get(tag))
         
         return tags
+
+    def __str__(self):
+        return self.name
+    
