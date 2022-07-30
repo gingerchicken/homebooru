@@ -39,3 +39,17 @@ class Scanner(models.Model):
         
         # Return the selected boorus
         return self.search_boorus.all()
+
+    @property
+    def default_tags(self) -> list:
+        """Returns the default tags for an item when nothing was found"""
+
+        tags = []
+
+        if not homebooru.settings.SCANNER_USE_DEFAULT_TAGS:
+            return tags
+
+        for tag in homebooru.settings.SCANNER_DEFAULT_TAGS:
+            tags.append(Tag.create_or_get(tag))
+        
+        return tags
