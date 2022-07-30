@@ -11,6 +11,7 @@ from .booru import Booru
 from .searchresult import SearchResult
 
 import os
+from pathlib import Path
 
 class Scanner(models.Model):
     # The name of the scanner
