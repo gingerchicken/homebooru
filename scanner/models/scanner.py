@@ -144,3 +144,39 @@ class Scanner(models.Model):
 
         # Call the superclass save method
         super().save(*args, **kwargs)
+
+    def should_search_file(self, path : str) -> bool:
+        """Checks if the file should be searched"""
+
+        # Get the file_path
+        file_path = Path(path)
+        file_path = file_path.resolve()
+
+        # Make sure it is an acceptable file type
+        try:
+            Post.validate_file(file_path=file_path)
+        except:
+            # If it is not an acceptable file type, return false
+            return False
+
+        # Make sure that it is a child of the scanner path
+        scanner_path = Path(self.path)
+        scanner_path = scanner_path.resolve()
+        
+        if not str(file_path).startswith(str(scanner_path)):
+            return False
+        
+        # Get the checksum
+        md5 = boorutils.get_file_checksum(path)
+
+        # Make sure that the file is not already in the database as a post
+        if Post.objects.filter(md5=md5).exists():
+            return False
+        
+        # Make sure that the file is not already in the database as a result
+        if SearchResult.objects.filter(md5=md5).exists():
+            return False
+
+        # All checks passed, return true
+        return True
+

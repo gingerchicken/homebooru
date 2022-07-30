@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from scanner.models import Booru, Scanner, SearchResult, Tag
+from scanner.models import Booru, Scanner, SearchResult, Tag, Post
 from booru.models import Rating
 
 import booru.tests.testutils as booru_testutils
@@ -8,6 +8,9 @@ import scanner.tests.testutils as scanner_testutils
 import booru.boorutils as boorutils
 
 import homebooru.settings
+
+import shutil
+import os
 
 class BoorusTest(TestCase):
     def setUp(self):
@@ -306,3 +309,60 @@ class ScannerCreatePostTest(TestCase):
 
         # Make sure that the post is None
         self.assertEqual(post, None)
+
+class ScannerShouldSearchTest(TestCase):
+    def setUp(self):
+        self.scanner = Scanner(name='test_scanner', path=booru_testutils.CONTENT_PATH)
+        self.scanner.save()
+
+        # Create a booru
+        self.booru = Booru(url=scanner_testutils.VALID_BOORUS[0], name='imagebooru')
+        self.booru.save()
+
+        # Copy an image to /tmp/scanner.jpg
+        shutil.copy(booru_testutils.FELIX_PATH, '/tmp/scanner.jpg')
+
+    def tearDown(self):
+        # Delete the image
+        os.remove('/tmp/scanner.jpg')
+
+    def test_invalid_file(self):
+        """Returns false if the file is an invalid type"""
+
+        self.assertFalse(self.scanner.should_search_file(booru_testutils.NON_IMAGE_PATH))
+
+    def test_outside_path(self):
+        """Returns false if the file is outside the path"""
+    
+        self.assertFalse(self.scanner.should_search_file('/tmp/scanner.jpg'))
+    
+    def test_valid_file(self):
+        """Returns true if the file is valid"""
+
+        self.assertTrue(self.scanner.should_search_file(booru_testutils.FELIX_PATH))
+
+
+    def test_post(self):
+        """Returns false if the image is already a post"""
+
+        # Create a post
+        post = Post.create_from_file(booru_testutils.FELIX_PATH)
+        post.save()
+
+        self.assertFalse(self.scanner.should_search_file(booru_testutils.FELIX_PATH))
+    
+    def test_result(self):
+        """Returns false if there are valid results"""
+
+        # Create a result
+        result = SearchResult(
+            booru=self.booru,
+            md5=boorutils.get_file_checksum(booru_testutils.FELIX_PATH),
+            found=True,
+            raw_rating='safe',
+            source='https://example.com/',
+            tags='common_tag'
+        )
+        result.save()
+
+        self.assertFalse(self.scanner.should_search_file(booru_testutils.FELIX_PATH))
