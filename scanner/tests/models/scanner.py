@@ -98,3 +98,24 @@ class DefaultTagsTest(TestCase):
 
         # Make sure that the actual tags are empty
         self.assertEqual(len(actual_tags), 0)
+
+class ScannerSaveTest(TestCase):
+    def test_rejects_invalid_path(self):
+        """Rejects invalid paths"""
+
+        scanner = Scanner(name='test_scanner', path='/invalid/path')
+        self.assertRaises(ValueError, scanner.save)
+    
+    def test_rejects_non_directory(self):
+        """Rejects non-directory paths"""
+
+        scanner = Scanner(name='test_scanner', path=booru_testutils.FELIX_PATH)
+        self.assertRaises(ValueError, scanner.save)
+    
+    def test_accepts_directory(self):
+        """Accepts directory paths"""
+
+        scanner = Scanner(name='test_scanner', path=booru_testutils.CONTENT_PATH)
+        scanner.save()
+
+        self.assertTrue(scanner.pk is not None)

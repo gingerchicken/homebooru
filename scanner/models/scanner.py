@@ -57,3 +57,15 @@ class Scanner(models.Model):
     def __str__(self):
         return self.name
     
+    
+    def save(self, *args, **kwargs):
+        # Make sure that the path exists
+        if not os.path.exists(self.path):
+            raise ValueError('The path does not exist')
+
+        # Make sure that the path is valid
+        if not os.path.isdir(self.path):
+            raise ValueError('Invalid scanner path')
+
+        # Call the superclass save method
+        super().save(*args, **kwargs)
