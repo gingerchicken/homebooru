@@ -48,6 +48,10 @@ if [ "$DB_MIGRATE" = "True" ]; then
     python manage.py makemigrations booru
     python manage.py migrate
 
+    # Migrate scanner
+    python manage.py makemigrations scanner
+    python manage.py migrate
+
     # Migrate the rest of the site
     python manage.py makemigrations
     python manage.py migrate --run-syncdb
