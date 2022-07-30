@@ -19,7 +19,7 @@ def get_file_checksum(path : str) -> str:
     file_path = pathlib.Path(path)
 
     if not file_path.exists():
-        raise Exception("File does not exist")
+        raise Exception("File does not exist:", file_path.resolve())
 
     # Make the file path absolute
     file_path = file_path.resolve()
