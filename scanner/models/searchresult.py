@@ -18,10 +18,10 @@ class SearchResult(models.Model):
     tags = models.TextField(blank=True)
 
     # The source URL of the file
-    source = models.URLField(blank=True)
+    source = models.URLField(blank=True, null=True)
 
     # Raw Rating from the booru
-    raw_rating = models.TextField(blank=True)
+    raw_rating = models.TextField(blank=True, default='')
 
     # Mark if the file was found
     found = models.BooleanField(default=False)
