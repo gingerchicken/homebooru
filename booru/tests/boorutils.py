@@ -223,3 +223,49 @@ class ValidEmailTest(TestCase):
 
         for email in emails:
             self.assertFalse(is_valid_email(email))
+
+class ModeTest(TestCase):
+    def test_returns_expected_nonobj(self):
+        """Returns expected mode with non-object types"""
+
+        l = [1, 2, 2, 3]
+
+        self.assertEqual(mode(l), 2)
+    
+    def test_returns_expected_with_duplicates(self):
+        """Returns expected mode with duplicates"""
+
+        l = [1, 2, 2, 2, 3, 3, 3]
+
+        self.assertEqual(mode(l), 2)
+    
+    def test_returns_expected_with_empty_list(self):
+        """Returns expected mode with empty list"""
+
+        l = []
+
+        self.assertEqual(mode(l), None)
+    
+    def test_returns_expected_with_one_element(self):
+        """Returns expected mode with one element"""
+
+        l = [1]
+
+        self.assertEqual(mode(l), 1)
+
+    def test_returns_expected_with_obj(self):
+        """Returns expected mode with object types"""
+
+        class Test:
+            def __init__(self, value):
+                self.value = value
+            
+            def __eq__(self, other):
+                return self.value == other.value
+            
+            def __hash__(self):
+                return hash(self.value)
+        
+        l = [Test(1), Test(2), Test(2), Test(3)]
+
+        self.assertEqual(mode(l).value, 2)
