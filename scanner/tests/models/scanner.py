@@ -1,6 +1,5 @@
 from django.test import TestCase
 
-from scanner.models import Booru, Scanner
 from scanner.models import Booru, Scanner, SearchResult, Tag
 from booru.models import Rating
 
@@ -37,7 +36,14 @@ class BoorusTest(TestCase):
 
         # Get the actual boorus
         actual_boorus = self.scanner.boorus.all()
+
+        # Make sure the same amount of boorus are returned
+        self.assertEqual(len(expected_boorus), len(actual_boorus))
     
+        # Make sure it was the expected booru
+        for booru in expected_boorus:
+            self.assertTrue(booru in actual_boorus)
+
     def test_empty_boorus(self):
         """Returns all boorus if none are specified"""
         # Get the expected boorus
