@@ -547,10 +547,10 @@ div.forum-list-space {
         clear: both;
         position: absolute;
         top: 0px;
-        width: 50%;
+        width: calc(50% - 10px);
         z-index: 100;
         padding-right: 15px;
-        margin-left: 80px;
+        margin-left: 90px;
     }
     .navbar-header {
         padding-right: 15px;
