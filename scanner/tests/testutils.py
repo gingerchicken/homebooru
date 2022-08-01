@@ -1,4 +1,10 @@
 import base64
+import pathlib
+import datetime
+import os
+import shutil
+
+import booru.boorutils as boorutils
 
 # I have encoded them since I don't want to associate with them!
 # Please be aware that I do not moderate these sites nor do I have control of what content is on them.
@@ -17,3 +23,42 @@ INVALID_BOORUS = [
     'https://google.com/',
     VALID_BOORUS[0] + '/cement', # for non-200 case
 ]
+
+class TempScanFolder:
+    def __init__(self, files : list = []):
+        self.__files = files
+
+    def setUp(self):
+        # Get a folder name
+        timestamp = str(datetime.datetime.now().timestamp())
+        md5 = boorutils.hash_str(timestamp)
+
+        # Create a temporary folder
+        self.folder = pathlib.Path('/tmp/' + md5)
+
+        # Create the folder
+        self.folder.mkdir(parents=True, exist_ok=True)
+
+        # Copy the files
+        for file in self.__files:
+            # Original path
+            original_path = pathlib.Path(file)
+
+            # New path
+            result_path = self.folder / (boorutils.get_file_checksum(original_path) + original_path.suffix)
+
+            # Copy the file
+            shutil.copy(original_path, result_path)
+
+    def tearDown(self):
+        # Remove the folder and all of its contents
+        shutil.rmtree(self.folder)
+    
+    def add_file(self, file : str):
+        self.__files.append(file)
+    
+    def remove_file(self, file : str):
+        self.__files.remove(file)
+    
+    def remove_all_files(self):
+        self.__files.clear()

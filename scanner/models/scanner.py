@@ -11,6 +11,7 @@ from .booru import Booru
 from .searchresult import SearchResult
 
 import os
+import threading
 from pathlib import Path
 
 class Scanner(models.Model):
@@ -145,6 +146,113 @@ class Scanner(models.Model):
 
         # Call the superclass save method
         super().save(*args, **kwargs)
+    
+    def scan(self, create_posts : bool = True, use_default_tags : bool = True) -> list:
+        """Scans the scanner for new files"""
+
+        # TODO implement multithreading
+        multi_thread = False
+        max_concurrent_threads = 8
+
+        # Check if we should prune the results
+        if self.auto_prune_results:
+            # Prune the results
+            SearchResult.prune()
+
+        # Store the md5 hashes as the key and the path as the value
+        file_hashes = {}
+
+        # Find all the files in the path using the walk function
+        for root, dirs, files in os.walk(self.path):
+            # Loop through all the files
+            for file in files:
+                # Get the full path
+                path = os.path.join(root, file)
+
+                # Make the path absolute
+                path = os.path.abspath(path)
+
+                # Get the md5 hash of the file
+                md5 = boorutils.get_file_checksum(path)
+
+                # Check if we already have this file
+                if md5 in file_hashes: continue
+
+                # Make sure that we should search the file
+                if not self.should_search_file(path): continue
+
+                # Add the file to the list
+                file_hashes[md5] = path
+
+        # Store the created posts
+        created_posts = []
+
+        # Store the threads
+        threads = []
+        operations = 0
+
+        # create_post code, this is used to create the posts in a thread
+        def create_post(path : str) -> None:
+            # Search for the file
+            if not self.search_file(path): return
+
+            # ... Successfully found the file
+
+            # Get the required local variables
+            nonlocal created_posts
+
+            # Create the post
+            post = self.create_post(path)
+
+            # Make sure that it is not None
+            if post is None: return
+
+            # Add the post to the list
+            created_posts.append(post)
+
+        # Iterate through all the files
+        for (md5, path) in file_hashes.items():
+            # Check if we should thread
+            if not multi_thread:
+                # Create the post
+                create_post(path)
+
+                # Continue to the next file
+                continue
+
+            # Check if we have reached the maximum number of threads
+            if len(threads) >= max_concurrent_threads:
+                # Get the first thread
+                thread = threads.pop(0)
+
+                # Wait for the thread to finish
+                thread.join()
+                
+                # Close the thread
+                thread._stop()
+                thread._delete()
+
+            # Create a thread for the file
+            thread = threading.Thread(target=create_post, args=(path,))
+
+            # Add the thread to the list
+            threads.append(thread)
+
+            # Start the thread
+            thread.start()
+        
+        # Wait for all the threads to finish
+        for thread in threads:
+            # TODO this is repeated code, make this a function
+            # Wait for the thread to finish
+            thread.join()
+
+            # Remove the thread
+            thread._stop()
+            thread._delete()
+        
+        # Return the created posts
+        return created_posts
 
     def should_search_file(self, path : str) -> bool:
         """Checks if the file should be searched"""

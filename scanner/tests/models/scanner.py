@@ -593,3 +593,61 @@ class ScannerSearchFileTest(TestCase):
 
         # Make sure that the result has the other tag
         self.assertIn('common_tag', result.tags)
+
+class ScannerScanTest(TestCase):
+    temp_scan_dir = scanner_testutils.TempScanFolder()
+
+    fixtures = ['ratings.json']
+
+    def setUp(self):
+        self.temp_scan_dir.add_file(booru_testutils.BOORU_IMAGE)
+        self.temp_scan_dir.setUp()
+
+        # Create the scanner
+        self.scanner = Scanner(
+            path=str(self.temp_scan_dir.folder),
+            name='Test Scanner'
+        )
+        self.scanner.save()
+
+        # Create a booru
+        self.booru = Booru(
+            url=scanner_testutils.VALID_BOORUS[0],
+            name='imagebooru'
+        )
+        self.booru.save()
+
+        # Add the booru to the scanner
+        self.scanner.search_boorus.add(self.booru)
+        self.scanner.save()
+    
+    def tearDown(self):
+        self.temp_scan_dir.tearDown()
+
+        self.temp_scan_dir.remove_all_files()
+    
+    def test_scan_dir(self):
+        """Scans a directory"""
+
+        # Run the scan
+        posts = self.scanner.scan()
+
+        # Make sure that there is one post
+        self.assertEqual(len(posts), 1)
+
+        # Get the first post
+        post = posts[0]
+
+        # Make sure that it is the correct post
+        self.assertEqual(post.md5, boorutils.get_file_checksum(booru_testutils.BOORU_IMAGE))
+
+        # Make sure that it has tags
+        self.assertGreater(post.tags.all().count(), 1)
+
+        # Make sure that the item has a rating
+        self.assertEqual(str(post.rating), 'safe')
+    
+    # TODO test recursive scan
+    # TODO test scan with multiple boorus
+    # TODO test auto_prune
+    # TODO test auto-tagging
