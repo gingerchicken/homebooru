@@ -172,8 +172,18 @@ class Scanner(models.Model):
         # Make sure that the file is not already in the database as a post
         if Post.objects.filter(md5=md5).exists(): return False
         
-        # Make sure that the file is not already in the database as a result
-        if SearchResult.objects.filter(md5=md5).exists(): return False
+        boorus = self.boorus
+        checked_boorus = 0
+        # Check all of the local boorus
+        for booru in self.boorus.all():
+            # Make sure that the file is not already in the database as a result
+            if SearchResult.objects.filter(md5=md5, booru=booru).exists(): continue
+
+            # Increment the checked boorus
+            checked_boorus += 1
+        
+        # Make sure that we need to check at least one booru
+        if checked_boorus == 0: return False
 
         # All checks passed, return true
         return True
