@@ -164,19 +164,16 @@ class Scanner(models.Model):
         scanner_path = Path(self.path)
         scanner_path = scanner_path.resolve()
         
-        if not str(file_path).startswith(str(scanner_path)):
-            return False
+        if not str(file_path).startswith(str(scanner_path)): return False
         
         # Get the checksum
         md5 = boorutils.get_file_checksum(path)
 
         # Make sure that the file is not already in the database as a post
-        if Post.objects.filter(md5=md5).exists():
-            return False
+        if Post.objects.filter(md5=md5).exists(): return False
         
         # Make sure that the file is not already in the database as a result
-        if SearchResult.objects.filter(md5=md5).exists():
-            return False
+        if SearchResult.objects.filter(md5=md5).exists(): return False
 
         # All checks passed, return true
         return True
