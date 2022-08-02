@@ -333,3 +333,8 @@ class Scanner(models.Model):
             new_find = result.found or new_find
         
         return new_find
+
+    class Meta:
+        permissions = (
+            ('scan', 'Can use a scanner'),
+        )
