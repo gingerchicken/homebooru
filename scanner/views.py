@@ -11,7 +11,7 @@ def scan(request, scanner_id):
     try:
         scanner = Scanner.objects.get(id=scanner_id)
     except Scanner.DoesNotExist:
-        return HttpResponse('Scanner does not exist.')
+        return HttpResponse('Scanner does not exist.', status=404)
 
     # Call the Scan function
     posts = scanner.scan()
