@@ -21,7 +21,10 @@ from homebooru import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('booru.urls')) # This makes the posts page the homepage
+    path('', include('booru.urls')), # This makes the posts page the homepage
+    
+    # Include the scanner urls
+    path('scanner/', include('scanner.urls')),
 ]
 
 if settings.DEBUG:
