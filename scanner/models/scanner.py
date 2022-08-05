@@ -150,10 +150,6 @@ class Scanner(models.Model):
     def scan(self, create_posts : bool = True, use_default_tags : bool = True) -> list:
         """Scans the scanner for new files"""
 
-        # TODO implement multithreading
-        multi_thread = False
-        max_concurrent_threads = 8
-
         # Check if we should prune the results
         if self.auto_prune_results:
             # Prune the results
@@ -191,65 +187,21 @@ class Scanner(models.Model):
         threads = []
         operations = 0
 
-        # create_post code, this is used to create the posts in a thread
-        def create_post(path : str) -> None:
+        # Iterate through all the files
+        for (md5, path) in file_hashes.items():
             # Search for the file
-            if not self.search_file(path): return
+            if not self.search_file(path): continue
 
             # ... Successfully found the file
-
-            # Get the required local variables
-            nonlocal created_posts
 
             # Create the post
             post = self.create_post(path)
 
             # Make sure that it is not None
-            if post is None: return
+            if post is None: continue
 
             # Add the post to the list
             created_posts.append(post)
-
-        # Iterate through all the files
-        for (md5, path) in file_hashes.items():
-            # Check if we should thread
-            if not multi_thread:
-                # Create the post
-                create_post(path)
-
-                # Continue to the next file
-                continue
-
-            # Check if we have reached the maximum number of threads
-            if len(threads) >= max_concurrent_threads:
-                # Get the first thread
-                thread = threads.pop(0)
-
-                # Wait for the thread to finish
-                thread.join()
-                
-                # Close the thread
-                thread._stop()
-                thread._delete()
-
-            # Create a thread for the file
-            thread = threading.Thread(target=create_post, args=(path,))
-
-            # Add the thread to the list
-            threads.append(thread)
-
-            # Start the thread
-            thread.start()
-        
-        # Wait for all the threads to finish
-        for thread in threads:
-            # TODO this is repeated code, make this a function
-            # Wait for the thread to finish
-            thread.join()
-
-            # Remove the thread
-            thread._stop()
-            thread._delete()
         
         # Return the created posts
         return created_posts
