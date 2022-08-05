@@ -83,7 +83,7 @@ class ResultStrTest(TestCase):
 
         self.result = SearchResult(
             booru=self.booru,
-            md5='88d087c21ed70168c35ed4b503e641ea',
+            md5=scanner_testutils.BOORU_MD5,
             tags='tag1 tag2 tag3',
             raw_rating='safe',
             found=True
@@ -115,7 +115,7 @@ class ResultRatingTest(TestCase):
         for rating in self.ratings:
             result = SearchResult(
                 booru=self.booru,
-                md5='88d087c21ed70168c35ed4b503e641ea',
+                md5=scanner_testutils.BOORU_MD5,
                 tags='tag1 tag2 tag3',
                 raw_rating=rating,
                 found=True
@@ -139,7 +139,7 @@ class ResultRatingTest(TestCase):
         # Create a new result
         result = SearchResult(
             booru=self.booru,
-            md5='88d087c21ed70168c35ed4b503e641ea',
+            md5=scanner_testutils.BOORU_MD5,
             tags='tag1 tag2 tag3',
             raw_rating='invalid',
             found=True
@@ -157,7 +157,7 @@ class ResultRatingTest(TestCase):
         # Create a new result
         result = SearchResult(
             booru=self.booru,
-            md5='88d087c21ed70168c35ed4b503e641ea',
+            md5=scanner_testutils.BOORU_MD5,
             raw_rating='safe', # This will never happen but still let's see if it ignores data
             found=False
         )

@@ -5,6 +5,18 @@ import os
 import shutil
 
 import booru.boorutils as boorutils
+import booru.tests.testutils as booru_testutils
+
+
+# Booru image
+BOORU_MD5 = boorutils.get_file_checksum(booru_testutils.BOORU_IMAGE)
+
+# Expected booru tags for that image
+BOORU_TAGS = [
+    'astolfo_(fate)',
+    '1boy',
+    'pink_hair'
+]
 
 # I have encoded them since I don't want to associate with them!
 # Please be aware that I do not moderate these sites nor do I have control of what content is on them.

@@ -5,12 +5,8 @@ from scanner.models import Booru
 import scanner.tests.testutils as scanner_testutils
 
 class SearchBooruMD5Test(TestCase):
-    valid_md5 = '88d087c21ed70168c35ed4b503e641ea'
-    expected_tags = [
-        'astolfo_(fate)',
-        '1boy',
-        'pink_hair'
-    ]
+    valid_md5 = scanner_testutils.BOORU_MD5
+    expected_tags = scanner_testutils.BOORU_TAGS
 
     def setUp(self):
         booru_url = scanner_testutils.VALID_BOORUS[0]
