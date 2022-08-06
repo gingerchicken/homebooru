@@ -600,6 +600,8 @@ class ScannerScanTest(TestCase):
     fixtures = ['ratings.json']
 
     def setUp(self):
+        self.og_SCANNER_USE_DEFAULT_TAGS = homebooru.settings.SCANNER_USE_DEFAULT_TAGS
+
         self.temp_scan_dir.add_file(booru_testutils.BOORU_IMAGE)
         self.temp_scan_dir.setUp()
 
@@ -622,6 +624,8 @@ class ScannerScanTest(TestCase):
         self.scanner.save()
     
     def tearDown(self):
+        homebooru.settings.SCANNER_USE_DEFAULT_TAGS = self.og_SCANNER_USE_DEFAULT_TAGS
+
         self.temp_scan_dir.tearDown()
 
         self.temp_scan_dir.remove_all_files()
@@ -647,7 +651,108 @@ class ScannerScanTest(TestCase):
         # Make sure that the item has a rating
         self.assertEqual(str(post.rating), 'safe')
     
-    # TODO test recursive scan
+    def test_recursive_search(self):
+        """Finds files in subdirectories"""
+
+        # Create a subdirectory
+        folder_path = self.temp_scan_dir.folder / 'subdir'
+        folder_path.mkdir()
+
+        # Image name
+        image_name = scanner_testutils.BOORU_MD5 + booru_testutils.BOORU_IMAGE.suffix
+
+        # Move the file into the subdirectory
+        shutil.move(
+            str(self.temp_scan_dir.folder / image_name),
+            str(folder_path / image_name)
+        )
+
+        # Make sure that the original file is gone
+        self.assertFalse((self.temp_scan_dir.folder / image_name).exists())
+
+        # Run the scan
+        posts = self.scanner.scan()
+
+        # Make sure that there is one post
+        self.assertEqual(len(posts), 1)
+
+        # Get the first post
+        post = posts[0]
+
+        # Make sure that it is the correct post
+        self.assertEqual(post.md5, scanner_testutils.BOORU_MD5)
+
+        # Make sure that it has tags
+        self.assertGreater(post.tags.all().count(), 1)
+
+        # Make sure that the item has a rating
+        self.assertEqual(str(post.rating), 'safe')
+
     # TODO test scan with multiple boorus
-    # TODO test auto_prune
-    # TODO test auto-tagging
+    
+    def test_auto_tag_with_tags(self):
+        """Appends tags to images with tags"""
+
+        # Add default tags
+        for i in [
+            Tag.create_or_get(tag='auto'),
+            Tag.create_or_get(tag='tagme')
+        ]:
+            self.scanner.auto_tags.add(i)
+        
+        # Save the scanner
+        self.scanner.save()
+
+        # Run the scan
+        posts = self.scanner.scan()
+
+        # Make sure that there is one post
+        self.assertEqual(len(posts), 1)
+
+        # Get the first post
+        post = posts[0]
+
+        # Make sure that it has the tags
+        for tag in ['auto', 'tagme']:
+            self.assertIn(tag, post.tags.all().values_list('tag', flat=True))
+        
+        # Make sure that the item has a rating
+        self.assertEqual(str(post.rating), 'safe')
+    
+    def test_auto_tag_without_tags(self):
+    def test_auto_prune(self):
+        """Automatically removes stale search results"""
+
+        # Enable auto prune
+        self.scanner.auto_prune_results = True
+        self.scanner.save()
+
+        # Add a stale result
+        result = SearchResult(
+            booru=self.booru,
+            md5=scanner_testutils.BOORU_MD5,
+            found=True,
+            raw_rating='explicit',
+            source='https://example.com/',
+            tags='tagme123'
+        )
+        result.save()
+
+        # Change the date of the result
+        result.created = SearchResult.get_stale_date()
+        result.save()
+
+        # Run the scan
+        posts = self.scanner.scan()
+
+        # Make sure that there is one post
+        self.assertEqual(len(posts), 1)
+
+        # Get the first post
+        post = posts[0]
+
+        # Make sure that it doesn't have the tags
+        self.assertNotIn('tagme123', post.tags.all().values_list('tag', flat=True))
+
+        # Make sure that the item has a rating
+        self.assertEqual(str(post.rating), 'safe')
