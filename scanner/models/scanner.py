@@ -16,10 +16,10 @@ from pathlib import Path
 
 class Scanner(models.Model):
     # The name of the scanner
-    name = models.TextField(unique=True, blank=False, null=False)
+    name = models.CharField(unique=True, blank=False, null=False, max_length=256)
 
     # The path for the root directory of the scanner
-    path = models.TextField(unique=True, blank=False, null=False)
+    path = models.CharField(unique=True, blank=False, null=False, max_length=512)
 
     # The owner of all of the found posts
     owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
