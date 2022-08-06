@@ -278,11 +278,11 @@ class Post(models.Model):
 
     @property
     def sample_url(self):
-        return f"samples/{self.folder}/sample_{self.md5}.jpg"
+        return f"samples/{self.folder}/sample_{self.md5}.png"
     
     @property
     def thumbnail_url(self):
-        return f"thumbnails/{self.folder}/thumbnail_{self.md5}.jpg"
+        return f"thumbnails/{self.folder}/thumbnail_{self.md5}.png"
     
     @property
     def media_url(self):
@@ -331,8 +331,8 @@ class Post(models.Model):
         folder = Post.get_next_folder()
 
         # File paths
-        sample_path = settings.BOORU_STORAGE_PATH / f"samples/{folder}/sample_{md5}.jpg"
-        thumb_path  = settings.BOORU_STORAGE_PATH / f"thumbnails/{folder}/thumbnail_{md5}.jpg"
+        sample_path = settings.BOORU_STORAGE_PATH / f"samples/{folder}/sample_{md5}.png"
+        thumb_path  = settings.BOORU_STORAGE_PATH / f"thumbnails/{folder}/thumbnail_{md5}.png"
         image_path  = settings.BOORU_STORAGE_PATH / f"media/{folder}/{md5}.{file_extension}"
 
         # If these folders don't exist, create them
