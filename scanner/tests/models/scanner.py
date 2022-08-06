@@ -719,7 +719,7 @@ class ScannerScanTest(TestCase):
         # Make sure that the item has a rating
         self.assertEqual(str(post.rating), 'safe')
     
-    def test_auto_tag_without_tags(self):
+    
     def test_auto_prune(self):
         """Automatically removes stale search results"""
 
