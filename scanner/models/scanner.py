@@ -31,7 +31,7 @@ class Scanner(models.Model):
     search_boorus = models.ManyToManyField(Booru, blank=True, related_name='boorus')
 
     # Specify if we should prune the results on startup
-    auto_prune_results = models.BooleanField(default=False)
+    auto_prune_results = models.BooleanField(default=True)
 
     @property
     def boorus(self):
