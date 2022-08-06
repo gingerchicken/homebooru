@@ -12,7 +12,7 @@ class SearchResult(models.Model):
     booru = models.ForeignKey(Booru, on_delete=models.CASCADE, blank=False)
 
     # The MD5 hash of the file
-    md5 = models.TextField(blank=False, null=False)
+    md5 = models.CharField(max_length=32, blank=False)
 
     # The raw tags list
     tags = models.TextField(blank=True)
@@ -21,7 +21,7 @@ class SearchResult(models.Model):
     source = models.URLField(blank=True, null=True)
 
     # Raw Rating from the booru
-    raw_rating = models.TextField(blank=True, default='')
+    raw_rating = models.CharField(blank=True, default='', max_length=32)
 
     # Mark if the file was found
     found = models.BooleanField(default=False)
