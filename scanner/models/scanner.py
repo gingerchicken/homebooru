@@ -153,6 +153,7 @@ class Scanner(models.Model):
 
         # Store the md5 hashes as the key and the path as the value
         file_hashes = {}
+        post_hashes = {}
 
         # Find all the files in the path using the walk function
         for root, dirs, files in os.walk(self.path):
@@ -168,24 +169,37 @@ class Scanner(models.Model):
                 md5 = boorutils.get_file_checksum(path)
 
                 # Check if we already have this file
-                if md5 in file_hashes: continue
+                if md5 in file_hashes or md5 in post_hashes: continue
 
-                # Make sure that we should search the file
-                if not self.should_search_file(path): continue
+                # Check if we should search the file
+                if self.should_search_file(path):
+                    # Add the file to the list
+                    file_hashes[md5] = path
 
-                # Add the file to the list
-                file_hashes[md5] = path
+                    continue
+                
+                # Check if we should create the post
+                if self.should_create_post(path):
+                    # Add the file to the list
+                    post_hashes[md5] = path
 
+                    continue
+                    
         # Store the created posts
         created_posts = []
 
-        # Iterate through all the files
+        # Iterate through all the files to search for
         for (md5, path) in file_hashes.items():
             # Search for the file
             if not self.search_file(path): continue
 
             # ... Successfully found the file
 
+            # Add the file to the post hashes
+            post_hashes[md5] = path
+
+        # Iterate through all the files to create posts for
+        for (md5, path) in post_hashes.items():
             # Create the post
             post = self.create_post(path)
 
@@ -197,6 +211,21 @@ class Scanner(models.Model):
         
         # Return the created posts
         return created_posts
+
+    def should_create_post(self, path : str) -> bool:
+        """Returns whether or not we should create a post for the file"""
+
+        # Get the md5 hash of the file
+        md5 = boorutils.get_file_checksum(path)
+
+        # Check that there are search results for the file
+        if not SearchResult.objects.filter(md5=md5).exists(): return False
+
+        # Check if there are already posts for the file
+        if Post.objects.filter(md5=md5).exists(): return False
+
+        # Return true
+        return True
 
     def should_search_file(self, path : str) -> bool:
         """Checks if the file should be searched"""

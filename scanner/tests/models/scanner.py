@@ -719,7 +719,128 @@ class ScannerScanTest(TestCase):
         # Make sure that the item has a rating
         self.assertEqual(str(post.rating), 'safe')
     
+    def test_auto_tag_without_tags(self):
+        """Appends tags to images without tags"""
+
+        homebooru.settings.SCANNER_USE_DEFAULT_TAGS = True
+
+        # Create a search result without tags
+        result = SearchResult(
+            booru=self.booru,
+            md5=scanner_testutils.BOORU_MD5,
+            found=True,
+            raw_rating='safe',
+            source='https://example.com/',
+            tags=''
+        )
+        result.save()
+
+        # Add default tags
+        for i in [
+            Tag.create_or_get(tag='auto'),
+            Tag.create_or_get(tag='tagme')
+        ]:
+            self.scanner.auto_tags.add(i)
+        
+        # Save the scanner
+        self.scanner.save()
+
+        # Run the scan
+        posts = self.scanner.scan()
+
+        # Make sure that there is one post
+        self.assertEqual(len(posts), 1)
+
+        # Get the first post
+        post = posts[0]
+
+        # Make sure that it only has 2 tags
+        self.assertEqual(post.tags.all().count(), 2)
+
+        # Make sure that it has the tags
+        for tag in ['auto', 'tagme']:
+            self.assertIn(tag, post.tags.all().values_list('tag', flat=True))
+        
+        # Make sure that the item has a rating
+        self.assertEqual(str(post.rating), 'safe')
+
+    def test_uses_previous_results(self):
+        """Creates posts from previous results if they are not stale"""
+
+        # Create a search result with some tags
+        result = SearchResult(
+            booru=self.booru,
+            md5=scanner_testutils.BOORU_MD5,
+            found=True,
+            raw_rating='explicit',
+            source='https://example.com/',
+            tags='tag1 tag2'
+        )
+        result.save()
+
+        # Run the scan
+        posts = self.scanner.scan()
+
+        # Make sure that there is one post
+        self.assertEqual(len(posts), 1)
+
+        # Get the first post
+        post = posts[0]
+
+        # Make sure it only has 2 tags
+        self.assertEqual(post.tags.all().count(), 2)
+
+        # Make sure that it has the tags
+        for tag in ['tag1', 'tag2']:
+            self.assertIn(tag, post.tags.all().values_list('tag', flat=True))
+        
+        # Make sure that the item has a rating
+        self.assertEqual(str(post.rating), 'explicit')
     
+    def test_ignores_previous_stale_results_on_auto_prune(self):
+        """Ignores previous results if they are stale with auto pruning"""
+
+        # Create a search result with some tags
+        result = SearchResult(
+            booru=self.booru,
+            md5=scanner_testutils.BOORU_MD5,
+            found=True,
+            raw_rating='explicit',
+            source='https://example.com/',
+            tags='tag1 tag2'
+        )
+        result.save()
+
+        # Make the result stale
+        result.created = SearchResult.get_stale_date()
+        result.save()
+
+        # Enable auto pruning
+        self.scanner.auto_prune_results = True
+
+        # Run the scan
+        posts = self.scanner.scan()
+
+        # Make sure that there is one post
+        self.assertEqual(len(posts), 1)
+
+        # Get the first post
+        post = posts[0]
+
+        # Make sure it has more than 2 tags
+        self.assertNotEqual(post.tags.all().count(), 2)
+
+        # Make sure that it doesn't have the original tags
+        for tag in ['tag1', 'tag2']:
+            self.assertNotIn(tag, post.tags.all().values_list('tag', flat=True))
+        
+        # Make sure it has the expected tags
+        for tag in scanner_testutils.BOORU_TAGS:
+            self.assertIn(tag, post.tags.all().values_list('tag', flat=True))
+
+        # Make sure that the item has a rating
+        self.assertEqual(str(post.rating), 'safe')
+
     def test_auto_prune(self):
         """Automatically removes stale search results"""
 
