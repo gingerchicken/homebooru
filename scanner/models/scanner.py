@@ -183,10 +183,6 @@ class Scanner(models.Model):
         # Store the created posts
         created_posts = []
 
-        # Store the threads
-        threads = []
-        operations = 0
-
         # Iterate through all the files
         for (md5, path) in file_hashes.items():
             # Search for the file
