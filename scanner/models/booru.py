@@ -7,7 +7,7 @@ import requests
 
 class Booru(models.Model):
     # The name of the booru that is going to be scanned
-    name = models.TextField(unique=True, blank=False, null=False)
+    name = models.CharField(unique=True, blank=False, null=False, max_length=256)
 
     # The URL for the root of the booru
     url = models.URLField(unique=True, blank=False, null=False)
