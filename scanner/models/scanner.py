@@ -111,11 +111,7 @@ class Scanner(models.Model):
         tags_list = list(tags.values())
 
         # Make sure that we have at least one tag
-        if len(tags_list) == 0:
-            if homebooru.settings.SCANNER_USE_DEFAULT_TAGS:
-                tags_list = self.get_default_tags()
-            else:
-                return None
+        if len(tags_list) == 0: return None
 
         # Create the post
         post = Post.create_from_file(file_path=path, owner=self.owner)
