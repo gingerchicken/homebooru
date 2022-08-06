@@ -191,7 +191,7 @@ class PostCreateFromFileTest(TestCase):
         self.assertTrue(os.path.exists(os.path.join(self.temp_storage.temp_storage_path, 'thumbnails', '1', 'thumbnail_2dcd09f6c874b36355336112d17434e1.png')))
 
         # Make sure that the sample file is not created
-        self.assertFalse(os.path.exists(os.path.join(self.temp_storage.temp_storage_path, 'samples', '1', 'sample_2dcd09f6c874b36355336112d17434e1.jpg')))
+        self.assertFalse(os.path.exists(os.path.join(self.temp_storage.temp_storage_path, 'samples', '1', 'sample_2dcd09f6c874b36355336112d17434e1.png')))
 
     def test_thumbnail_smaller(self):
         """Creates smaller thumbnail"""
@@ -214,7 +214,7 @@ class PostCreateFromFileTest(TestCase):
         p.save()
 
         # Check that the sample file exists
-        self.assertTrue(os.path.exists(os.path.join(self.temp_storage.temp_storage_path, 'samples', '1', 'sample_656bc10f9f3a6a8f7e017892c8aabcb8.jpg')))
+        self.assertTrue(os.path.exists(os.path.join(self.temp_storage.temp_storage_path, 'samples', '1', 'sample_656bc10f9f3a6a8f7e017892c8aabcb8.png')))
 
         # Check that the sample flag is true
         self.assertEqual(p.sample, 1)
@@ -273,7 +273,7 @@ class PostCreateFromFileTest(TestCase):
         p.save()
 
         # Check that the sample file exists (and is a jpg)
-        self.assertTrue(os.path.exists(os.path.join(self.temp_storage.temp_storage_path, 'samples', '1', 'sample_656bc10f9f3a6a8f7e017892c8aabcb8.jpg')))
+        self.assertTrue(os.path.exists(os.path.join(self.temp_storage.temp_storage_path, 'samples', '1', 'sample_656bc10f9f3a6a8f7e017892c8aabcb8.png')))
 
     def test_raises_against_directories(self):
         """Raises an error when trying to create a post from a directory"""
