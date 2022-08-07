@@ -45,7 +45,7 @@ class Booru(models.Model):
         except:
             return []
 
-    def search_booru_md5(self, md5 : str, cache_on_failure : bool = True):
+    def search_booru_md5(self, md5 : str):
         """Search for a file with the given MD5 hash."""
 
         # Get the SearchResult model
@@ -62,18 +62,6 @@ class Booru(models.Model):
 
         # If we didn't find anything, return an empty result
         if not post or 'tags' not in post:
-            if existing_results.exists():
-                # Get the result
-                result = existing_results.first()
-                
-                # Make sure that it was a successful result and that caching is enabled
-                if cache_on_failure and result.found:
-                    # Return previously saved result
-                    return existing_results.first()
-                
-                # Otherwise, remove it
-                result.delete()
-
             # Create a new result
             return SearchResult(booru=self, md5=md5, found=False)
 
