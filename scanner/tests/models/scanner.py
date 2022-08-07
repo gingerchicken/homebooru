@@ -876,6 +876,102 @@ class ScannerScanTest(TestCase):
         # Make sure that the item has a rating
         self.assertEqual(str(post.rating), 'safe')
 
+    def setUp_failure(self, remove_old_files=True):
+        self.temp_scan_dir.tearDown()
+
+        # Remove the booru image
+        if remove_old_files:
+            self.temp_scan_dir.remove_all_files()
+        
+        # Add a new non-booru image
+        self.temp_scan_dir.add_file(booru_testutils.GATO_PATH)
+
+        # Copy it
+        self.temp_scan_dir.setUp()
+
+        # Configure the scanner
+        self.scanner.path                 = self.temp_scan_dir.folder
+        self.scanner.auto_prune_results   = True
+        self.scanner.add_posts_on_failure = True
+    
+        # Add some tags
+        no_here = Tag(tag='no_here')
+        no_here.save()
+
+        both = Tag(tag='both')
+        both.save()
+
+        # Add the tags to the scanner
+        self.scanner.auto_failure_tags.add(no_here)
+        self.scanner.auto_tags.add(both)
+
+        # Save the scanner
+        self.scanner.save()
+
+    def test_add_posts_on_failure_adds_tags(self):
+        """Adds tags to posts that were not found"""
+
+        self.setUp_failure()
+
+        # Run the scan
+        posts = self.scanner.scan()
+
+        # Make sure that there is one post
+        self.assertEqual(len(posts), 1)
+
+        # Get the first post
+        post = posts[0]
+
+        # Make sure that it has the tags
+        for tag in ['no_here', 'both']:
+            self.assertIn(tag, post.tags.all().values_list('tag', flat=True))
+        
+        # Make sure it only has 2 tags
+        self.assertEqual(post.tags.all().count(), 2)
+
+    def test_add_posts_on_failure_doesnt_add_tags_if_already_added(self):
+        """Doesn't add tags to post that were found"""
+
+        self.setUp_failure(False)
+
+        # Run the scan
+        posts = self.scanner.scan()
+
+        # Make sure that there are two posts
+        self.assertEqual(len(posts), 2)
+
+        # Sort the posts by the amount of tags they have
+        posts = sorted(posts, key=lambda x: x.tags.all().count())
+        posts.reverse()
+
+        # Get the first post
+        post = posts[0]
+
+        # Make sure that it has more than 2 tags
+        self.assertNotEqual(post.tags.all().count(), 2)
+
+        # Make sure that it has the correct md5
+        self.assertEqual(post.md5, scanner_testutils.BOORU_MD5)
+
+        # Make sure that it doesn't have the 'not here' tag
+        self.assertNotIn('no_here', post.tags.all().values_list('tag', flat=True))
+
+        # Make sure that it has the 'both' tag
+        self.assertIn('both', post.tags.all().values_list('tag', flat=True))
+
+        # Check the other post
+        post = posts[1]
+
+        # Make sure that it has 2 tags
+        self.assertEqual(post.tags.all().count(), 2)
+
+        # Make sure that it has both the 'both' and 'not here' tags
+        for tag in ['both', 'no_here']:
+            self.assertIn(tag, post.tags.all().values_list('tag', flat=True))
+        
+        # Make sure that it has the correct md5
+        self.assertEqual(post.md5, boorutils.get_file_checksum(booru_testutils.GATO_PATH))
+
     def test_auto_prune(self):
         """Automatically removes stale search results"""
 

@@ -94,6 +94,11 @@ class Scanner(models.Model):
         # Automatically add the auto tags
         for tag in self.auto_tags.all():
             tags[str(tag)] = tag
+        
+        # Automatically add the auto failure tags
+        if self.add_posts_on_failure and not results.filter(found=True).exists():
+            for tag in self.auto_failure_tags.all():
+                tags[str(tag)] = tag
 
         for result in results:
             # Get the tags
@@ -188,7 +193,7 @@ class Scanner(models.Model):
                     file_hashes[md5] = path
 
                     continue
-                
+
                 # Check if we should create the post
                 if self.should_create_post(path):
                     # Add the file to the list
@@ -202,7 +207,7 @@ class Scanner(models.Model):
         # Iterate through all the files to search for
         for (md5, path) in file_hashes.items():
             # Search for the file
-            if not self.search_file(path): continue
+            if not self.search_file(path) and not self.add_posts_on_failure: continue
 
             # ... Successfully found the file
 
@@ -230,7 +235,7 @@ class Scanner(models.Model):
         md5 = boorutils.get_file_checksum(path)
 
         # Check that there are search results for the file
-        if not SearchResult.objects.filter(md5=md5).exists(): return False
+        if not SearchResult.objects.filter(md5=md5).exists() and not self.add_posts_on_failure: return False
 
         # Check if there are already posts for the file
         if Post.objects.filter(md5=md5).exists(): return False
