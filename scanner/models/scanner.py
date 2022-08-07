@@ -33,6 +33,12 @@ class Scanner(models.Model):
     # Specify if we should prune the results on startup
     auto_prune_results = models.BooleanField(default=True)
 
+    # Specify if we should add posts on failure
+    add_posts_on_failure = models.BooleanField(default=False)
+
+    # The tags to be automatically added to posts that failed to be found
+    auto_failure_tags = models.ManyToManyField(Tag, blank=True, related_name='auto_failure_tags')
+
     @property
     def boorus(self):
         # If none of the boorus are selected, return all of them
@@ -139,6 +145,11 @@ class Scanner(models.Model):
         # Make sure that the path is valid
         if not os.path.isdir(self.path):
             raise ValueError('Invalid scanner path')
+        
+        if self.add_posts_on_failure:
+            # Make sure that we have at least one auto tag or auto failure tag
+            if self.auto_failure_tags.all().count() == 0 and self.auto_tags.all().count() == 0:
+                raise ValueError('No auto tags or auto failure tags were specified')
 
         # Call the superclass save method
         super().save(*args, **kwargs)

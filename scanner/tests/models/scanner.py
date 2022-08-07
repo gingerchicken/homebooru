@@ -133,6 +133,41 @@ class ScannerSaveTest(TestCase):
         scanner.save()
 
         self.assertTrue(scanner.pk is not None)
+    
+    def test_rejects_add_posts_on_failure_no_tags(self):
+        """Rejects when add_posts_on_failure is enabled and there are no auto tags"""
+
+        # Create a tag
+        tag = Tag(tag='test_tag')
+        tag.save()
+
+        scanner = Scanner(name='test_scanner', path=booru_testutils.CONTENT_PATH)
+        scanner.save()
+
+        scanner.add_posts_on_failure = True
+
+        self.assertRaises(ValueError, scanner.save)
+
+        # Add some tags
+        scanner.auto_tags.add(tag)
+
+        # Make sure it works now
+        scanner.save()
+
+        # Delete the scanner
+        scanner.delete()
+
+        # Try again but with auto_failure_tags
+        scanner = Scanner(name='test_scanner', path=booru_testutils.CONTENT_PATH)
+        scanner.save()
+
+        scanner.add_posts_on_failure = True
+
+        # Add some tags
+        scanner.auto_failure_tags.add(tag)
+
+        # Make sure it works now
+        scanner.save()
 
 class ScannerCreatePostTest(TestCase):
     fixtures = ['ratings.json']
