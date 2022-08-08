@@ -118,41 +118,6 @@ class ScannerSaveTest(TestCase):
         scanner.save()
 
         self.assertTrue(scanner.pk is not None)
-    
-    def test_rejects_add_posts_on_failure_no_tags(self):
-        """Rejects when add_posts_on_failure is enabled and there are no auto tags"""
-
-        # Create a tag
-        tag = Tag(tag='test_tag')
-        tag.save()
-
-        scanner = Scanner(name='test_scanner', path=booru_testutils.CONTENT_PATH)
-        scanner.save()
-
-        scanner.add_posts_on_failure = True
-
-        self.assertRaises(ValueError, scanner.save)
-
-        # Add some tags
-        scanner.auto_tags.add(tag)
-
-        # Make sure it works now
-        scanner.save()
-
-        # Delete the scanner
-        scanner.delete()
-
-        # Try again but with auto_failure_tags
-        scanner = Scanner(name='test_scanner', path=booru_testutils.CONTENT_PATH)
-        scanner.save()
-
-        scanner.add_posts_on_failure = True
-
-        # Add some tags
-        scanner.auto_failure_tags.add(tag)
-
-        # Make sure it works now
-        scanner.save()
 
 class ScannerCreatePostTest(TestCase):
     fixtures = ['ratings.json']
@@ -334,6 +299,27 @@ class ScannerCreatePostTest(TestCase):
 
         # Make sure that the post is None
         self.assertEqual(post, None)
+    
+    def test_add_posts_on_failure_correct(self):
+        """add_posts_on_failure is flagged correctly"""
+
+        # Clear the auto_failure_tags
+        self.scanner.auto_failure_tags.clear()
+        self.scanner.save()
+
+        # Make sure that add_posts_on_failure is false
+        self.assertFalse(self.scanner.add_posts_on_failure)
+
+        # Add a tag to the auto_failure_tags
+        test_tag = Tag(tag='test_tag')
+        test_tag.save()
+
+        self.scanner.auto_failure_tags.add(test_tag)
+        self.scanner.save()
+
+        # Make sure that add_posts_on_failure is true
+        self.assertTrue(self.scanner.add_posts_on_failure)
+
 
 class ScannerShouldSearchTest(TestCase):
     def setUp(self):
@@ -346,6 +332,7 @@ class ScannerShouldSearchTest(TestCase):
 
         # Add the booru to the scanner  
         self.scanner.boorus.add(self.booru)
+        self.scanner.save()
 
         # Copy an image to /tmp/scanner.jpg
         shutil.copy(booru_testutils.FELIX_PATH, '/tmp/scanner.jpg')
@@ -888,7 +875,6 @@ class ScannerScanTest(TestCase):
         # Configure the scanner
         self.scanner.path                 = self.temp_scan_dir.folder
         self.scanner.auto_prune_results   = True
-        self.scanner.add_posts_on_failure = True
     
         # Add some tags
         no_here = Tag(tag='no_here')
