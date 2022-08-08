@@ -17,4 +17,5 @@ def scan(request, scanner_id):
     posts = scanner.scan()
 
     # Redirect to the scanner admin page
-    return HttpResponseRedirect(reverse('admin:index'))
+    # The 'scanner/scanner' bit is a bit of a hack, but it works
+    return HttpResponseRedirect(reverse('admin:index') + 'scanner/scanner')
