@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.apps import apps
 
 import homebooru.settings
 
@@ -11,6 +12,7 @@ from .booru import Booru
 from .searchresult import SearchResult
 
 import os
+import datetime
 from pathlib import Path
 
 class Scanner(models.Model):
@@ -37,6 +39,49 @@ class Scanner(models.Model):
 
     # The tags to be automatically added to posts that failed to be found
     auto_failure_tags = models.ManyToManyField(Tag, blank=True, related_name='auto_failure_tags')
+
+    @property
+    def status(self):
+        """Returns the status of the scanner"""
+
+        # Get the ScannerStatus model
+        ScannerStatus = apps.get_model('scanner', 'ScannerStatus')
+
+        # Get the status
+        status = ScannerStatus.objects.filter(scanner=self)
+
+        if not status.exists(): 
+            # Create a new status
+            status = ScannerStatus(scanner=self)
+            status.save()
+        else:
+            # Get the status
+            status = status.first()
+        
+        # Return the status
+        return str(status)
+
+    # Setter for the status field
+    def __set_status(self, new_status : str):
+        """Sets the status of the scanner"""
+
+        # Get the ScannerStatus model
+        ScannerStatus = apps.get_model('scanner', 'ScannerStatus')
+
+        # Delete all previous statuses
+        status = ScannerStatus.objects.filter(scanner=self)
+        
+        # Remove it if it exists
+        if status.exists(): status.delete()
+
+        # Create a new status
+        status = ScannerStatus(scanner=self, status=new_status)
+
+        # Save the status
+        status.save()
+
+        # Return the status
+        return status
 
     @property
     def boorus(self):
@@ -170,6 +215,9 @@ class Scanner(models.Model):
         file_hashes = {}
         post_hashes = {}
 
+        # Set the status
+        self.__set_status('Finding files')
+
         # Find all the files in the path using the walk function
         for root, dirs, files in os.walk(self.path):
             # Loop through all the files
@@ -199,7 +247,13 @@ class Scanner(models.Model):
                     post_hashes[md5] = path
 
                     continue
-                    
+        
+        # Save the total files
+        total_files = len(file_hashes) + len(post_hashes)
+
+        # Update the status
+        self.__set_status(f'Looking up {len(file_hashes)} files')
+
         # Store the created posts
         created_posts = []
 
@@ -213,6 +267,9 @@ class Scanner(models.Model):
             # Add the file to the post hashes
             post_hashes[md5] = path
 
+        # Update the status
+        self.__set_status(f'Creating {len(post_hashes)} new posts')
+
         # Iterate through all the files to create posts for
         for (md5, path) in post_hashes.items():
             # Create the post
@@ -224,6 +281,9 @@ class Scanner(models.Model):
             # Add the post to the list
             created_posts.append(post)
         
+        # Update the status
+        self.__set_status(f'Finished at {datetime.datetime.now()} creating {len(created_posts)} new posts, {total_files} new files were detected, {len(file_hashes)} files were scanned')
+
         # Return the created posts
         return created_posts
 
