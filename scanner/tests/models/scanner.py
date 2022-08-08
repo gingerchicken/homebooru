@@ -972,6 +972,23 @@ class ScannerScanTest(TestCase):
         # Make sure that it has the correct md5
         self.assertEqual(post.md5, boorutils.get_file_checksum(booru_testutils.GATO_PATH))
 
+    def test_updates_status(self):
+        """Updates the status of the scanner"""
+
+        # Check that the status is 'Idle'
+        self.assertEqual(self.scanner.status, 'Idle')
+
+        # Run the scan
+        self.scanner.scan()
+
+        # Finished at ... creating 1 new posts, 1 new files were detected, 1 files were scanned
+        
+        # Make sure it starts with 'Finished at'
+        self.assertTrue(self.scanner.status.startswith('Finished at'))
+
+        # Make sure that the status ends with the correct amount of new posts and files
+        self.assertTrue(self.scanner.status.endswith('1 new posts, 1 new files were detected, 1 files were scanned'))
+
     def test_auto_prune(self):
         """Automatically removes stale search results"""
 
