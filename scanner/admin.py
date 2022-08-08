@@ -20,5 +20,10 @@ class ScannerAdmin(admin.ModelAdmin):
     
     scan_button.short_description = 'Scan'
     scan_button.allow_tags = True
+
+    # Add a label that shows the status of the scanner
+    def status(self, obj):
+        # Display obj.status
+        return format_html('<span class="label">{}</span>', obj.status)
     
-    list_display = ('name', 'scan_button')
+    list_display = ('name', 'scan_button', 'status')
