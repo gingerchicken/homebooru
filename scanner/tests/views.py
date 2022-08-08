@@ -25,7 +25,7 @@ class ScanTest(TestCase):
         self.scanner = Scanner(name='Scanner', path=self.temp_scan_folder.folder)
         self.scanner.save()
 
-        self.scanner.search_boorus.add(self.booru)
+        self.scanner.boorus.add(self.booru)
         self.scanner.save()
 
         # Create a user

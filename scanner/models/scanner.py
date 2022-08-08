@@ -29,7 +29,7 @@ class Scanner(models.Model):
     auto_tags = models.ManyToManyField(Tag, blank=True, related_name='auto_tags')
 
     # The boorus to search, by default all of them
-    search_boorus = models.ManyToManyField(Booru, blank=True, related_name='boorus')
+    boorus = models.ManyToManyField(Booru, blank=True, related_name='boorus')
 
     # Specify if we should prune the results on startup
     auto_prune_results = models.BooleanField(default=True)
@@ -82,13 +82,6 @@ class Scanner(models.Model):
 
         # Return the status
         return status
-
-    @property
-    def boorus(self):
-        """Returns all the selected boorus"""
-
-        # Return the selected boorus
-        return self.search_boorus.all()
 
     @property
     def default_tags(self) -> list:
@@ -326,10 +319,10 @@ class Scanner(models.Model):
         # Make sure that the file is not already in the database as a post
         if Post.objects.filter(md5=md5).exists(): return False
         
-        boorus = self.boorus
+        boorus = self.boorus.all()
         checked_boorus = 0
         # Check all of the local boorus
-        for booru in self.boorus.all():
+        for booru in boorus:
             # Make sure that the file is not already in the database as a result
             if SearchResult.objects.filter(md5=md5, booru=booru).exists(): continue
 
@@ -351,7 +344,7 @@ class Scanner(models.Model):
         # Get the results
         results = SearchResult.objects.filter(md5=md5, found=True)
 
-        bs = [i for i in self.boorus]
+        bs = [i for i in self.boorus.all()]
 
         # Check that we have work to do
         for result in results:

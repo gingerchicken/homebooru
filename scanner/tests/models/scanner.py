@@ -32,7 +32,7 @@ class BoorusTest(TestCase):
         """Returns expected boorus"""
 
         # Add a booru to the scanner
-        self.scanner.search_boorus.add(self.boorus[0])
+        self.scanner.boorus.add(self.boorus[0])
         self.scanner.save()
 
         # Get the expected boorus
@@ -193,7 +193,7 @@ class ScannerCreatePostTest(TestCase):
             self.boorus.append(booru)
 
             # Add to the scanner
-            self.scanner.search_boorus.add(booru)
+            self.scanner.boorus.add(booru)
             self.scanner.save()
         
         # Create some results
@@ -345,7 +345,7 @@ class ScannerShouldSearchTest(TestCase):
         self.booru.save()
 
         # Add the booru to the scanner  
-        self.scanner.search_boorus.add(self.booru)
+        self.scanner.boorus.add(self.booru)
 
         # Copy an image to /tmp/scanner.jpg
         shutil.copy(booru_testutils.FELIX_PATH, '/tmp/scanner.jpg')
@@ -405,7 +405,7 @@ class ScannerSearchFileTest(TestCase):
         self.booru.save()
 
         # Add the booru to the scanner
-        self.scanner.search_boorus.add(self.booru)
+        self.scanner.boorus.add(self.booru)
         self.scanner.save()
 
         self.booru_image = booru_testutils.BOORU_IMAGE
@@ -651,7 +651,7 @@ class ScannerScanTest(TestCase):
         self.booru.save()
 
         # Add the booru to the scanner
-        self.scanner.search_boorus.add(self.booru)
+        self.scanner.boorus.add(self.booru)
         self.scanner.save()
     
     def tearDown(self):
