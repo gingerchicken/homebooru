@@ -48,21 +48,6 @@ class BoorusTest(TestCase):
         for booru in expected_boorus:
             self.assertTrue(booru in actual_boorus)
 
-    def test_empty_boorus(self):
-        """Returns all boorus if none are specified"""
-        # Get the expected boorus
-        expected_boorus = self.boorus
-
-        # Get the actual boorus
-        actual_boorus = self.scanner.boorus
-
-        # Make sure the same amount of boorus are returned
-        self.assertEqual(len(expected_boorus), len(actual_boorus))
-
-        # Make sure all boorus are returned
-        for booru in expected_boorus:
-            self.assertTrue(booru in actual_boorus)
-
 class ScannerStrTest(TestCase):
     def setUp(self):
         self.scanner = Scanner(name='test_scanner', path=booru_testutils.CONTENT_PATH)
@@ -206,6 +191,10 @@ class ScannerCreatePostTest(TestCase):
             booru.save()
 
             self.boorus.append(booru)
+
+            # Add to the scanner
+            self.scanner.search_boorus.add(booru)
+            self.scanner.save()
         
         # Create some results
         self.result_path = booru_testutils.FELIX_PATH
@@ -355,6 +344,9 @@ class ScannerShouldSearchTest(TestCase):
         self.booru = Booru(url=scanner_testutils.VALID_BOORUS[0], name='imagebooru')
         self.booru.save()
 
+        # Add the booru to the scanner  
+        self.scanner.search_boorus.add(self.booru)
+
         # Copy an image to /tmp/scanner.jpg
         shutil.copy(booru_testutils.FELIX_PATH, '/tmp/scanner.jpg')
 
@@ -411,6 +403,10 @@ class ScannerSearchFileTest(TestCase):
         # Create a booru
         self.booru = Booru(url=scanner_testutils.VALID_BOORUS[0], name='imagebooru')
         self.booru.save()
+
+        # Add the booru to the scanner
+        self.scanner.search_boorus.add(self.booru)
+        self.scanner.save()
 
         self.booru_image = booru_testutils.BOORU_IMAGE
     

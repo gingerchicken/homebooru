@@ -85,10 +85,8 @@ class Scanner(models.Model):
 
     @property
     def boorus(self):
-        # If none of the boorus are selected, return all of them
-        if len(self.search_boorus.all()) == 0:
-            return Booru.objects.all()
-        
+        """Returns all the selected boorus"""
+
         # Return the selected boorus
         return self.search_boorus.all()
 
