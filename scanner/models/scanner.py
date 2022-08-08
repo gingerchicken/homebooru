@@ -11,7 +11,6 @@ from .booru import Booru
 from .searchresult import SearchResult
 
 import os
-import threading
 from pathlib import Path
 
 class Scanner(models.Model):
