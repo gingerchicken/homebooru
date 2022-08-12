@@ -16,7 +16,9 @@ from .models import Scanner
 class ScannerAdmin(admin.ModelAdmin):
     # Add a button to the scanner admin page that adds a button that calls Scanner.scan()
     def scan_button(self, obj):
-        return format_html('<a class="button" href="{}">Scan</a>', reverse('scan', args=[obj.id]))
+        # Instead of doing some async or fancy threading stuff, I am just going to make it up to the client for now!
+        # TODO change this if we implement celery or something
+        return format_html('<a class="button" onclick="fetch(this.href); window.location.reload(); return false;" href="{}">Scan</a>', reverse('scan', args=[obj.id]))
     
     scan_button.short_description = 'Scan'
     scan_button.allow_tags = True
