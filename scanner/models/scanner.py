@@ -203,6 +203,7 @@ class Scanner(models.Model):
         # Store the md5 hashes as the key and the path as the value
         file_hashes = {}
         post_hashes = {}
+        skip_hashes = {}
 
         # Set the status
         self.__set_status('Finding files')
@@ -221,7 +222,10 @@ class Scanner(models.Model):
                 md5 = boorutils.get_file_checksum(path)
 
                 # Check if we already have this file
-                if md5 in file_hashes or md5 in post_hashes: continue
+                if md5 in file_hashes or md5 in post_hashes or md5 in skip_hashes: continue
+
+                # Make sure we don't check if again
+                skip_hashes[md5] = True
 
                 # Check if we should search the file
                 if self.should_search_file(path):
