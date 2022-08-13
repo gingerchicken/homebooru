@@ -278,7 +278,12 @@ class Scanner(models.Model):
         # Iterate through all the files to create posts for
         for (md5, path) in post_hashes.items():
             # Create the post
-            post = self.create_post(path)
+            try:
+                post = self.create_post(path)
+            except Exception as e:
+                # Must be corrupted
+                # TODO log an error
+                post = None
 
             # Make sure that it is not None
             if post is None: continue
