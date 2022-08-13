@@ -13,6 +13,7 @@ from .searchresult import SearchResult
 
 import os
 import datetime
+import magic
 from pathlib import Path
 
 class Scanner(models.Model):
@@ -224,8 +225,19 @@ class Scanner(models.Model):
                 # Check if we already have this file
                 if md5 in file_hashes or md5 in post_hashes or md5 in skip_hashes: continue
 
-                # Make sure we don't check if again
-                skip_hashes[md5] = True
+                # Make sure we don't check it again
+                skip_hashes[md5] = path
+
+                # Check the file mimetype
+                m = magic.Magic(mime=True)
+                mimetype = m.from_file(path)
+
+                # Get the file type
+                file_type = mimetype.split('/')[-1]
+
+                # Check if the file type is acceptable
+                if file_type not in homebooru.settings.BOORU_ALLOWED_FILE_EXTENSIONS:
+                    continue
 
                 # Check if we should search the file
                 if self.should_search_file(path):
@@ -275,7 +287,7 @@ class Scanner(models.Model):
             created_posts.append(post)
         
         # Update the status
-        self.__set_status(f'Finished at {datetime.datetime.now()} creating {len(created_posts)} new posts, {total_files} new files were detected, {len(file_hashes)} files were scanned')
+        self.__set_status(f'Finished at {datetime.datetime.now()} {len(skip_hashes)} unique files found, creating {len(created_posts)} new posts, {total_files} new files were detected, {len(file_hashes)} files were scanned')
 
         # Return the created posts
         return created_posts

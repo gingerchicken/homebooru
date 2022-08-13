@@ -969,7 +969,7 @@ class ScannerScanTest(TestCase):
         self.assertTrue(self.scanner.status.startswith('Finished at'))
 
         # Make sure that the status ends with the correct amount of new posts and files
-        self.assertTrue(self.scanner.status.endswith('1 new posts, 1 new files were detected, 1 files were scanned'))
+        self.assertTrue(self.scanner.status.endswith('1 unique files found, creating 1 new posts, 1 new files were detected, 1 files were scanned'), self.scanner.status)
 
     def test_auto_prune(self):
         """Automatically removes stale search results"""
@@ -1007,3 +1007,30 @@ class ScannerScanTest(TestCase):
 
         # Make sure that the item has a rating
         self.assertEqual(str(post.rating), 'safe')
+    
+    def test_skips_corrupt(self):
+        """Skips corrupt files"""
+
+        # Remove old files
+        self.temp_scan_dir.tearDown()
+
+        # Add a corrupt file
+        self.temp_scan_dir.add_file(booru_testutils.CORRUPT_IMAGE_PATH)
+        
+        # Setup
+        self.temp_scan_dir.setUp()
+
+        self.scanner.path = self.temp_scan_dir.folder
+
+        # Run the scan
+        posts = self.scanner.scan()
+
+        # Make sure there is only one post
+        self.assertEqual(len(posts), 1, 'The corrupt file was not skipped')
+
+        # Make sure there is only one scan result (i.e. the corrupt file was skipped)
+        self.assertEqual(SearchResult.objects.count(), 1, 'The corrupt file was not skipped when scanning')
+
+        # Make sure that the only scan result is the valid file
+        result = SearchResult.objects.first()
+        self.assertEqual(result.md5, scanner_testutils.BOORU_MD5)
