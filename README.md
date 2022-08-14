@@ -22,7 +22,7 @@ By default, since the PostgreSQL database should be locked off from the rest of 
 > **Note:** If you wish to access the server from other computers on your network, you will need to change the [`validate.conf`](.nginx/sec/validate.conf) file in the `.nginx` directory. This is covered in the [Specifying origins](#specifying-origins) section.
 
 ### Specifying origins
-Homebooru's nginx configuration is configured, by default, to only accept requests from `localhost` and `127.0.0.1`, this is to prevent malicious users from accessing the server from other computers on your network.
+Homebooru's nginx configuration is configured, by default, to only accept requests from `localhost` and `127.0.0.1`, this is to prevent unauthorised access from foreign hosts.
 
 Don't worry, you can change this by editing the `validate.conf` file in the `.nginx` directory ([`.nginx/sec/validate.conf`](.nginx/sec/validate.conf)).
 
