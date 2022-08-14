@@ -24,7 +24,7 @@ By default, since the PostgreSQL database should be locked off from the rest of 
 ### Specifying origins
 Homebooru's nginx configuration is configured, by default, to only accept requests from `localhost` and `127.0.0.1`, this is to prevent malicious users from accessing the server from other computers on your network.
 
-Don't worry, you can change this by editing the `validate.conf` file in the `.nginx` directory ([`.nginx/sec/validate.conf`](.nginx/sec/validate.conf).
+Don't worry, you can change this by editing the `validate.conf` file in the `.nginx` directory ([`.nginx/sec/validate.conf`](.nginx/sec/validate.conf)).
 
 Firstly, let me explain briefly what an origin is; an origin is the address that you type into the address bar of your browser to access the server, so (_for me_) I would enter `https://10.0.2.43` and the origin would be `10.0.2.43`.  To allow this origin, I would add the following to the `validate.conf` file:
 
