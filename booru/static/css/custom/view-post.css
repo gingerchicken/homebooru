@@ -118,3 +118,20 @@
 /* #image-container .image-tools:hover {
     opacity: 1;
 } */
+
+/* Previous / Next display */
+.prev-next {
+    /* Because of using float: left/right, this messes up the padding */
+    /* So here's a hack to fix it! */
+    height: 50px;
+}
+
+.prev-next .next {
+    /* Make sure that next is always left */
+    float: left;
+}
+
+.prev-next .prev {
+    /* Make sure that previous is always left */
+    float: right;
+}
