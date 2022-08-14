@@ -41,6 +41,8 @@ if ($host !~* ^(localhost|127.0.0.1|10.0.2.43|example.com)$) {
     ...
 ```
 
+> Of course, if you just want your domain to be the origin you could just remove the `localhost|127.0.0.1| ... ` etc. and just add `yourdomain.com` in its place.
+
 ## Contributions
 If you have any suggestions for improvements, please open an issue on the [GitHub repository](https://github.com/gingerchicken/homebooru). If you have a bit of knowledge with Python and Django, feel free to fork the repository and submit a pull request for new features. Before contributing to the project, I would recommend reading some of the [Miscellaneous Project Information](/docs/MISC.md) to understand why certain things are implemented in certain ways and maybe what ethics you should work with when contributing (such as the low JavaScript dependence).
 
