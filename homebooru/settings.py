@@ -30,20 +30,22 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
-# TODO change these to your own domain
+# Handle hosts (this should be done properly in the nginx config)
+CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST = [
+    # Debug
+    'http://localhost', 'https://localhost',
+] if DEBUG else [
+    # Production
+    'http://nginx/*', 'https://nginx/*'
+]
+
 ALLOWED_HOSTS = [
-    '*'
+    # Debug
+    'localhost', '127.0.0.1', '::1',
+] if DEBUG else [
+    # Production
+    'nginx'
 ]
-
-CSRF_TRUSTED_ORIGINS = [
-    'http://localhost'
-]
-
-
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost'
-]
-
 
 # Application definition
 
