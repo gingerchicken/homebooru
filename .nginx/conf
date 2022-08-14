@@ -1,6 +1,6 @@
 server {
     listen       443 ssl;
-    server_name  localhost;
+    server_name  homebooru;
 
     # Include ssl configuration
     include snippets/ssl-signed.conf;
@@ -10,6 +10,9 @@ server {
     client_max_body_size 8G;
 
     # TODO add error pages etc.
+
+    # Include host validation rules
+    include snippets/sec-validate.conf;
 
     # Django forward
     location @django_proxy {
@@ -76,7 +79,7 @@ server {
 # Redirect to the HTTPS version of the site
 server {
     listen       80;
-    server_name  localhost;
+    server_name  homebooru;
 
     location / {
         return 301 https://$host$request_uri;
