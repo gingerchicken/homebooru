@@ -30,14 +30,14 @@ Firstly, let me explain briefly what an origin is; an origin is the address that
 
 ```conf
 # Check that the origin is acceptable and expected.
-if ($host !~* ^(localhost|10.0.2.43)$) {
+if ($host !~* ^(localhost|127.0.0.1|10.0.2.43)$) {
     ...
 ```
 
 Remember, if you are wishing to use a **domain name** (for example, `example.com`) you can add this here too:
 
 ```conf
-if ($host !~* ^(localhost|10.0.2.43|example.com)$) {
+if ($host !~* ^(localhost|127.0.0.1|10.0.2.43|example.com)$) {
     ...
 ```
 
