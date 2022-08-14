@@ -13,7 +13,7 @@ services:
     ports:
       - "8000:8000" # Allow a direct connection to port 8000 from the host machine.
     volumes:
-      - ../:/code # Pass the current directory to the container.
+      - ../:/app # Pass the current directory to the container.
     environment:
       # Database
       - POSTGRES_NAME=${DB_NAME}
