@@ -19,6 +19,30 @@ $ docker-compose up --build
 ## Configuration
 By default, since the PostgreSQL database should be locked off from the rest of the network, the server will have a default username and password of `homebooru` and `H0meboOru!420`. You can change these by editing the `.env` file in the root directory.
 
+> **Note:** If you wish to access the server from other computers on your network, you will need to change the [`validate.conf`](.nginx/sec/validate.conf) file in the `.nginx` directory. This is covered in the [Specifying origins](#specifying-origins) section.
+
+### Specifying origins
+Homebooru's nginx configuration is configured, by default, to only accept requests from `localhost` and `127.0.0.1`, this is to prevent malicious users from accessing the server from other computers on your network.
+
+Don't worry, you can change this by editing the `validate.conf` file in the `.nginx` directory ([`.nginx/sec/validate.conf`](.nginx/sec/validate.conf)).
+
+Firstly, let me explain briefly what an origin is; an origin is the address that you type into the address bar of your browser to access the server, so (_for me_) I would enter `https://10.0.2.43` and the origin would be `10.0.2.43`.  To allow this origin, I would add the following to the `validate.conf` file:
+
+```conf
+# Check that the origin is acceptable and expected.
+if ($host !~* ^(localhost|127.0.0.1|10.0.2.43)$) {
+    ...
+```
+
+Remember, if you are wishing to use a **domain name** (for example, `example.com`) you can add this here too:
+
+```conf
+if ($host !~* ^(localhost|127.0.0.1|10.0.2.43|example.com)$) {
+    ...
+```
+
+> Of course, if you just want your domain to be the origin you could just remove the `localhost|127.0.0.1| ... ` etc. and just add `yourdomain.com` in its place.
+
 ## Contributions
 If you have any suggestions for improvements, please open an issue on the [GitHub repository](https://github.com/gingerchicken/homebooru). If you have a bit of knowledge with Python and Django, feel free to fork the repository and submit a pull request for new features. Before contributing to the project, I would recommend reading some of the [Miscellaneous Project Information](/docs/MISC.md) to understand why certain things are implemented in certain ways and maybe what ethics you should work with when contributing (such as the low JavaScript dependence).
 

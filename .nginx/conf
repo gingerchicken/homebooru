@@ -1,6 +1,6 @@
 server {
     listen       443 ssl;
-    server_name  localhost;
+    server_name  homebooru;
 
     # Include ssl configuration
     include snippets/ssl-signed.conf;
@@ -11,6 +11,9 @@ server {
 
     # TODO add error pages etc.
 
+    # Include host validation rules
+    include snippets/sec-validate.conf;
+
     # Django forward
     location @django_proxy {
         # Forward to the Django docker container
@@ -19,7 +22,21 @@ server {
         # gunicorn recommended settings
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header Host $http_host;
+
+        # Say that it is behind a proxy
+        # The idea is that if it is not a valid host nginx should have rejected it, not Django.
+        proxy_set_header Host nginx;
+
+        # I am not sure if I should do this or not but as I said, if it is not a valid host, nginx should have rejected it.
+        proxy_set_header Origin $scheme://nginx;
+        proxy_set_header Referer $scheme://nginx/$request_uri;
+
+        # Send the actual info etc.
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Real-Origin $scheme://$host;
+        proxy_set_header X-Real-Port $remote_port;
+        proxy_set_header X-Real-Proto $scheme;
+
 
         # Prevent nginx "doing something" clever with redirects
         proxy_redirect off;
@@ -62,7 +79,7 @@ server {
 # Redirect to the HTTPS version of the site
 server {
     listen       80;
-    server_name  localhost;
+    server_name  homebooru;
 
     location / {
         return 301 https://$host$request_uri;
