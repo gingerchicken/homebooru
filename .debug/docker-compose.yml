@@ -29,6 +29,7 @@ services:
       # Debugging
       - BOORU_SHOW_FFMPEG_OUTPUT=${BOORU_SHOW_FFMPEG_OUTPUT}
       - DEBUG=True
+      - CREATE_ROOT=True
 
       # Unit Testing
       - UNIT_TEST=${UNIT_TEST}
