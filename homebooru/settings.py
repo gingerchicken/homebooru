@@ -56,8 +56,18 @@ INSTALLED_APPS = [
 
     # Homebooru
     'booru.apps.BooruConfig',
-    'booru.management.commands.createsecretkey',
+    'booru.management.commands.createsecretkey'
 ]
+
+# Check if we should create a root user
+CREATE_ROOT = os.environ.get('CREATE_ROOT', 'False').lower() == 'true'
+
+# Check if debug is enabled
+if DEBUG and CREATE_ROOT:
+    # Add the create superuser command
+    INSTALLED_APPS += [
+        'booru.management.commands.createrootuser'
+    ]
 
 # Show static files in debug mode
 COLLECT_STATIC = os.environ.get('COLLECT_STATIC', 'False').lower() == 'true'

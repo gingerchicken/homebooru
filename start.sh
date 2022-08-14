@@ -42,7 +42,6 @@ else
     echo "Pulled secret from environment variable"
 fi
 
-
 if [ "$DB_MIGRATE" = "True" ]; then
     # Migrate booru
     python manage.py makemigrations booru
@@ -97,6 +96,13 @@ fi
 
 # Start the application
 if [ "$DEBUG" = "True" ]; then
+    if [ "$CREATE_ROOT" = "True" ]; then
+        echo 'Creating root user for debugging...'
+
+        # Create the root user
+        python manage.py createrootuser
+    fi
+
     # Start the application in debug mode
     python manage.py runserver 0.0.0.0:8000
 else
