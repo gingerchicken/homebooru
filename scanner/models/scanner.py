@@ -275,6 +275,8 @@ class Scanner(models.Model):
         # Update the status
         self.__set_status(f'Creating {len(post_hashes)} new posts')
 
+        total_errors = 0
+
         # Iterate through all the files to create posts for
         for (md5, path) in post_hashes.items():
             # Create the post
@@ -282,8 +284,10 @@ class Scanner(models.Model):
                 post = self.create_post(path)
             except Exception as e:
                 # Must be corrupted
-                # TODO log an error
                 post = None
+
+                # Increment the total errors
+                total_errors += 1
 
             # Make sure that it is not None
             if post is None: continue
@@ -292,7 +296,7 @@ class Scanner(models.Model):
             created_posts.append(post)
         
         # Update the status
-        self.__set_status(f'Finished at {datetime.datetime.now()} {len(skip_hashes)} unique files found, creating {len(created_posts)} new posts, {total_files} new files were detected, {len(file_hashes)} files were scanned')
+        self.__set_status(f'Finished at {datetime.datetime.now()} {len(skip_hashes)} unique files found, creating {len(created_posts)} new posts, {total_files} new files were detected, {len(file_hashes)} files were scanned, {total_errors} errors occurred')
 
         # Return the created posts
         return created_posts

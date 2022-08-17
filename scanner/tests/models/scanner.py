@@ -969,7 +969,7 @@ class ScannerScanTest(TestCase):
         self.assertTrue(self.scanner.status.startswith('Finished at'))
 
         # Make sure that the status ends with the correct amount of new posts and files
-        self.assertTrue(self.scanner.status.endswith('1 unique files found, creating 1 new posts, 1 new files were detected, 1 files were scanned'), self.scanner.status)
+        self.assertTrue(self.scanner.status.endswith('1 unique files found, creating 1 new posts, 1 new files were detected, 1 files were scanned, 0 errors occurred'), self.scanner.status)
 
     def test_auto_prune(self):
         """Automatically removes stale search results"""
