@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block main_content %}
-    <form action="?tag={{ tag }}" method="POST" class="tag-edit-form">
+    <form action="?tag={{ tag|urlencode }}" method="POST" class="tag-edit-form">
         <div class="tag-title-display tag-type-{{tag.tag_type}}">
             <span>{{ tag.tag|tag_view }}</span>
         </div>
