@@ -1034,3 +1034,39 @@ class ScannerScanTest(TestCase):
         # Make sure that the only scan result is the valid file
         result = SearchResult.objects.first()
         self.assertEqual(result.md5, scanner_testutils.BOORU_MD5)
+    
+    def test_corrupt_image(self):
+        """Make sure that it counts a corrupt image as an error"""
+
+        # Remove all images 
+        self.temp_scan_dir.tearDown()
+        self.temp_scan_dir.remove_all_files()
+
+        # Add a corrupt file
+        self.temp_scan_dir.add_file(booru_testutils.CORRUPT_FELIX_PATH)
+
+        # Setup
+        self.temp_scan_dir.setUp()
+        
+        # Change the scanner's path
+        self.scanner.path = self.temp_scan_dir.folder
+        self.scanner.save()
+
+        corrupt_tag = Tag.create_or_get('corrupt')
+        corrupt_tag.save()
+
+        # Make sure that the scanner would add any image
+        self.scanner.auto_failure_tags.add(corrupt_tag)
+        self.scanner.save()
+
+        # Run the scan
+        posts = self.scanner.scan()
+
+        # Make sure that there are no posts
+        self.assertEqual(len(posts), 0, 'The corrupt file was not skipped')
+
+        # Get the status
+        status = self.scanner.status
+
+        # Make sure that the status includes '1 error'
+        self.assertIn('1 error', status)
