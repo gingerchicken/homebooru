@@ -1,3 +1,6 @@
+# Rate limit zoning etc.
+include snippets/sec-ratelimit.conf;
+
 server {
     listen       443 ssl;
     server_name  homebooru;
@@ -16,6 +19,9 @@ server {
 
     # Django forward
     location @django_proxy {
+        # Rate limit requests
+        include snippets/sec-apply-ratelimit.conf;
+
         # Forward to the Django docker container
         proxy_pass http://web:8000;
 

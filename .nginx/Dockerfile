@@ -9,6 +9,8 @@ COPY ssl/signed.conf /etc/nginx/snippets/ssl-signed.conf
 
 # Add Security configuration
 COPY sec/validate.conf /etc/nginx/snippets/sec-validate.conf
+COPY sec/ratelimit.conf /etc/nginx/snippets/sec-ratelimit.conf
+COPY sec/apply-ratelimit.conf /etc/nginx/snippets/sec-apply-ratelimit.conf
 
 # Create the certs directory
 RUN mkdir /certs/
