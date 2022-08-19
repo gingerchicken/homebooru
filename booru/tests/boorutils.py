@@ -269,3 +269,20 @@ class ModeTest(TestCase):
         l = [Test(1), Test(2), Test(2), Test(3)]
 
         self.assertEqual(mode(l).value, 2)
+
+class HtmlDecodeTest(TestCase):
+    def test_decodes_html_escaped(self):
+        """Decodes HTML escaped strings correctly"""
+
+        self.assertEqual(html_decode('finger_to_another&#039;s_mouth'), 'finger_to_another\'s_mouth')
+
+    def test_ignores_non_encoded_ands(self):
+        """Ignores &s where appropriate"""
+
+        phrases = [
+            '& what?'
+            '&what;?'
+        ]
+
+        for phrase in phrases:
+            self.assertEqual(html_decode(phrase), phrase)

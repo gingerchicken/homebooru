@@ -2,6 +2,7 @@ import hashlib
 import pathlib
 import ffmpegio
 import re
+import html
 
 import homebooru.settings
 
@@ -220,3 +221,8 @@ def mode(l : list):
     
     # Get the most common item
     return max(freq, key=freq.get)
+
+def html_decode(text : str) -> str:
+    """Decodes HTML entities"""
+
+    return html.unescape(text)

@@ -151,6 +151,9 @@ class Scanner(models.Model):
                 # Skip the tag if we have already added it
                 if tag in tags: continue
 
+                # HTML unescape
+                tag = boorutils.html_decode(tag)
+
                 # Skip the tag if it is invalid
                 if not Tag.is_name_valid(tag): continue
 
