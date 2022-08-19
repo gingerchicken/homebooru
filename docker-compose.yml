@@ -48,7 +48,9 @@ services:
     volumes:
       - ${ACTUAL_STORAGE_PATH}:/storage/
       - ${ACTUAL_STATIC_PATH}:/static/
-      - .nginx/conf/:/etc/nginx/conf.d/booru.conf # Allows for custom nginx config
+    
+      - .nginx/sec/validate.conf:/etc/nginx/snippets/sec-validate.conf  # Allows you to specify custom hosts (e.g. mybooru.org, 192.168.1.42, etc.)
+      - .nginx/conf/:/etc/nginx/conf.d/booru.conf                       # Allows for custom nginx config
 
       # SSL/TLS Certificates (Uncomment if you want to use your own SSL/TLS certs)
       # - ${SSL_KEY_PATH}:/certs/booru.key

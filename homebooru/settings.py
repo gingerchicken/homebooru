@@ -30,20 +30,22 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
-# TODO change these to your own domain
+# Handle hosts (this should be done properly in the nginx config)
+CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST = [
+    # Debug
+    'http://localhost', 'https://localhost',
+] if DEBUG else [
+    # Production
+    'http://nginx/*', 'https://nginx/*'
+]
+
 ALLOWED_HOSTS = [
-    '*'
+    # Debug
+    'localhost', '127.0.0.1', '::1',
+] if DEBUG else [
+    # Production
+    'nginx'
 ]
-
-CSRF_TRUSTED_ORIGINS = [
-    'http://localhost'
-]
-
-
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost'
-]
-
 
 # Application definition
 
@@ -56,13 +58,24 @@ INSTALLED_APPS = [
 
     # Homebooru
     'booru.apps.BooruConfig',
-    'booru.management.commands.createsecretkey',
+    'booru.management.commands.createsecretkey'
 ]
 
 DIRECTORY_SCAN_ENABLED = os.environ.get('DIRECTORY_SCAN_ENABLED', 'False').lower() == 'true'
+
 if DIRECTORY_SCAN_ENABLED:
     INSTALLED_APPS += [
         'scanner.apps.ScannerConfig',
+    ]
+
+# Check if we should create a root user
+CREATE_ROOT = os.environ.get('CREATE_ROOT', 'False').lower() == 'true'
+
+# Check if debug is enabled
+if DEBUG and CREATE_ROOT:
+    # Add the create superuser command
+    INSTALLED_APPS += [
+        'booru.management.commands.createrootuser'
     ]
 
 # Show static files in debug mode
@@ -200,7 +213,7 @@ BOORU_DEFAULT_RATING_PK = 'safe'
 
 BOORU_SHOW_FFMPEG_OUTPUT = os.environ.get("BOORU_SHOW_FFMPEG_OUTPUT", 'False').lower() == 'true' and DEBUG
 
-BOORU_POSTS_PER_PAGE = 20   # How many posts to display in the browse page
+BOORU_POSTS_PER_PAGE = 45   # How many posts to display in the browse page
 BOORU_TAGS_PER_PAGE  = 22   # How many tags to display on the tag search page
 
 # Fixtures

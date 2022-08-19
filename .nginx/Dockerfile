@@ -7,6 +7,9 @@ COPY conf /etc/nginx/conf.d/booru.conf
 COPY ssl/params.conf /etc/nginx/snippets/ssl-params.conf
 COPY ssl/signed.conf /etc/nginx/snippets/ssl-signed.conf
 
+# Add Security configuration
+COPY sec/validate.conf /etc/nginx/snippets/sec-validate.conf
+
 # Create the certs directory
 RUN mkdir /certs/
 
