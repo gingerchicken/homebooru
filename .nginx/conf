@@ -1,6 +1,6 @@
 server {
     listen       443 ssl;
-    server_name  homebooru;
+    server_name  _;
 
     # Include ssl configuration
     include snippets/ssl-signed.conf;
@@ -79,9 +79,7 @@ server {
 # Redirect to the HTTPS version of the site
 server {
     listen       80;
-    server_name  homebooru;
+    server_name  _;
 
-    location / {
-        return 301 https://$host$request_uri;
-    }
+    return 301 https://$host$request_uri;
 }
