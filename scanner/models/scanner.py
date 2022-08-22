@@ -82,7 +82,6 @@ class Scanner(models.Model):
         if not status.exists(): 
             # Create a new status
             status = ScannerStatus(scanner=self)
-            status.save()
         else:
             # Get the status
             status = status.first()
