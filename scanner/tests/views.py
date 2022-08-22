@@ -113,3 +113,30 @@ class ScanTest(TestCase):
 
         # Make sure that there are no posts
         self.assertEqual(Post.objects.count(), 0)
+
+    def test_scan_active(self):
+        """Rejects when scan is active"""
+
+        # Make active
+        self.scanner.set_is_active(True)
+
+        # Scan the scanner
+        response = self.send_request(self.scanner.id)
+
+        # Make sure that the response is 400
+        self.assertEqual(response.status_code, 400)
+
+        # Make sure that there are no posts
+        self.assertEqual(Post.objects.count(), 0)
+
+        # Make inactive
+        self.scanner.set_is_active(False)
+
+        # Scan the scanner
+        response = self.send_request(self.scanner.id)
+
+        # Make sure that the response is not 400
+        self.assertNotEqual(response.status_code, 400)
+
+        # Make sure that there are posts
+        self.assertEqual(Post.objects.count(), 1)

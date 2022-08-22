@@ -13,6 +13,8 @@ def scan(request, scanner_id):
     except Scanner.DoesNotExist:
         return HttpResponse('Scanner does not exist.', status=404)
 
+    if scanner.is_active: return HttpResponse('Scanner is already active.', status=400)
+
     # Call the Scan function
     posts = scanner.scan()
 
