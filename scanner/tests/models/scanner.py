@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, modify_settings
 
 from scanner.models import Booru, Scanner, SearchResult, ScannerError
 from booru.models import Rating, Post, Tag
@@ -189,6 +189,8 @@ class ScannerCreatePostTest(TestCase):
     
     def tearDown(self):
         self.temp_storage.tearDown()
+
+        # TODO Use modify_settings
         homebooru.settings.SCANNER_USE_DEFAULT_TAGS = self.og_setting
 
     def test_selects_mode_rating(self):
@@ -619,6 +621,7 @@ class ScannerScanTest(TestCase):
 
     def setUp(self):
         self.og_SCANNER_USE_DEFAULT_TAGS = homebooru.settings.SCANNER_USE_DEFAULT_TAGS
+        self.og_BOORU_ALLOWED_FILE_EXTENSIONS = [i for i in homebooru.settings.BOORU_ALLOWED_FILE_EXTENSIONS]
 
         self.temp_scan_dir.add_file(booru_testutils.BOORU_IMAGE)
         self.temp_scan_dir.setUp()
@@ -643,6 +646,7 @@ class ScannerScanTest(TestCase):
     
     def tearDown(self):
         homebooru.settings.SCANNER_USE_DEFAULT_TAGS = self.og_SCANNER_USE_DEFAULT_TAGS
+        homebooru.settings.BOORU_ALLOWED_FILE_EXTENSIONS = self.og_BOORU_ALLOWED_FILE_EXTENSIONS
 
         self.temp_scan_dir.tearDown()
 
@@ -1008,6 +1012,36 @@ class ScannerScanTest(TestCase):
         # Make sure that the item has a rating
         self.assertEqual(str(post.rating), 'safe')
     
+    def test_skips_disallowed_extensions(self):
+        """Skips files with disallowed extensions"""
+
+        # Remove jpg from the allowed extensions
+        homebooru.settings.BOORU_ALLOWED_FILE_EXTENSIONS = ['png']
+
+        # Run the scan
+        posts = self.scanner.scan()
+
+        # Make sure that there are no posts
+        self.assertEqual(len(posts), 0)
+
+        # Make sure that there are no scan results
+        self.assertEqual(SearchResult.objects.count(), 0)
+
+        # Restore the allowed extensions
+        homebooru.settings.BOORU_ALLOWED_FILE_EXTENSIONS = self.og_BOORU_ALLOWED_FILE_EXTENSIONS
+
+        # Run the scan
+        posts = self.scanner.scan()
+
+        # Make sure that there is one post
+        self.assertEqual(len(posts), 1)
+
+        # Get the first post
+        post = posts[0]
+
+        # Make sure that it has the correct md5
+        self.assertEqual(post.md5, scanner_testutils.BOORU_MD5)
+
     def test_skips_corrupt(self):
         """Skips corrupt files"""
 
