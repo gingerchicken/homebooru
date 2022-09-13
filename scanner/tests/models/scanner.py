@@ -1,6 +1,6 @@
 from django.test import TestCase, modify_settings
 
-from scanner.models import Booru, Scanner, SearchResult, ScannerError
+from scanner.models import Booru, Scanner, SearchResult, ScannerError, ScannerIgnore
 from booru.models import Rating, Post, Tag
 
 import booru.tests.testutils as booru_testutils
@@ -381,6 +381,46 @@ class ScannerShouldSearchTest(TestCase):
             tags='common_tag'
         )
         result.save()
+
+        self.assertFalse(self.scanner.should_search_file(booru_testutils.FELIX_PATH))
+
+    def test_global_ignore(self):
+        """Returns false if the file is globally ignored"""
+
+        # Make sure that we should search the file
+        self.assertTrue(self.scanner.should_search_file(booru_testutils.FELIX_PATH))
+
+        # Get the MD5
+        md5 = boorutils.get_file_checksum(booru_testutils.FELIX_PATH)
+
+        # Create an ignore
+        ignore = ScannerIgnore(checksum=md5)
+        ignore.save()
+
+        self.assertFalse(self.scanner.should_search_file(booru_testutils.FELIX_PATH))
+    
+    def test_exempt_ignore(self):
+        """Returns true if we are exempt to the ignore"""
+
+        # Make sure that we should search the file
+        self.assertTrue(self.scanner.should_search_file(booru_testutils.FELIX_PATH))
+
+        # Get the MD5
+        md5 = boorutils.get_file_checksum(booru_testutils.FELIX_PATH)
+
+        # Create an ignore
+        ignore = ScannerIgnore(checksum=md5)
+        ignore.save()
+
+        # Add the ignore to the scanner
+        self.scanner.exempt_ignores.add(ignore)
+        self.scanner.save()
+
+        self.assertTrue(self.scanner.should_search_file(booru_testutils.FELIX_PATH))
+
+        # Remove the exemption
+        self.scanner.exempt_ignores.remove(ignore)
+        self.scanner.save()
 
         self.assertFalse(self.scanner.should_search_file(booru_testutils.FELIX_PATH))
 

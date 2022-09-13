@@ -10,6 +10,7 @@ from booru.models.tags import Tag
 
 from .booru import Booru
 from .searchresult import SearchResult
+from .scannerignore import ScannerIgnore
 
 import os
 import datetime
@@ -40,6 +41,9 @@ class Scanner(models.Model):
 
     # The tags to be automatically added to posts that failed to be found
     auto_failure_tags = models.ManyToManyField(Tag, blank=True, related_name='auto_failure_tags')
+
+    # Exempt ignores
+    exempt_ignores = models.ManyToManyField(ScannerIgnore, blank=True)
 
     # A static list of all the active scanner ids
     ACTIVE_SCANNER_PKS = []
@@ -379,6 +383,9 @@ class Scanner(models.Model):
         # Make sure that the file is not already in the database as a post
         if Post.objects.filter(md5=md5).exists(): return False
         
+        # Check if the checksum is marked as ignore
+        if self.should_ignore_checksum(md5): return False
+
         boorus = self.boorus.all()
         checked_boorus = 0
         # Check all of the local boorus
@@ -432,6 +439,18 @@ class Scanner(models.Model):
             new_find = result.found or new_find
         
         return new_find
+
+    def should_ignore_checksum(self, checksum : str) -> bool:
+        """Checks if the scanner is exempt from the ignore"""
+
+        # Get the ignore
+        ignore = ScannerIgnore.objects.filter(checksum=checksum).first()
+
+        # Check if the ignore exists
+        if ignore is None: return False
+
+        # Check if the scanner is exempt
+        return ignore not in self.exempt_ignores.all()
 
     class Meta:
         permissions = (
