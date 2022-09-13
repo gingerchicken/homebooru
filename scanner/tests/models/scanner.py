@@ -394,7 +394,7 @@ class ScannerShouldSearchTest(TestCase):
         md5 = boorutils.get_file_checksum(booru_testutils.FELIX_PATH)
 
         # Create an ignore
-        ignore = ScannerIgnore(checksum=md5)
+        ignore = ScannerIgnore(md5=md5)
         ignore.save()
 
         self.assertFalse(self.scanner.should_search_file(booru_testutils.FELIX_PATH))
@@ -409,7 +409,7 @@ class ScannerShouldSearchTest(TestCase):
         md5 = boorutils.get_file_checksum(booru_testutils.FELIX_PATH)
 
         # Create an ignore
-        ignore = ScannerIgnore(checksum=md5)
+        ignore = ScannerIgnore(md5=md5)
         ignore.save()
 
         # Add the ignore to the scanner
@@ -1209,3 +1209,65 @@ class ScannerActiveTest(TestCase):
 
         # Make sure that the other scanner is active
         self.assertTrue(foreign.is_active)
+
+class PostDeleteHookTest(TestCase):
+    temp_storage = booru_testutils.TempStorage()
+
+    def setUp(self):
+        self.temp_storage.setUp()
+
+        # Create a post
+        self.post = Post.create_from_file(booru_testutils.FELIX_PATH)
+        self.post.save()
+
+        # Get the md5
+        self.md5 = self.post.md5
+    
+    def tearDown(self):
+        self.temp_storage.tearDown()
+    
+    def test_adds_ignore(self):
+        """Creates ignore case when post is deleted"""
+
+        # Make sure there are no ignore cases
+        self.assertEqual(ScannerIgnore.objects.count(), 0)
+
+        # Delete the post
+        self.post.delete()
+
+        # Make sure that there is one ignore case
+        self.assertEqual(ScannerIgnore.objects.count(), 1)
+
+        # Get the ignore case
+        ignore = ScannerIgnore.objects.first()
+
+        # Make sure that the ignore case has the correct md5
+        self.assertEqual(ignore.md5, self.md5)
+
+        # Make sure the reason includes the word 'deleted'
+        self.assertIn('deleted', ignore.reason)
+    
+    def test_does_not_add_ignore(self):
+        """Does not override an already placed ignore"""
+
+        # Create the ignore case
+        ignore = ScannerIgnore(md5=self.md5, reason='Test')
+        ignore.save()
+
+        # Make sure that there is one ignore case
+        self.assertEqual(ScannerIgnore.objects.count(), 1)
+
+        # Delete the post
+        self.post.delete()
+
+        # Make sure that there is still only one ignore case
+        self.assertEqual(ScannerIgnore.objects.count(), 1)
+
+        # Get the ignore case
+        ignore = ScannerIgnore.objects.first()
+
+        # Make sure that the ignore case has the correct md5
+        self.assertEqual(ignore.md5, self.md5)
+
+        # Make sure that the reason is still 'Test'
+        self.assertEqual(ignore.reason, 'Test')

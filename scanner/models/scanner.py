@@ -440,11 +440,11 @@ class Scanner(models.Model):
         
         return new_find
 
-    def should_ignore_checksum(self, checksum : str) -> bool:
+    def should_ignore_checksum(self, md5 : str) -> bool:
         """Checks if the scanner is exempt from the ignore"""
 
         # Get the ignore
-        ignore = ScannerIgnore.objects.filter(checksum=checksum).first()
+        ignore = ScannerIgnore.objects.filter(md5=md5).first()
 
         # Check if the ignore exists
         if ignore is None: return False
@@ -456,3 +456,27 @@ class Scanner(models.Model):
         permissions = (
             ('scan', 'Can use a scanner'),
         )
+
+# Hook into the Post delete method
+from django.db.models.signals import post_delete
+
+def post_delete_post(sender, instance, **kwargs):
+    """Adds the post's md5 to the ignore list"""
+
+    # Get the checksum
+    md5 = instance.md5
+
+    # Check if the post was already ignored
+    if ScannerIgnore.objects.filter(md5=md5).exists(): return
+
+    # Create the ignore
+    ignore = ScannerIgnore(md5=md5)
+
+    # Set the reason
+    ignore.reason = 'Post was deleted'
+
+    # Save the ignore
+    ignore.save()
+
+# Connect the post delete signal
+post_delete.connect(post_delete_post, sender=Post)

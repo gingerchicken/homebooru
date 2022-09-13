@@ -9,7 +9,7 @@ class ScannerIgnoreStrTest(TestCase):
         """The string representation is the checksum"""
 
         # Create a new ignore
-        ignore = ScannerIgnore(checksum=BOORU_MD5)
+        ignore = ScannerIgnore(md5=BOORU_MD5)
 
         # Check the string representation
         self.assertEqual(str(ignore), BOORU_MD5)
