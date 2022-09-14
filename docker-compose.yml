@@ -58,3 +58,5 @@ services:
       # - ${SSL_DH_PATH}:/certs/dhparam.pem
     depends_on:
       - web
+  redis:
+    image: redis

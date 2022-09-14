@@ -45,3 +45,7 @@ services:
       - DIRECTORY_SCAN_ENABLED=${DIRECTORY_SCAN_ENABLED}
     depends_on:
       - db
+  redis:
+    image: redis
+    ports:
+      - "6379:6379" # Allow a direct connection to port 6379 from the host machine.

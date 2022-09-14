@@ -4,6 +4,10 @@ FROM python:3
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+# Celery
+ENV CELERY=True
+ENV CELERY_WORKERS=5
+
 # Make the current working dir /app
 WORKDIR /app
 

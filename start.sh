@@ -98,6 +98,14 @@ if [ "$DEBUG" = "False" ]; then
     export COLLECT_STATIC=False
 fi
 
+if [ "$CELERY" = "True" ]; then
+    # Start mutliple celery workers
+    # The number of workers is set by the CELERY_WORKERS environment variable
+
+    # Start the celery worker
+    celery -A homebooru worker -l info -Q default -c $CELERY_WORKERS &
+fi
+
 # Start the application
 if [ "$DEBUG" = "True" ]; then
     if [ "$CREATE_ROOT" = "True" ]; then
