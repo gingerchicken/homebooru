@@ -103,7 +103,7 @@ if [ "$CELERY" = "True" ]; then
     # The number of workers is set by the CELERY_WORKERS environment variable
 
     # Start the celery worker
-    celery -A homebooru worker -l info -Q default -c $CELERY_WORKERS &
+    celery -A homebooru worker -l info -Q default -c $CELERY_WORKERS -E &
 fi
 
 # Start the application
