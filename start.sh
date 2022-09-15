@@ -104,6 +104,9 @@ if [ "$CELERY" = "True" ]; then
 
     # Start the celery worker
     celery -A homebooru worker -l info -Q default -c $CELERY_WORKERS -E &
+
+    # Start the celery beat
+    celery -A homebooru beat &
 fi
 
 # Start the application
