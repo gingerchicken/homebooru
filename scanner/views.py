@@ -2,6 +2,7 @@ from django.shortcuts import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 
 from .models import Scanner
+from .tasks import scan as scan_task
 
 def scan(request, scanner_id):
     # Make sure that the user has permission to scan
@@ -16,7 +17,7 @@ def scan(request, scanner_id):
     if scanner.is_active: return HttpResponse('Scanner is already active.', status=400)
 
     # Call the Scan function
-    posts = scanner.scan()
+    posts = scan_task.delay(scanner.id)
 
     # Redirect to the scanner admin page
     # The 'scanner/scanner' bit is a bit of a hack, but it works

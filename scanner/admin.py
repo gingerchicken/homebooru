@@ -20,9 +20,7 @@ class ScannerAdmin(admin.ModelAdmin):
             # Disabled button
             return format_html('<span class="button" disabled>Scan</span>')
         else:
-            # Instead of doing some async or fancy threading stuff, I am just going to make it up to the client for now!
-            # TODO change this if we implement celery or something
-            return format_html('<a class="button" onclick="fetch(this.href); window.location.reload(); return false;" href="{}">Scan</a>', reverse('scan', args=[obj.id]))
+            return format_html('<a class="button" href="{}">Scan</a>', reverse('scan', args=[obj.id]))
     
     scan_button.short_description = 'Scan'
     scan_button.allow_tags = True

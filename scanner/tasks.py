@@ -20,6 +20,9 @@ def scan(scanner_id):
     # Get the scanner
     scanner = Scanner.objects.get(id=scanner_id)
 
+    # Make sure that it is not active
+    if scanner.is_active: return
+
     # Run the scan function
     results = scanner.scan()
 
