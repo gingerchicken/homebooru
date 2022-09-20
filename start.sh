@@ -98,17 +98,6 @@ if [ "$DEBUG" = "False" ]; then
     export COLLECT_STATIC=False
 fi
 
-if [ "$CELERY" = "True" ]; then
-    # Start mutliple celery workers
-    # The number of workers is set by the CELERY_WORKERS environment variable
-
-    # Start the celery worker
-    celery -A homebooru worker -l info -Q default -c $CELERY_WORKERS -E &
-
-    # Start the celery beat
-    celery -A homebooru beat &
-fi
-
 # Start the application
 if [ "$DEBUG" = "True" ]; then
     if [ "$CREATE_ROOT" = "True" ]; then
@@ -118,9 +107,11 @@ if [ "$DEBUG" = "True" ]; then
         python manage.py createrootuser
     fi
 
+    export CELERY_RUN_TASKS=True
     # Start the application in debug mode
     python manage.py runserver 0.0.0.0:8000
 else
+    export CELERY_RUN_TASKS=True
     # Start the application in production mode
     gunicorn homebooru.wsgi:application -b 0.0.0.0:8000 --workers $WORKERS
 fi
