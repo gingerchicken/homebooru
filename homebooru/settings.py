@@ -209,6 +209,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'scanner.tasks.scan_all',
         'schedule': 60 * 5, # Every 5 minutes
     },
+    'register_all_watchdogs': {
+        'task': 'scanner.tasks.register_all_watchdogs',
+        'schedule': 30, # Every 30 seconds
+    }
 }
 
 # Homebooru settings
