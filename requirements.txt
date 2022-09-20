@@ -20,3 +20,4 @@ requests                # HTTP client
 # Distributed computing
 celery                  # Distributed task queue
 redis                   # Distributed cache
+flower                  # Celery monitoring
