@@ -14,6 +14,7 @@ services:
       - "8000:8000" # Allow a direct connection to port 8000 from the host machine.
     volumes:
       - ../:/app # Pass the current directory to the container.
+      - /tmp/booru_storage:/storage/
     environment:
       # Database
       - POSTGRES_NAME=${DB_NAME}
@@ -45,3 +46,72 @@ services:
       - DIRECTORY_SCAN_ENABLED=${DIRECTORY_SCAN_ENABLED}
     depends_on:
       - db
+  redis:
+    image: redis
+    ports:
+      - "6379:6379" # Allow a direct connection to port 6379 from the host machine.
+  worker:
+    build: ../
+    volumes:
+      - ../:/app # Pass the current directory to the container.
+      - /tmp/booru_storage:/storage/
+    command: "/app/.celery/worker.sh"
+    depends_on:
+      - db
+      - redis
+      - web
+    environment:
+      - CELERY_WORKER=True
+
+      - UNIT_TEST=${UNIT_TEST}
+      - DIRECTORY_SCAN_ENABLED=${DIRECTORY_SCAN_ENABLED}
+
+      # Database
+      - POSTGRES_NAME=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+
+      # Booru
+      - BOORU_STORAGE_PATH=/storage/
+
+      - SECRET_KEY=${SECRET_KEY}
+  beat:
+    build: ../
+    volumes:
+      - ../:/app # Pass the current directory to the container.
+    command: "/app/.celery/beat.sh"
+    depends_on:
+      - db
+      - redis
+      - web
+    environment:
+      - CELERY_BEAT=True
+
+      - UNIT_TEST=${UNIT_TEST}
+      - DIRECTORY_SCAN_ENABLED=${DIRECTORY_SCAN_ENABLED}
+
+      # Database
+      - POSTGRES_NAME=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+  flower:
+    build: ../
+    volumes:
+      - ../:/app # Pass the current directory to the container.
+    command: "/app/.celery/flower.sh"
+    depends_on:
+      - db
+      - redis
+      - worker
+    ports:
+      - 5555:5555
+    environment:
+      - CELERY_FLOW=True
+
+      - UNIT_TEST=${UNIT_TEST}
+      - DIRECTORY_SCAN_ENABLED=${DIRECTORY_SCAN_ENABLED}
+
+      # Database
+      - POSTGRES_NAME=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}

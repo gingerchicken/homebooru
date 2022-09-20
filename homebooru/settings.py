@@ -199,6 +199,18 @@ if not DEBUG:
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Celery Configuration
+CELERY_BROKER_URL = 'redis://redis:6379'
+CELERY_RESULT_BACKEND = 'redis://redis:6379'
+
+CELERY_BEAT_SCHEDULE = {
+    # Scanner tasks
+    'scan_all': {
+        'task': 'scanner.tasks.scan_all',
+        'schedule': 60 * 5, # Every 5 minutes
+    },
+}
+
 # Homebooru settings
 
 BOORU_STORAGE_PATH = Path(os.environ.get("BOORU_STORAGE_PATH", "data/storage"))

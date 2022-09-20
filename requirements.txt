@@ -16,3 +16,8 @@ psycopg2-binary         # Postgresql driver
 ffmpegio                # ffmpeg wrapper
 python-magic            # Magic file type detection
 requests                # HTTP client
+
+# Distributed computing
+celery                  # Distributed task queue
+redis                   # Distributed cache
+flower                  # Celery monitoring

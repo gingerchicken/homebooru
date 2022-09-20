@@ -27,5 +27,8 @@ COPY . /app/
 # Make sure start.sh is executable
 RUN chmod +x /app/start.sh
 
+# Make sure that the celery scripts are executable
+RUN chmod +x /app/.celery/*.sh
+
 # Run the start.sh script with bash
 CMD "/app/start.sh"
