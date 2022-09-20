@@ -63,6 +63,8 @@ class Scanner(models.Model):
     def set_is_active(self, is_active : bool):
         """Sets the `is_active` field"""
 
+        # TODO this method doesn't work with async scanners
+
         # If the scanner is active
         if is_active:
             # Add the scanner to the list of active scanners
