@@ -207,7 +207,7 @@ CELERY_BEAT_SCHEDULE = {
     # Scanner tasks
     'scan_all': {
         'task': 'scanner.tasks.scan_all',
-        'schedule': 60 * 30, # Every 30 minutes
+        'schedule': 60 * 5, # Every 5 minutes
     },
 }
 
