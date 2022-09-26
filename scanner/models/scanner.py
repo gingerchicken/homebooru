@@ -204,8 +204,8 @@ class Scanner(models.Model):
 
         # Call the superclass save method
         super().save(*args, **kwargs)
-    
-    def scan(self, create_posts : bool = True, use_default_tags : bool = True) -> list:
+
+    def __scan(self, create_posts : bool = True, use_default_tags : bool = True) -> list:
         """Scans the scanner for new files"""
 
         # Get if we are already active (from the database)
@@ -327,6 +327,28 @@ class Scanner(models.Model):
 
         # Return the created posts
         return created_posts
+    
+    def scan(self, **kwargs) -> list:
+        """Scans the scanner for new files"""
+
+        # This is used to wrap the scan method in a try catch block
+        # If it fails, then it will mark the scanner as inactive
+
+        try:
+            # Scan the scanner
+            return self.__scan(**kwargs)
+        except ScannerError as e:
+            raise e
+        except Exception as e:
+            # Mark our scanner as inactive
+            self.is_active = False
+            self.save()
+
+            # Set the status as the error
+            self.__set_status(str(e))
+
+            # Raise the exception
+            raise e
 
     def should_create_post(self, path : str) -> bool:
         """Returns whether or not we should create a post for the file"""
