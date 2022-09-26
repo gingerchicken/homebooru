@@ -1149,66 +1149,22 @@ class ScannerScanTest(TestCase):
         """Rejects when scanner is scanning"""
 
         # Mark the scanner as active
-        self.scanner.set_is_active(True)
+        self.scanner.is_active = True
+        self.scanner.save()
 
         # Run the scan and expect an error
         with self.assertRaises(ScannerError):
             self.scanner.scan()
         
         # Set the scanner as inactive
-        self.scanner.set_is_active(False)
+        self.scanner.is_active = False
+        self.scanner.save()
 
         # Run the scan and expect no error
         self.scanner.scan()
 
         # Make sure that after it has finished, the scanner is inactive
         self.assertFalse(self.scanner.is_active)
-
-class ScannerActiveTest(TestCase):
-    def test_set_active(self):
-        """Set active updates the active field"""
-
-        # Create a scanner
-        scanner = Scanner(name='Test', path='/tmp/')
-        scanner.save()
-        
-        # Make sure that the scanner is not active
-        self.assertFalse(scanner.is_active)
-
-        # Set the scanner as active
-        scanner.set_is_active(True)
-
-        # Make sure that the scanner is active
-        self.assertTrue(scanner.is_active)
-
-        # Set the scanner as inactive
-        scanner.set_is_active(False)
-
-        # Make sure that the scanner is not active
-        self.assertFalse(scanner.is_active)
-    
-    def test_updates_staticly(self):
-        """The scanner.is_active is the same between primary keys"""
-
-        # Create a scanner
-        scanner = Scanner(name='Test', path='/tmp/')
-        scanner.save()
-
-        # Get the scanner by its primary key
-        foreign = Scanner.objects.get(pk=scanner.pk)
-
-        # Make sure that the scanner is not active
-        self.assertFalse(scanner.is_active)
-        self.assertFalse(foreign.is_active)
-
-        # Update one of the scanners
-        scanner.set_is_active(True)
-
-        # Make sure that the scanner is active
-        self.assertTrue(scanner.is_active)
-
-        # Make sure that the other scanner is active
-        self.assertTrue(foreign.is_active)
 
 class PostDeleteHookTest(TestCase):
     temp_storage = booru_testutils.TempStorage()

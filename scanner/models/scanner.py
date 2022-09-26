@@ -45,35 +45,14 @@ class Scanner(models.Model):
     # Exempt ignores
     exempt_ignores = models.ManyToManyField(ScannerIgnore, blank=True)
 
-    # A static list of all the active scanner ids
-    ACTIVE_SCANNER_PKS = []
+    # Is the scanner active
+    is_active = models.BooleanField(default=False)
 
     @property
     def add_posts_on_failure(self):
         """Returns whether or not we should add posts on failure"""
 
         return self.auto_failure_tags.all().count() > 0
-
-    @property
-    def is_active(self):
-        """Returns whether or not the scanner is active"""
-
-        return self.pk in Scanner.ACTIVE_SCANNER_PKS
-
-    def set_is_active(self, is_active : bool):
-        """Sets the `is_active` field"""
-
-        # TODO this method doesn't work with async scanners
-
-        # If the scanner is active
-        if is_active:
-            # Add the scanner to the list of active scanners
-            Scanner.ACTIVE_SCANNER_PKS.append(self.pk)
-        else:
-            # Remove the scanner from the list of active scanners
-            Scanner.ACTIVE_SCANNER_PKS.remove(self.pk)
-        
-        return self.is_active
 
     @property
     def status(self):
@@ -229,12 +208,16 @@ class Scanner(models.Model):
     def scan(self, create_posts : bool = True, use_default_tags : bool = True) -> list:
         """Scans the scanner for new files"""
 
+        # Get if we are already active (from the database)
+        is_active = Scanner.objects.get(pk=self.pk).is_active
+
         # Check if the scanner is active
-        if self.is_active:
+        if is_active:
             raise ScannerError('The scanner is already active')
 
         # Mark our scanner as active
-        self.set_is_active(True)
+        self.is_active = True
+        self.save()
 
         # Check if we should prune the results
         if self.auto_prune_results:
@@ -339,7 +322,8 @@ class Scanner(models.Model):
         self.__set_status(f'Finished at {datetime.datetime.now()} {len(skip_hashes)} unique files found, creating {len(created_posts)} new posts, {total_files} new files were detected, {len(file_hashes)} files were scanned, {total_errors} errors occurred')
 
         # Mark our scanner as inactive
-        self.set_is_active(False)
+        self.is_active = False
+        self.save()
 
         # Return the created posts
         return created_posts

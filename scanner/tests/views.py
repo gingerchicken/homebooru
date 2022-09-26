@@ -120,7 +120,8 @@ class ScanTest(TestCase):
         """Rejects when scan is active"""
 
         # Make active
-        self.scanner.set_is_active(True)
+        self.scanner.is_active = True
+        self.scanner.save()
 
         # Scan the scanner
         response = self.send_request(self.scanner.id)
@@ -132,7 +133,8 @@ class ScanTest(TestCase):
         self.assertEqual(Post.objects.count(), 0)
 
         # Make inactive
-        self.scanner.set_is_active(False)
+        self.scanner.is_active = False
+        self.scanner.save()
 
         # Scan the scanner
         response = self.send_request(self.scanner.id)
