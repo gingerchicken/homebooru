@@ -141,6 +141,28 @@ class ScannerSaveTest(TestCase):
         sub_scanner = Scanner(name='sub_test_scanner', path=booru_testutils.CONTENT_PATH)
         self.assertRaises(ValueError, sub_scanner.save)
     
+    def test_rejects_non_abs_sub_directory(self):
+        """Rejects directories that are sub-directories of the scanner path (non-absolute)"""
+
+        # Create a scanner
+        scanner = Scanner(name='test_scanner', path='./assets')
+        scanner.save()
+
+        # Create a sub-scanner
+        sub_scanner = Scanner(name='sub_test_scanner', path='/app/assets/TEST_DATA')
+        self.assertRaises(ValueError, sub_scanner.save)
+    
+    def test_rejects_parent(self):
+        """Rejects directories that are parent directories of the scanner path"""
+
+        # Create a scanner
+        scanner = Scanner(name='test_scanner', path='/app/assets/TEST_DATA')
+        scanner.save()
+
+        # Create a sub-scanner
+        sub_scanner = Scanner(name='sub_test_scanner', path='/app')
+        self.assertRaises(ValueError, sub_scanner.save)
+
     # TODO maybe check for symbolic links being used as paths
 
 class ScannerCreatePostTest(TestCase):

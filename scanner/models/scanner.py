@@ -201,8 +201,8 @@ class Scanner(models.Model):
         # Make sure that the path is valid
         if not os.path.isdir(self.path):
             raise ValueError('Invalid scanner path')
-        
-        # Make sure that the directory is not a sub-directory of any other scanner
+
+        # Make sure that the directory is not a sub-directory of any other scanner (or vice versa)
         for scanner in Scanner.objects.all():
             # Skip the current scanner
             if scanner.id == self.id: continue
@@ -213,6 +213,10 @@ class Scanner(models.Model):
             # Check if the path is a sub-directory
             if os.path.commonpath([scanner_path, self.path]) == scanner_path:
                 raise ValueError('The path is a sub-directory of another scanner')
+            
+            # Check if the path is a super-directory
+            if os.path.commonpath([scanner_path, self.path]) == self.path:
+                raise ValueError('The path is a super-directory of another scanner')
 
         # Call the superclass save method
         super().save(*args, **kwargs)
