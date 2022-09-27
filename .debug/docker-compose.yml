@@ -21,16 +21,21 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
 
+      # Secret
+      - ROLL_SECRET=False
+
       # Debugging
       - DEBUG=True
       - CREATE_ROOT=True
 
       # Unit Testing
-      - UNIT_TEST=${UNIT_TEST}
+      - UNIT_TEST
 
       # Booru
       - BOORU_STORAGE_PATH=/storage/
-      - DIRECTORY_SCAN_ENABLED=${DIRECTORY_SCAN_ENABLED}
+      
+      # Scanning
+      - DIRECTORY_SCAN_ENABLED
     depends_on:
       - db
   redis:
@@ -50,8 +55,8 @@ services:
     environment:
       - CELERY_WORKER=True
 
-      - UNIT_TEST=${UNIT_TEST}
-      - DIRECTORY_SCAN_ENABLED=${DIRECTORY_SCAN_ENABLED}
+      - UNIT_TEST
+      - DIRECTORY_SCAN_ENABLED
 
       # Database
       - POSTGRES_NAME=${DB_NAME}
@@ -72,8 +77,8 @@ services:
     environment:
       - CELERY_BEAT=True
 
-      - UNIT_TEST=${UNIT_TEST}
-      - DIRECTORY_SCAN_ENABLED=${DIRECTORY_SCAN_ENABLED}
+      - UNIT_TEST
+      - DIRECTORY_SCAN_ENABLED
 
       # Database
       - POSTGRES_NAME=${DB_NAME}
@@ -93,7 +98,7 @@ services:
     environment:
       - CELERY_FLOW=True
 
-      - UNIT_TEST=${UNIT_TEST}
+      - UNIT_TEST
       - DIRECTORY_SCAN_ENABLED=${DIRECTORY_SCAN_ENABLED}
 
       # Database
