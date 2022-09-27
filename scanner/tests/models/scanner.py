@@ -140,6 +140,8 @@ class ScannerSaveTest(TestCase):
         # Create a sub-scanner for the content directory
         sub_scanner = Scanner(name='sub_test_scanner', path=booru_testutils.CONTENT_PATH)
         self.assertRaises(ValueError, sub_scanner.save)
+    
+    # TODO maybe check for symbolic links being used as paths
 
 class ScannerCreatePostTest(TestCase):
     fixtures = ['ratings.json']
