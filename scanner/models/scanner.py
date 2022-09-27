@@ -303,8 +303,15 @@ class Scanner(models.Model):
 
         # Iterate through all the files to search for
         for (md5, path) in file_hashes.items():
-            # Search for the file
-            if not self.search_file(path) and not self.add_posts_on_failure: continue
+            try:
+                # Search for the file
+                if not self.search_file(path) and not self.add_posts_on_failure: continue
+            except Exception as e:
+                # Show the error
+                print(e)
+                
+                # Skip the file
+                continue
 
             # ... Successfully found the file
 
