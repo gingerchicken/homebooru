@@ -118,6 +118,28 @@ class ScannerSaveTest(TestCase):
         scanner.save()
 
         self.assertTrue(scanner.pk is not None)
+    
+    def test_rejects_sub_directory(self):
+        """Rejects directories that are already being scanned as sub-directories"""
+
+        # Create a scanner
+        scanner = Scanner(name='test_scanner', path=booru_testutils.TEST_DATA_PATH)
+        scanner.save()
+
+        # Create a sub-scanner
+        sub_scanner = Scanner(name='sub_test_scanner', path=booru_testutils.CONTENT_PATH)
+        self.assertRaises(ValueError, sub_scanner.save)
+    
+    def test_rejects_sub_directory_deep(self):
+        """Rejects directories that are deeply nested"""
+
+        # Create a scanner for app
+        scanner = Scanner(name='test_scanner', path='/app')
+        scanner.save()
+
+        # Create a sub-scanner for the content directory
+        sub_scanner = Scanner(name='sub_test_scanner', path=booru_testutils.CONTENT_PATH)
+        self.assertRaises(ValueError, sub_scanner.save)
 
 class ScannerCreatePostTest(TestCase):
     fixtures = ['ratings.json']
