@@ -2,6 +2,7 @@ import hashlib
 import pathlib
 import ffmpegio
 import re
+import html
 
 import homebooru.settings
 
@@ -19,7 +20,7 @@ def get_file_checksum(path : str) -> str:
     file_path = pathlib.Path(path)
 
     if not file_path.exists():
-        raise Exception("File does not exist")
+        raise Exception("File does not exist:", file_path.resolve())
 
     # Make the file path absolute
     file_path = file_path.resolve()
@@ -198,3 +199,30 @@ def bool_from_str(value : str) -> bool:
     """Converts a string to a boolean"""
 
     return str(value).lower() == 'true'
+
+def mode(l : list):
+    """Returns the mode of a list"""
+    
+    # Check that the list is not empty
+    if not l or len(l) == 0:
+        return None
+
+    # Create something to store our frequencies
+    freq = {}
+
+    # Go through the list and count the frequencies
+    for item in l:
+        # Make sure that the item is in the dictionary
+        if item not in freq:
+            freq[item] = 0
+        
+        # Increment the frequency
+        freq[item] += 1
+    
+    # Get the most common item
+    return max(freq, key=freq.get)
+
+def html_decode(text : str) -> str:
+    """Decodes HTML entities"""
+
+    return html.unescape(text)

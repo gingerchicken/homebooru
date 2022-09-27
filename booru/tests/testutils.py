@@ -9,17 +9,20 @@ import os
 
 # Paths
 TEST_DATA_PATH = pathlib.Path('assets/TEST_DATA')
-CONTENT_PATH = TEST_DATA_PATH / 'content'
+CONTENT_PATH   = TEST_DATA_PATH / 'content'
 
 # Expected
-FELIX_PATH = pathlib.Path(CONTENT_PATH / 'felix.jpg')
-GATO_PATH  = pathlib.Path(CONTENT_PATH / 'gato.png')
-VIDEO_PATH = pathlib.Path(CONTENT_PATH / 'ana_cat.mp4')
+FELIX_PATH  = pathlib.Path(CONTENT_PATH / 'felix.jpg')
+GATO_PATH   = pathlib.Path(CONTENT_PATH / 'gato.png')
+VIDEO_PATH  = pathlib.Path(CONTENT_PATH / 'ana_cat.mp4')
+BOORU_IMAGE = pathlib.Path(CONTENT_PATH / 'booru_image.jpg')
+
 SAMPLEABLE_PATH = pathlib.Path(CONTENT_PATH / 'sampleable_image.jpg')
 
 # Erroneous
-NON_IMAGE_PATH = pathlib.Path(CONTENT_PATH / 'test.txt')
+NON_IMAGE_PATH     = pathlib.Path(CONTENT_PATH / 'test.txt')
 CORRUPT_IMAGE_PATH = pathlib.Path(CONTENT_PATH / 'corrupt_image.jpg')
+CORRUPT_FELIX_PATH = pathlib.Path(CONTENT_PATH / 'corrupt_felix.png')
 
 class TempStorage():
     og_path = None

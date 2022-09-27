@@ -21,8 +21,15 @@ from homebooru import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('booru.urls')) # This makes the posts page the homepage
+    path('', include('booru.urls')), # This makes the posts page the homepage
 ]
+
+# Scanner
+if settings.DIRECTORY_SCAN_ENABLED:
+    # Include the scanner urls
+    urlpatterns += [
+        path('scanner/', include('scanner.urls')),
+    ]
 
 if settings.DEBUG:
     # Append storage folders

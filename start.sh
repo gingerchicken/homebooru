@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export CLEANUP_DATABASE="False"
+
 # Check if we need to install jQuery
 if [ "$INSTALL_JQUERY" = "True" ]; then
     # Feel free to check for more recent versions of jQuery: https://jquery.com/download/
@@ -47,6 +49,12 @@ if [ "$DB_MIGRATE" = "True" ]; then
     python manage.py makemigrations booru
     python manage.py migrate
 
+    # Migrate scanner
+    if [ "$DIRECTORY_SCAN_ENABLED" = "True" ]; then
+        python manage.py makemigrations scanner
+        python manage.py migrate
+    fi
+
     # Migrate the rest of the site
     python manage.py makemigrations
     python manage.py migrate --run-syncdb
@@ -60,8 +68,15 @@ if [ "$UNIT_TEST" = "True" ]; then
         tar -xzf assets/TEST_DATA.tar.gz -C assets
     fi
 
+    SRCS="./booru"
+
+    # Append scanner if it is enabled
+    if [ "$DIRECTORY_SCAN_ENABLED" = "True" ]; then
+        SRCS="$SRCS,./scanner"
+    fi
+
     # Run the unit tests
-    coverage run --omit=*/tests/*.py,*/migrations/*.py --source='./booru' manage.py test --verbosity 2
+    coverage run --omit=*/tests/*.py,*/migrations/*.py --source=$SRCS manage.py test --verbosity 2
 
     # Save the exit code of the unit tests
     UNIT_TEST_EXIT_CODE=$?
@@ -81,6 +96,8 @@ if [ "$LOAD_FIXTURES" = "True" ]; then
     # Load the fixtures
     python manage.py loaddata booru/fixtures/*.json
 fi
+
+export CLEANUP_DATABASE="True"
 
 # Check if the debug enviroment variable is set and equal to "False"
 if [ "$DEBUG" = "False" ]; then

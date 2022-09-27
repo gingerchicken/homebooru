@@ -289,9 +289,7 @@ class Post(models.Model):
         return f"media/{self.folder}/{self.filename}"
 
     @staticmethod
-    def create_from_file(file_path : str, owner=None):
-        """Create a post from a file"""
-
+    def validate_file(file_path : str) -> bool:
         # Checking the file path
         # Get the file as a path
         file_path = pathlib.Path(file_path)
@@ -315,7 +313,23 @@ class Post(models.Model):
         if file_extension not in settings.BOORU_ALLOWED_FILE_EXTENSIONS:
             raise Exception("File extension is not valid")
         
+        return True
+
+    @staticmethod
+    def create_from_file(file_path : str, owner=None):
+        """Create a post from a file"""
+
+        # Get the file as a path
+        file_path = pathlib.Path(file_path)
+
+        # Make sure that it is valid before doing anything else
+        Post.validate_file(file_path)
+        
         # TODO size check (i.e. dont kill the server with massive images - make this a setting)
+
+        file_extension = file_path.suffix
+        if file_extension[0] == '.':
+            file_extension = file_extension[1:]
 
         # Check if the item is a video
         is_video = file_extension in settings.BOORU_VIDEO_FILE_EXTENSIONS

@@ -35,6 +35,9 @@ services:
 
       # Static
       - INSTALL_JQUERY=${INSTALL_JQUERY}
+
+      # Directory Scanning
+      - DIRECTORY_SCAN_ENABLED=${DIRECTORY_SCAN_ENABLED}
     depends_on:
       - db
   nginx:
@@ -57,3 +60,46 @@ services:
       # - ${SSL_DH_PATH}:/certs/dhparam.pem
     depends_on:
       - web
+  redis:
+    image: redis
+  worker:
+    build: ../
+    volumes:
+      - ${ACTUAL_STORAGE_PATH}:${BOORU_STORAGE_PATH}
+    command: "/app/.celery/worker.sh"
+    depends_on:
+      - db
+      - redis
+      - web
+    environment:
+      - CELERY_WORKER=True
+
+      - UNIT_TEST=${UNIT_TEST}
+      - DIRECTORY_SCAN_ENABLED=${DIRECTORY_SCAN_ENABLED}
+
+      # Database
+      - POSTGRES_NAME=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+
+      # Booru
+      - BOORU_STORAGE_PATH=/storage/
+
+      - SECRET_KEY=${SECRET_KEY}
+  beat:
+    build: ../
+    command: "/app/.celery/beat.sh"
+    depends_on:
+      - db
+      - redis
+      - web
+    environment:
+      - CELERY_BEAT=True
+
+      - UNIT_TEST=${UNIT_TEST}
+      - DIRECTORY_SCAN_ENABLED=${DIRECTORY_SCAN_ENABLED}
+
+      # Database
+      - POSTGRES_NAME=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
