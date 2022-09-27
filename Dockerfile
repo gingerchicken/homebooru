@@ -37,8 +37,20 @@ RUN chmod +x /app/.celery/*.sh
 # Scanner
 ENV SCANNER_ENABLE_DIR_WATCHER=True
 ENV SCANNER_ENABLE_AUTO_SCAN_ALL=True
+ENV DIRECTORY_SCAN_ENABLED=True
 
-# TODO add more env vars here!
+# Homebooru
+ENV ROLL_SECRET=False
+ENV SECRET_KEY=changemenow!
+ENV LOAD_FIXTURES=True
+ENV STATIC_ROOT=/static/
+ENV INSTALL_JQUERY=True
+ENV DB_MIGRATE=True
+ENV WORKERS=16
+
+# Debug
+ENV UNIT_TEST_DISPLAY_COVERAGE=True
+ENV BOORU_SHOW_FFMPEG_OUTPUT=False
 
 # Run the start.sh script with bash
 CMD "/app/start.sh"

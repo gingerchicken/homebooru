@@ -20,30 +20,22 @@ services:
       - POSTGRES_NAME=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - LOAD_FIXTURES=${LOAD_FIXTURES}
-      - DB_MIGRATE=${DB_MIGRATE}
 
       # Secret
       - ROLL_SECRET=False
-      - SECRET_KEY=${SECRET_KEY}
 
       # Debugging
-      - BOORU_SHOW_FFMPEG_OUTPUT=${BOORU_SHOW_FFMPEG_OUTPUT}
       - DEBUG=True
       - CREATE_ROOT=True
 
       # Unit Testing
-      - UNIT_TEST=${UNIT_TEST}
-      - UNIT_TEST_DISPLAY_COVERAGE=${UNIT_TEST_DISPLAY_COVERAGE}
+      - UNIT_TEST
 
       # Booru
       - BOORU_STORAGE_PATH=/storage/
-
-      # Static
-      - INSTALL_JQUERY=${INSTALL_JQUERY}
-
+      
       # Scanning
-      - DIRECTORY_SCAN_ENABLED=${DIRECTORY_SCAN_ENABLED}
+      - DIRECTORY_SCAN_ENABLED
     depends_on:
       - db
   redis:
@@ -63,8 +55,8 @@ services:
     environment:
       - CELERY_WORKER=True
 
-      - UNIT_TEST=${UNIT_TEST}
-      - DIRECTORY_SCAN_ENABLED=${DIRECTORY_SCAN_ENABLED}
+      - UNIT_TEST
+      - DIRECTORY_SCAN_ENABLED
 
       # Database
       - POSTGRES_NAME=${DB_NAME}
@@ -73,8 +65,6 @@ services:
 
       # Booru
       - BOORU_STORAGE_PATH=/storage/
-
-      - SECRET_KEY=${SECRET_KEY}
   beat:
     build: ../
     volumes:
@@ -87,8 +77,8 @@ services:
     environment:
       - CELERY_BEAT=True
 
-      - UNIT_TEST=${UNIT_TEST}
-      - DIRECTORY_SCAN_ENABLED=${DIRECTORY_SCAN_ENABLED}
+      - UNIT_TEST
+      - DIRECTORY_SCAN_ENABLED
 
       # Database
       - POSTGRES_NAME=${DB_NAME}
@@ -108,7 +98,7 @@ services:
     environment:
       - CELERY_FLOW=True
 
-      - UNIT_TEST=${UNIT_TEST}
+      - UNIT_TEST
       - DIRECTORY_SCAN_ENABLED=${DIRECTORY_SCAN_ENABLED}
 
       # Database

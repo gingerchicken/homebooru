@@ -19,25 +19,24 @@ services:
       - POSTGRES_NAME=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - LOAD_FIXTURES=${LOAD_FIXTURES}
-      - DB_MIGRATE=${DB_MIGRATE}
+      # - LOAD_FIXTURES
+      # - DB_MIGRATE
 
       # Secret
-      - ROLL_SECRET=${ROLL_SECRET}
-      - SECRET_KEY=${SECRET_KEY} # Feel free to change this in production to something static and secure!
+      # - ROLL_SECRET
+      # - SECRET_KEY # Feel free to change this in production to something static and secure!
 
       # Booru
-      - BOORU_STORAGE_PATH=${BOORU_STORAGE_PATH}
+      - BOORU_STORAGE_PATH
 
       # Production
       - DEBUG=False
-      - WORKERS=${GUNICORN_WORKERS}
 
       # Static
-      - INSTALL_JQUERY=${INSTALL_JQUERY}
+      # - INSTALL_JQUERY
 
       # Directory Scanning
-      - DIRECTORY_SCAN_ENABLED=${DIRECTORY_SCAN_ENABLED}
+      # - DIRECTORY_SCAN_ENABLED
     depends_on:
       - db
   nginx:
@@ -63,7 +62,7 @@ services:
   redis:
     image: redis
   worker:
-    build: ../
+    build: .
     volumes:
       - ${ACTUAL_STORAGE_PATH}:${BOORU_STORAGE_PATH}
     command: "/app/.celery/worker.sh"
@@ -74,8 +73,7 @@ services:
     environment:
       - CELERY_WORKER=True
 
-      - UNIT_TEST=${UNIT_TEST}
-      - DIRECTORY_SCAN_ENABLED=${DIRECTORY_SCAN_ENABLED}
+      # - DIRECTORY_SCAN_ENABLED
 
       # Database
       - POSTGRES_NAME=${DB_NAME}
@@ -85,9 +83,10 @@ services:
       # Booru
       - BOORU_STORAGE_PATH=/storage/
 
-      - SECRET_KEY=${SECRET_KEY}
+      # - SECRET_KEY
+      # - ROLL_SECRET
   beat:
-    build: ../
+    build: .
     command: "/app/.celery/beat.sh"
     depends_on:
       - db
@@ -96,8 +95,7 @@ services:
     environment:
       - CELERY_BEAT=True
 
-      - UNIT_TEST=${UNIT_TEST}
-      - DIRECTORY_SCAN_ENABLED=${DIRECTORY_SCAN_ENABLED}
+      # - DIRECTORY_SCAN_ENABLED
 
       # Database
       - POSTGRES_NAME=${DB_NAME}
