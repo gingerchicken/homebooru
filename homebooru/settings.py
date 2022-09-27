@@ -230,20 +230,26 @@ SCANNER_USE_DEFAULT_TAGS = True
 SCANNER_DEFAULT_TAGS = ['tagme']
 SCANNER_STALENESS_THRESHOLD = 30 * 24 * 60 * 60 # 30 days in seconds
 
+# Env variables
 DIRECTORY_SCAN_ENABLED = os.environ.get('DIRECTORY_SCAN_ENABLED', 'False').lower() == 'true'
+SCANNER_ENABLE_DIR_WATCHER = os.environ.get('SCANNER_ENABLE_DIR_WATCHER', 'False').lower() == 'true'
+SCANNER_ENABLE_AUTO_SCAN_ALL = os.environ.get('SCANNER_ENABLE_AUTO_SCAN_ALL', 'False').lower() == 'true'
 
 if DIRECTORY_SCAN_ENABLED:
     INSTALLED_APPS += [
         'scanner.apps.ScannerConfig',
     ]
 
-    # Add the scanner to the celery beat schedule
-    CELERY_BEAT_SCHEDULE['scan_all'] = {
-        'task': 'scanner.tasks.scan_all',
-        'schedule': 60 * 5, # Every 5 minutes
-    }
+    if SCANNER_ENABLE_AUTO_SCAN_ALL:
+        # Add the scanner to the celery beat schedule
+        CELERY_BEAT_SCHEDULE['scan_all'] = {
+            'task': 'scanner.tasks.scan_all',
+            'schedule': 60 * 5, # Every 5 minutes
+        }
 
-    CELERY_BEAT_SCHEDULE['register_all_watchdogs'] = {
-        'task': 'scanner.tasks.register_all_watchdogs',
-        'schedule': 30, # Every 30 seconds
-    }
+    if SCANNER_ENABLE_DIR_WATCHER:
+        # Add the watchdog task to the celery beat schedule
+        CELERY_BEAT_SCHEDULE['register_all_watchdogs'] = {
+            'task': 'scanner.tasks.register_all_watchdogs',
+            'schedule': 30, # Every 30 seconds
+        }

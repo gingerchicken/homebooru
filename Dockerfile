@@ -33,5 +33,12 @@ RUN chmod +x /app/start.sh
 # Make sure that the celery scripts are executable
 RUN chmod +x /app/.celery/*.sh
 
+# Homebooru environment variables
+# Scanner
+ENV SCANNER_ENABLE_DIR_WATCHER=True
+ENV SCANNER_ENABLE_AUTO_SCAN_ALL=True
+
+# TODO add more env vars here!
+
 # Run the start.sh script with bash
 CMD "/app/start.sh"
