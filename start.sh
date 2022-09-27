@@ -48,8 +48,10 @@ if [ "$DB_MIGRATE" = "True" ]; then
     python manage.py migrate
 
     # Migrate scanner
-    python manage.py makemigrations scanner
-    python manage.py migrate
+    if [ "$DIRECTORY_SCAN_ENABLED" = "True" ]; then
+        python manage.py makemigrations scanner
+        python manage.py migrate
+    fi
 
     # Migrate the rest of the site
     python manage.py makemigrations
@@ -64,8 +66,15 @@ if [ "$UNIT_TEST" = "True" ]; then
         tar -xzf assets/TEST_DATA.tar.gz -C assets
     fi
 
+    SRCS="./booru"
+
+    # Append scanner if it is enabled
+    if [ "$DIRECTORY_SCAN_ENABLED" = "True" ]; then
+        SRCS="$SRCS,./scanner"
+    fi
+
     # Run the unit tests
-    coverage run --omit=*/tests/*.py,*/migrations/*.py --source=./booru,./scanner manage.py test --verbosity 2
+    coverage run --omit=*/tests/*.py,*/migrations/*.py --source=$SRCS manage.py test --verbosity 2
 
     # Save the exit code of the unit tests
     UNIT_TEST_EXIT_CODE=$?
