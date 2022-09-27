@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export CLEANUP_DATABASE="False"
+
 # Check if we need to install jQuery
 if [ "$INSTALL_JQUERY" = "True" ]; then
     # Feel free to check for more recent versions of jQuery: https://jquery.com/download/
@@ -94,6 +96,8 @@ if [ "$LOAD_FIXTURES" = "True" ]; then
     # Load the fixtures
     python manage.py loaddata booru/fixtures/*.json
 fi
+
+export CLEANUP_DATABASE="True"
 
 # Check if the debug enviroment variable is set and equal to "False"
 if [ "$DEBUG" = "False" ]; then

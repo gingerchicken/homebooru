@@ -13,6 +13,12 @@ class ScannerConfig(AppConfig):
         
         if UNIT_TEST:
             return
+        
+        # Make sure that we should clean up the database
+        CLEANUP_DATABASE = os.environ.get('CLEANUP_DATABASE', 'false').lower() == 'true'
+
+        if not CLEANUP_DATABASE:
+            return
 
         # Import the ScannerWatchdogs
         from .models import ScannerWatchDog
