@@ -11,7 +11,7 @@ urlpatterns = [
     path('upload', views.upload, name='upload'),
     path('post/<int:post_id>', views.view, name='view'),
     path('post/<int:post_id>/flag', views.post_flag, name='post_flag'),
-    path('post/<int:post_id>/comment', views.post_comment, name='post_comment'),
+    path('post/<int:post_id>/comments', views.post_comment, name='post_comment'),
 
     # Tags
     path('tags', views.tags, name='tags'),
