@@ -308,7 +308,7 @@ class ViewPost {
      * @returns {Boolean} anonymous
      * @returns {Promise<Response>} response
     */
-    async comment(comment, anonymous = false) {
+    async comment(comment, anonymous = false, showConfirm = false) {
         let resp = await this.request('POST', this.postId + '/comments', {
             comment: comment,
             as_anonymous: anonymous
@@ -324,13 +324,16 @@ class ViewPost {
             return resp;
         }
 
-        // Show a success message
-        let message = new OverlaySuccess();
-        message.show(
-            anonymous ? 'Successfully posted comment anonymously.' : 'Successfully posted comment.',
-            'Success'
-        );
-
-        return resp;
+        if (showConfirm) {
+            // Show a success message
+            let message = new OverlaySuccess();
+            message.show(
+                anonymous ? 'Successfully posted comment anonymously.' : 'Successfully posted comment.',
+                'Success'
+            );
+        } else {
+            // Reload the page
+            location.reload();
+        }
     }
 }
