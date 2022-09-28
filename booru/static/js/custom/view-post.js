@@ -318,8 +318,8 @@ class ViewPost {
             // Show an error if it was not accepted
             let error = new OverlayError();
 
-            let msg = await resp.text();
-            error.show((await this.#getStringError(resp)) || msg);
+            let msg = (await resp.text()).trim() || this.#getStringError(resp);
+            error.show(msg);
             
             return resp;
         }
