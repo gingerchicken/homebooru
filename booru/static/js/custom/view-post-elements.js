@@ -127,7 +127,7 @@ $(document).ready(() => {
     });
 
     // Add the comment submit button
-    $('.new-comment > input:nth-child(3)').click((e) => {
+    $('.new-comment > input.submit').click((e) => {
         // Send the comment
         sendComment();
     });
