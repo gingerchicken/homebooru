@@ -346,6 +346,16 @@ def post_comment(request, post_id):
         if not is_anon and not user.has_perm('booru.add_comment'):
             return HttpResponse(status=403, content='You do not have permission to comment on posts.')
 
+        # Get the anonymous part of the comment
+        want_anon = request.POST.get('as_anonymous', 'false').lower() == 'true'
+
+        # Check if the user is allowed to post anonymously
+        if want_anon:
+            if not homebooru.settings.BOORU_ANON_COMMENTS:
+                return HttpResponse(status=403, content='Anonymous comments are not allowed on this instance.')
+
+            is_anon = True
+
         # Get the comment text
         comment_text = request.POST.get('comment', '')
 

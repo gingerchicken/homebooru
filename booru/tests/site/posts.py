@@ -711,13 +711,13 @@ class PostPostCommentTest(TestCase):
     def tearDown(self):
         self.temp_storage.tearDown()
 
-    def send_request(self, post_id, comment):
+    def send_request(self, post_id, comment, as_anonymous = False):
         """Sends a request to the post comment view"""
 
         # Send the request
         return self.client.post(
             reverse('post_comment', kwargs={'post_id': post_id}),
-            {'comment': comment}
+            {'comment': comment, 'as_anonymous': as_anonymous}
         )
     
     def givePermissions(self, user):
@@ -878,3 +878,41 @@ class PostPostCommentTest(TestCase):
         self.assertEqual(comment.user, None)
         self.assertEqual(comment.content, 'test')
         self.assertTrue(comment.is_anonymous)
+
+    def test_as_anonymous(self):
+        homebooru.settings.BOORU_ANON_COMMENTS = True
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Give perms
+        self.givePermissions(self.user)
+
+        # Send the request
+        resp = self.send_request(self.post.id, 'test', as_anonymous = True)
+
+        # Sends a 201
+        self.assertEqual(resp.status_code, 201)
+
+        # Make sure that the comment is anonymous
+        comment = Comment.objects.last()
+
+        self.assertTrue(comment.is_anonymous)
+    
+    def test_as_anonymous_no_anon(self):
+        homebooru.settings.BOORU_ANON_COMMENTS = False
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Give perms
+        self.givePermissions(self.user)
+
+        # Send the request
+        resp = self.send_request(self.post.id, 'test', as_anonymous = True)
+
+        # Sends a 400
+        self.assertEqual(resp.status_code, 403)
+
+        # Make sure that no comment was created
+        self.assertEqual(Comment.objects.count(), 0)
