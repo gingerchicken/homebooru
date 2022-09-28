@@ -66,6 +66,19 @@ function downloadOriginal(src) {
     link.click();
 }
 
+/**
+ * Shows the new comment form
+ */
+function toggleCommentBox() {
+    // Get the new comment form
+    const form = $('#comment-section > .comments');
+
+    // Toggle the form's visibility
+    form.toggle();
+
+    return false;
+}
+
 // On document ready
 $(document).ready(() => {
     // Add a click listener to #image
@@ -86,4 +99,10 @@ $(document).ready(() => {
     // Add the cursor point to the image
     // (I am doing this dynamically as non-javascript users will not see this)
     $('#image').css('cursor', 'pointer');
+
+    // Add the comment section toggle
+    $('#comment-section > .title').click((e) => {
+        // Toggle the comment box
+        toggleCommentBox();
+    });
 });

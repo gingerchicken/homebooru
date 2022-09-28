@@ -89,7 +89,6 @@
 							</div>
 						{% endif %}
 					</div>
-					<br>
 					<div style="margin-bottom: 1em;">
 						<p id="note-count"></p>
 					</div>
@@ -98,11 +97,50 @@
 				</div>
 			</div>
 		</div>
+		<div id="comment-section">
+			<span class="title"><a href="#">Comments</a></span>
+			<div class="comments">
+				{% for comment in post.comments %}
+					<div class="comment">
+						<div class="header">
+							<span class="poster">
+								{% if comment.is_anonymous %}
+									<img src="{% static 'layout/booru-logo.png' %}" class="avatar" />
+									<span class="author">Anonymous</span>
+								{% else %}
+									<a href="/accounts/profile/{{comment.user.id}}">
+										<img src="{% static 'layout/booru-logo.png' %}" class="avatar" />
+										<span class="author">{{comment.user}}</span>
+									</a>
+								{% endif %}
+							</span>
+							<span class="timestamp">{{comment}}</span>
+						</div>
+						<div class="content">
+							{{comment}}
+						</div>
+					</div>
+				{% endfor %}
+				<div class="new-comment">
+					<textarea name="comment" id="comment"></textarea>
+						{% if user.is_authenticated %}
+							<div class="anonymous">
+								Post as anonymous? <input type="checkbox" name="post-anonymous">
+							</div>
+						{% endif %}
+						<input type="submit" name="submit" value="Post comment">
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 
 	<script>
 		// Since JavaScript must be enabled, display the moderation-options div.
 		$('#moderation-options').show();
+		
+		// Also display the comment section.
+		$('#comment-section > .new').show();
 	</script>
 {% endblock %}
 

@@ -135,3 +135,81 @@
     /* Make sure that previous is always left */
     float: right;
 }
+
+#comment-section {
+    padding-bottom: 0;
+}
+
+#comment-section > .title {
+    font-weight: bolder;
+    font-size: larger;
+}
+
+#comment-section > * > .new-comment {
+    margin-bottom: 10px;
+    padding: 10px;
+    width: 100%;
+}
+
+#comment {
+    width: 100%;
+    height: 75px;
+}
+
+.comment {
+    /* Shadow */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+
+    /* Padding */
+    padding: 10px;
+
+    /* Margin */
+    margin: 10px;
+    padding-bottom: 15px;
+
+    /* Border */
+    border: 1px solid #f0f0f0;
+    border-radius: 5px;
+
+    transition: all 0.2s ease-in;
+}
+
+.comment:hover {
+    background-color: #fdfdfd;
+}
+
+.comment > .header {
+    display: flex;
+    align-items: center;
+}
+
+.comment > .header > .poster {
+    cursor: pointer;
+}
+
+.comment > .header > .poster > * > .author {
+    font-weight: bolder;
+    color: black;
+}
+
+.comment > .header > .poster > * > .author:hover {
+    text-decoration: underline;
+}
+
+.comment > .header > .poster > * > .avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+}
+
+.comment > .header > .timestamp {
+    color: grey;
+    font-size: smaller;
+    margin-left: 10px;
+}
+
+.content {
+    margin-left: calc(42px);
+    padding-left: 10px;
+    padding-right: 10px;
+}
