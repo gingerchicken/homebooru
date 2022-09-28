@@ -2,8 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import render
 
-from booru.models.tags import Tag
-from booru.models import Post, Rating, PostFlag
+from booru.models import Post, Rating, PostFlag, Tag, Comment
 from booru.pagination import Paginator
 
 from .filters import *
@@ -322,3 +321,50 @@ def post_flag(request, post_id):
 
         # Send a 200
         return HttpResponse(status=200)
+
+def post_comment(request, post_id):
+    # Get the user
+    user = request.user
+
+    # Check if the user is logged in
+    is_anon = not user.is_authenticated
+
+    # Check if the user is logged in OR if we allow anonymous comments
+    if not homebooru.settings.BOORU_ANON_COMMENTS and is_anon:
+        return HttpResponse(status=403, content='You must be logged in to comment on posts.')
+    
+    # Get the post from the post_id
+    post = None
+
+    try:
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        return HttpResponse(status=404)
+    
+    if request.method == 'POST':
+        # Make sure that the user has permission to comment
+        if not is_anon and not user.has_perm('booru.add_comment'):
+            return HttpResponse(status=403, content='You do not have permission to comment on posts.')
+
+        # Get the comment text
+        comment_text = request.POST.get('comment', '')
+
+        # Strip whitespace
+        comment_text = comment_text.strip()
+
+        # Check if the comment is empty
+        if len(comment_text) == 0:
+            return HttpResponse(status=400, content='Comment cannot be empty.')
+        
+        user = request.user if not is_anon else None
+
+        # Create the comment
+        comment = Comment(
+            post=post,
+            user=user,
+            content=comment_text
+        )
+        comment.save()
+
+        # Send a 201
+        return HttpResponse(status=201)
