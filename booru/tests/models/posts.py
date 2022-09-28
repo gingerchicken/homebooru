@@ -1,9 +1,9 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from ...models.posts import Post, Rating
-from ...models.tags import Tag, TagType
-from ...pagination import Paginator
+from booru.models.posts import Post, Rating
+from booru.models.tags import Tag, TagType
+from booru.models.comments import Comment
 
 import hashlib
 import os
@@ -1360,3 +1360,75 @@ class RatingTest(TestCase):
         r.save()
 
         self.assertEqual(str(r), "test")
+
+class CommentsTest(TestCase):
+    def setUp(self) -> None:
+        # Create a post
+        self.post = Post.create_from_file(testutils.FELIX_PATH)
+        self.post.save()
+
+        # Create a user
+        self.user = User(username="test", password="test")
+        self.user.save()
+
+        # Create a comment
+        self.comment = Comment(
+            post=self.post,
+            user=self.user,
+            content="test comment"
+        )
+        self.comment.save()
+    
+    def test_correct_comments(self):
+        """Returns correct singular comment"""
+        comments = self.post.comments
+
+        # Make sure one comment is returned
+        self.assertEqual(len(comments), 1)
+
+        # Make sure the comment is the correct one
+        self.assertEqual(comments[0], self.comment)
+    
+    def test_multiple_comments(self):
+        """Returns correct comments"""
+        # Create a second comment
+        comment2 = Comment(
+            post=self.post,
+            user=self.user,
+            content="test comment 2"
+        )
+        comment2.save()
+
+        # Get the comments
+        comments = self.post.comments
+
+        # Make sure two comments are returned
+        self.assertEqual(len(comments), 2)
+
+        # Make sure the comments are the correct ones
+        self.assertEqual(comments[0], self.comment)
+        self.assertEqual(comments[1], comment2)
+    
+    def test_rel_only(self):
+        """Returns only relevent comments"""
+
+        # Create a second post
+        post2 = Post.create_from_file(testutils.GATO_PATH)
+        post2.save()
+
+        # Create a comment on the second post
+        comment2 = Comment(
+            post=post2,
+            user=self.user,
+            content="test comment 2"
+        )
+        comment2.save()
+
+        # Get the comments
+        comments = self.post.comments
+
+        # Make sure one comment is returned
+        self.assertEqual(len(comments), 1)
+
+        # Make sure the comment is the correct one
+        self.assertEqual(comments[0], self.comment)
