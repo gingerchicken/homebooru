@@ -79,6 +79,26 @@ function toggleCommentBox() {
     return false;
 }
 
+function sendComment() {
+    // Get the comment text area
+    const textarea = $('#comment');
+
+    // Get the comment text
+    let comment = textarea.val();
+
+    // Try and get .anonymous > input:nth-child(1)
+    let anonymousElement = $('.anonymous > input:nth-child(1)');
+    let anonymous = anonymousElement.length !== 0 ? anonymousElement.prop('checked') : false;
+
+    // Check if view is defined
+    if (typeof view === 'undefined') {
+        return comment;
+    }
+
+    // Send the comment
+    return view.comment(comment, anonymous);
+}
+
 // On document ready
 $(document).ready(() => {
     // Add a click listener to #image
@@ -104,5 +124,11 @@ $(document).ready(() => {
     $('#comment-section > .title').click((e) => {
         // Toggle the comment box
         toggleCommentBox();
+    });
+
+    // Add the comment submit button
+    $('.new-comment > input:nth-child(3)').click((e) => {
+        // Send the comment
+        sendComment();
     });
 });

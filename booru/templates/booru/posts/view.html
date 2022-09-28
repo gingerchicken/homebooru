@@ -105,8 +105,10 @@
 						<div class="header">
 							<span class="poster">
 								{% if comment.is_anonymous %}
-									<img src="{% static 'layout/booru-logo.png' %}" class="avatar" />
-									<span class="author">Anonymous</span>
+									<a>
+										<img src="{% static 'layout/booru-logo.png' %}" class="avatar" />
+										<span class="author">Anonymous</span>
+									</a>
 								{% else %}
 									<a href="/accounts/profile/{{comment.user.id}}">
 										<img src="{% static 'layout/booru-logo.png' %}" class="avatar" />
