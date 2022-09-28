@@ -121,7 +121,7 @@
 						</div>
 					</div>
 				{% endfor %}
-				<div class="new-comment">
+				<div class="new-comment" style="display:none;">
 					<textarea name="comment" id="comment"></textarea>
 						{% if user.is_authenticated %}
 							<div class="anonymous">
@@ -140,7 +140,7 @@
 		$('#moderation-options').show();
 		
 		// Also display the comment section.
-		$('#comment-section > .new').show();
+		$('.new-comment').show();
 	</script>
 {% endblock %}
 
