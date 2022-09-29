@@ -68,6 +68,15 @@ def view(request, post_id):
         # Get search phrase url parameter
         search_phrase = request.GET.get('tags', '').strip()
         
+        # Get the comment page url parameter
+        comment_page = request.GET.get('pid', '1')
+
+        # Make sure that it is an integer
+        try:
+            comment_page = int(comment_page)
+        except ValueError:
+            comment_page = 1
+
         # Get the sorted tags
         sorted_tags = post.get_sorted_tags()
 
@@ -78,6 +87,16 @@ def view(request, post_id):
         # Check if the post is flagged if the user is auth'd
         delete_flag = PostFlag.objects.filter(post=post, user=request.user).exists() if request.user.is_authenticated else False
 
+        # Paginate the comments
+        comment_set = post.comments.all().order_by('-created') # Newest on the first page etc.
+        comments, comments_pagination = Paginator.paginate(comment_set, comment_page, homebooru.settings.BOORU_COMMENTS_PER_PAGE)
+
+        # Convert the comments to a list and reverse it
+        comments = list(comments)
+
+        # Set the pagination url
+        comments_pagination.page_url = str(post.id) + '?tags=' + search_phrase
+
         # Render the view.html template with the post
         return render(request, 'booru/posts/view.html', {
             'post': post,
@@ -86,7 +105,11 @@ def view(request, post_id):
             'search_param': search_phrase,
             'next': proximate_posts['newer'],
             'previous': proximate_posts['older'],
-            'delete_flag': delete_flag
+            'delete_flag': delete_flag,
+
+            # Comments
+            'comments': comments,
+            'comments_pagination': comments_pagination
         })
     
     if request.method == 'DELETE':

@@ -213,8 +213,9 @@ BOORU_DEFAULT_RATING_PK = 'safe'
 
 BOORU_SHOW_FFMPEG_OUTPUT = os.environ.get("BOORU_SHOW_FFMPEG_OUTPUT", 'False').lower() == 'true' and DEBUG
 
-BOORU_POSTS_PER_PAGE = 45   # How many posts to display in the browse page
-BOORU_TAGS_PER_PAGE  = 22   # How many tags to display on the tag search page
+BOORU_POSTS_PER_PAGE    = 45 # How many posts to display in the browse page
+BOORU_TAGS_PER_PAGE     = 22 # How many tags to display on the tag search page
+BOORU_COMMENTS_PER_PAGE = 5  # How many comments to display on the post page
 
 # Fixtures
 FIXTURE_DIRS = [

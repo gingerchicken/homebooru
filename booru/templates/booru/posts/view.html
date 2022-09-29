@@ -100,7 +100,7 @@
 		<div id="comment-section">
 			<span class="title"><a href="#">Comments</a></span>
 			<div class="comments">
-				{% for comment in post.comments %}
+				{% for comment in comments %}
 					<div class="comment">
 						<div class="header">
 							<span class="poster">
@@ -123,6 +123,9 @@
 						</div>
 					</div>
 				{% endfor %}
+				{% with comments_pagination as paginator %}
+					{% include "booru/components/paginator.html" %}
+				{% endwith %}
 				<div class="new-comment" style="display:none;">
 					<textarea name="comment" id="comment"></textarea>
 						{% if user.is_authenticated %}
