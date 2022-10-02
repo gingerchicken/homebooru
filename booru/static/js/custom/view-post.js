@@ -332,9 +332,13 @@ class ViewPost {
                 anonymous ? 'Successfully posted comment anonymously.' : 'Successfully posted comment.',
                 'Success'
             );
-        } else {
-            // Reload the page
-            location.reload();
+
+            return resp;
         }
+
+        // Reload the page
+        location.reload();
+        
+        return resp;
     }
 }
