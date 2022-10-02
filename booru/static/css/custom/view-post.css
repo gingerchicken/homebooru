@@ -136,6 +136,11 @@
     float: right;
 }
 
+/* Comments */
+:root {
+    --avatar-size: 42px;
+}
+
 #comment-section {
     padding-bottom: 0;
 }
@@ -197,8 +202,8 @@
 }
 
 .comment > .header > .poster > * > .avatar {
-    width: 42px;
-    height: 42px;
+    width: var(--avatar-size);
+    height: var(--avatar-size);
     border-radius: 50%;
 }
 
@@ -209,7 +214,7 @@
 }
 
 .content {
-    margin-left: calc(42px);
+    margin-left: var(--avatar-size);
     padding-left: 10px;
     padding-right: 10px;
 }
