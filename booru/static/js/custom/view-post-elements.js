@@ -131,8 +131,20 @@ $(document).ready(() => {
     });
 
     // Add the comment submit button
-    $('.new-comment > input.submit').click((e) => {
+    $('.new-comment > * > .submit').click((e) => {
         // Send the comment
         sendComment();
+    });
+
+    // Add anonymous check button
+    $('.new-comment > * > .anonymous').click((e) => {
+        // Get the element
+        const element = $(e.target);
+
+        // Get the input
+        const input = element.find('input');
+
+        // Toggle the input
+        input.prop('checked', !input.prop('checked'));
     });
 });

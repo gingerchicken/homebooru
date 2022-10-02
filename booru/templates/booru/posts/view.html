@@ -127,13 +127,24 @@
 					{% include "booru/components/paginator.html" %}
 				{% endwith %}
 				<div class="new-comment" style="display:none;">
-					<textarea name="comment" id="comment"></textarea>
+					<div class="new-message">
+						<div class="avatar">
+							<a {% if user.is_authenticated %}href="/accounts/profile/{{user.id}}"{% endif %}>
+								<img src="{% static 'layout/booru-logo.png' %}" class="avatar" />
+								{{user}}
+							</a>
+						</div>
+						<textarea name="comment" id="comment"></textarea>
+					</div>
+					<div class="controls">
 						{% if user.is_authenticated %}
-							<div class="anonymous">
-								Post as anonymous? <input type="checkbox" name="post-anonymous">
+							<div class="control anonymous">
+								<input type="checkbox" name="post-anonymous">Post anonymously
 							</div>
 						{% endif %}
-						<input class="submit" type="submit" name="submit" value="Post comment">
+						<div class="control submit button" type="submit" name="submit">
+							<span class="ui-icon ui-icon-comment option"></span>Send
+						</div>
 					</div>
 				</div>
 			</div>
