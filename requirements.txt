@@ -10,7 +10,7 @@ django-pipeline         # CSS/JS minification
 coverage                # Code coverage
 
 # Postgres
-psycopg2-binary         # Postgresql driver
+psycopg2                # Postgresql driver
 
 # Data processing
 ffmpegio                # ffmpeg wrapper
