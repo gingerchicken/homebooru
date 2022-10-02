@@ -12,9 +12,6 @@ admin.site.register(PostFlag)
 from .models import Rating
 admin.site.register(Rating)
 
-from .models import Comment
-admin.site.register(Comment)
-
 # Tag
 from .models import Tag
 admin.site.register(Tag)
@@ -25,3 +22,7 @@ admin.site.register(TagType)
 # Profiles
 from .models import Profile
 admin.site.register(Profile)
+
+# Comments
+from .models import Comment
+admin.site.register(Comment)
