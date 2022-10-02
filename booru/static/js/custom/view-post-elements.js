@@ -79,6 +79,10 @@ function toggleCommentBox() {
     return false;
 }
 
+/**
+ * Sends the comment from the comment section
+ * @returns {Promise} response from the server
+ */
 function sendComment() {
     // Get the comment text area
     const textarea = $('#comment');
