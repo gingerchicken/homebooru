@@ -328,13 +328,15 @@ class ViewPost {
         if (showSuccessMessage) {
             // Show a success message
             let message = new OverlaySuccess();
-            message.show(
-                anonymous ? 'Successfully posted comment anonymously.' : 'Successfully posted comment.',
-                'Success'
-            );
 
+            let msg = anonymous ? 'Successfully posted comment anonymously.' : 'Successfully posted comment.';
+            message.show(msg, 'Success');
+
+            // Finish
             return resp;
         }
+
+        // Else ...
 
         // Reload the page
         location.reload();
