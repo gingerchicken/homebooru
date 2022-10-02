@@ -308,7 +308,7 @@ class ViewPost {
      * @returns {Boolean} anonymous
      * @returns {Promise<Response>} response
     */
-    async comment(comment, anonymous = false, showConfirm = false) {
+    async comment(comment, anonymous = false, showSuccessMessage = false) {
         let resp = await this.request('POST', this.postId + '/comments', {
             comment: comment,
             as_anonymous: anonymous
@@ -324,7 +324,7 @@ class ViewPost {
             return resp;
         }
 
-        if (showConfirm) {
+        if (showSuccessMessage) {
             // Show a success message
             let message = new OverlaySuccess();
             message.show(
