@@ -305,7 +305,8 @@ class ViewPost {
     /**
      * Post a comment
      * @param {String} comment comment text
-     * @returns {Boolean} anonymous
+     * @param {Boolean} anonymous if the comment was posted anonymously
+     * @param {Boolean} showSuccessMessage if a message should be shown on success
      * @returns {Promise<Response>} response
     */
     async comment(comment, anonymous = false, showSuccessMessage = false) {
