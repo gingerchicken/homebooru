@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import Permission
 
 from booru.models.posts import Post, PostFlag
+from booru.models.comments import Comment
 import booru.boorutils as boorutils
 import booru.tests.testutils as testutils
 
@@ -695,3 +696,223 @@ class PostDeleteFlagTest(TestCase):
         # Check that it is the correct one (i.e. the one from the second user)
         self.assertEqual(flag.user, user2)
         self.assertEqual(flag.reason, 'test')
+
+class PostPostCommentTest(TestCase):
+    def setUp(self) -> None:
+        self.temp_storage = testutils.TempStorage()
+        self.temp_storage.setUp()
+
+        self.user = User.objects.create_user(username='test', password='huevo')
+        self.user.save()
+
+        self.post = Post.create_from_file(testutils.FELIX_PATH)
+        self.post.save()
+    
+    def tearDown(self):
+        self.temp_storage.tearDown()
+
+    def send_request(self, post_id, comment, as_anonymous = False):
+        """Sends a request to the post comment view"""
+
+        # Send the request
+        return self.client.post(
+            reverse('post_comment', kwargs={'post_id': post_id}),
+            {'comment': comment, 'as_anonymous': as_anonymous}
+        )
+    
+    def givePermissions(self, user):
+        """Gives the user permissions to comment on posts"""
+
+        # Give the user permission to comment on posts
+        permission = Permission.objects.get(codename='add_comment')
+        user.user_permissions.add(permission)
+        user.save()
+    
+    def test_disallows_anonymous(self):
+        # Set the setting
+        homebooru.settings.BOORU_ANON_COMMENTS = False
+
+        # Send the request
+        resp = self.send_request(self.post.id, 'test')
+
+        # Sends a 403
+        self.assertEqual(resp.status_code, 403)
+
+        # Check that there are no comments
+        self.assertEqual(Comment.objects.count(), 0)
+    
+    def test_disallows_users_without_perm(self):
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Send the request
+        resp = self.send_request(self.post.id, 'test')
+
+        # Sends a 403
+        self.assertEqual(resp.status_code, 403)
+
+        # Check that there are no comments
+        self.assertEqual(Comment.objects.count(), 0)
+    
+    def test_allows_users_with_perm(self):
+        # Give the user permission to comment on posts
+        self.givePermissions(self.user)
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Send the request
+        resp = self.send_request(self.post.id, 'test')
+
+        # Sends a 201
+        self.assertEqual(resp.status_code, 201)
+
+        # Check that there is one comment
+        self.assertEqual(Comment.objects.count(), 1)
+
+        # Get the comment
+        comment = Comment.objects.last()
+
+        # Check that it is correct
+        self.assertEqual(comment.post, self.post)
+        self.assertEqual(comment.user, self.user)
+        self.assertEqual(comment.content, 'test')
+    
+    def test_no_post(self):
+        """Rejects when there is no post to comment on"""
+
+        # Remove the post
+        self.post.delete()
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Give perms
+        self.givePermissions(self.user)
+
+        # Send the request
+        resp = self.send_request(42423, 'test')
+
+        # Sends a 404
+        self.assertEqual(resp.status_code, 404)
+    
+    def test_empty_comment(self):
+        """Rejects when the comment is empty"""
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Give perms
+        self.givePermissions(self.user)
+
+        # Send the request
+        resp = self.send_request(self.post.id, '')
+
+        # Sends a 400
+        self.assertEqual(resp.status_code, 400)
+
+        # Check that there are no comments
+        self.assertEqual(Comment.objects.count(), 0)
+    
+    def test_comment_whitespace(self):
+        """Rejects when the comment is only whitespace"""
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Give perms
+        self.givePermissions(self.user)
+
+        # Send the request
+        resp = self.send_request(self.post.id, '   ')
+
+        # Sends a 400
+        self.assertEqual(resp.status_code, 400)
+
+        # Check that there are no comments
+        self.assertEqual(Comment.objects.count(), 0)
+    
+    def test_strips_whitespace(self):
+        """Strips whitespace from the comment"""
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Give perms
+        self.givePermissions(self.user)
+
+        # Send the request
+        resp = self.send_request(self.post.id, ' test ')
+
+        # Sends a 201
+        self.assertEqual(resp.status_code, 201)
+
+        # Check that there is one comment
+        self.assertEqual(Comment.objects.count(), 1)
+
+        # Get the comment
+        comment = Comment.objects.last()
+
+        # Check that it is correct
+        self.assertEqual(comment.post, self.post)
+        self.assertEqual(comment.user, self.user)
+        self.assertEqual(comment.content, 'test')
+    
+    def test_allow_anonymous_setting(self):
+        homebooru.settings.BOORU_ANON_COMMENTS = True
+
+        # Send the request
+        resp = self.send_request(self.post.id, 'test')
+
+        # Sends a 201
+        self.assertEqual(resp.status_code, 201)
+
+        # Check that there is one comment
+        self.assertEqual(Comment.objects.count(), 1)
+
+        # Get the comment
+        comment = Comment.objects.last()
+
+        # Check that it is correct
+        self.assertEqual(comment.post, self.post)
+        self.assertEqual(comment.user, None)
+        self.assertEqual(comment.content, 'test')
+        self.assertTrue(comment.is_anonymous)
+
+    def test_as_anonymous(self):
+        homebooru.settings.BOORU_ANON_COMMENTS = True
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Give perms
+        self.givePermissions(self.user)
+
+        # Send the request
+        resp = self.send_request(self.post.id, 'test', as_anonymous = True)
+
+        # Sends a 201
+        self.assertEqual(resp.status_code, 201)
+
+        # Make sure that the comment is anonymous
+        comment = Comment.objects.last()
+
+        self.assertTrue(comment.is_anonymous)
+    
+    def test_as_anonymous_no_anon(self):
+        homebooru.settings.BOORU_ANON_COMMENTS = False
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Give perms
+        self.givePermissions(self.user)
+
+        # Send the request
+        resp = self.send_request(self.post.id, 'test', as_anonymous = True)
+
+        # Sends a 400
+        self.assertEqual(resp.status_code, 403)
+
+        # Make sure that no comment was created
+        self.assertEqual(Comment.objects.count(), 0)

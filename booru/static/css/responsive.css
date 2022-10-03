@@ -620,3 +620,19 @@ div.forum-list-space {
     100% {
     }
 }
+
+/* Button */
+.button {
+    color: #fff;
+    font-weight: bold;
+    width: fit-content;
+    border: 0px;
+    padding: 5px;
+    background: #0773fb;
+    cursor: pointer;
+}
+
+.button:hover {
+    border: 0px;
+    background: #fbb307;
+}

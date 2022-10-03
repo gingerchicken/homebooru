@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.apps import apps
 
 from .tags import Tag, TagType
 from .posts_search_criteria import *
@@ -441,6 +442,16 @@ class Post(models.Model):
             'older': older,
             'newer': newer
         }
+
+    @property
+    def comments(self):
+        """Get the comments for this post"""
+
+        # Get the comments model
+        Comment = apps.get_model('booru', 'Comment')
+
+        # Get the comments
+        return Comment.objects.filter(post=self)
 
     # Delete flag
     @property

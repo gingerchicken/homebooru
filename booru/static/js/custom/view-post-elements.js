@@ -66,6 +66,60 @@ function downloadOriginal(src) {
     link.click();
 }
 
+/**
+ * Shows the new comment form
+ */
+function toggleCommentBox() {
+    // Get the new comment form
+    let form = $('#comment-section > .comments');
+
+    // Toggle the form's visibility
+    form.toggle();
+
+    // Get the comments title
+    let title = $('#comment-section > .title');
+
+    // Get the ui-icon
+    let icon = title.find('.ui-icon');
+
+    const NORTH = 'ui-icon-caret-2-n';
+    const SOUTH = 'ui-icon-caret-2-s';
+
+    // If the form is visible then make it a north arrow
+    if (form.is(':visible')) {
+        icon.removeClass(SOUTH).addClass(NORTH);
+    } else {
+        // Otherwise make it a south arrow
+        icon.removeClass(NORTH).addClass(SOUTH);
+    }
+
+    return false;
+}
+
+/**
+ * Sends the comment from the comment section
+ * @returns {Promise} response from the server
+ */
+function sendComment() {
+    // Get the comment text area
+    const textarea = $('#comment');
+
+    // Get the comment text
+    let comment = textarea.val();
+
+    // Try and get .anonymous > input:nth-child(1)
+    let anonymousElement = $('.anonymous > input:nth-child(1)');
+    let anonymous = anonymousElement.length !== 0 ? anonymousElement.prop('checked') : false;
+
+    // Check if view is defined
+    if (typeof view === 'undefined') {
+        return comment;
+    }
+
+    // Send the comment
+    return view.comment(comment, anonymous);
+}
+
 // On document ready
 $(document).ready(() => {
     // Add a click listener to #image
@@ -86,4 +140,28 @@ $(document).ready(() => {
     // Add the cursor point to the image
     // (I am doing this dynamically as non-javascript users will not see this)
     $('#image').css('cursor', 'pointer');
+
+    // Add the comment section toggle
+    $('#comment-section > .title').click((e) => {
+        // Toggle the comment box
+        toggleCommentBox();
+    });
+
+    // Add the comment submit button
+    $('.new-comment > * > .submit').click((e) => {
+        // Send the comment
+        sendComment();
+    });
+
+    // Add anonymous check button
+    $('.new-comment > * > .anonymous').click((e) => {
+        // Get the element
+        const element = $(e.target);
+
+        // Get the input
+        const input = element.find('input');
+
+        // Toggle the input
+        input.prop('checked', !input.prop('checked'));
+    });
 });

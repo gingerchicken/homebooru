@@ -22,3 +22,7 @@ admin.site.register(TagType)
 # Profiles
 from .models import Profile
 admin.site.register(Profile)
+
+# Comments
+from .models import Comment
+admin.site.register(Comment)

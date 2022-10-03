@@ -135,3 +135,197 @@
     /* Make sure that previous is always left */
     float: right;
 }
+
+/* Comments */
+:root {
+    --avatar-size: 42px;
+    --my-avatar-size: 75px;
+}
+
+#comment-section {
+    padding-bottom: 0;
+}
+
+#comment-section > .title {
+    font-weight: bolder;
+    font-size: larger;
+    display: inline-flex;
+    color: #337ab7;
+    cursor: pointer;
+}
+
+#comment-section > .title:hover {
+    color: #33CFFF;
+}
+
+#comment-section > .title > * {
+    margin-right: 5px;
+}
+
+#comment-section > .title > .ui-icon {
+    font-weight: normal;
+    font-size: medium;
+}
+
+/* New Comment */
+.new-comment {
+    /* Divide the top */
+    margin-top: 30px;
+
+    margin-bottom: 10px;
+    padding: 10px;
+    width: 100%;
+}
+
+/* New Content (contains avatar and message) */
+.new-message {
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+}
+
+.new-comment > * > .avatar {
+    display: inline-block;
+
+    max-width: var(--my-avatar-size);
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    text-align: center;
+    font-weight: bold;
+}
+
+.new-comment > * > .avatar > a {
+    /* Make sure that the text attributes are inheritted */
+    text-align: inherit;
+    font-weight: inherit;
+    color: inherit;
+}
+
+.new-comment > * > .avatar > * > img {
+    width: calc(var(--my-avatar-size) - 10px);
+    height: calc(var(--my-avatar-size) - 10px);
+
+    border-radius: 50%;
+}
+
+.controls {
+    width: 100%;
+    display: inline-flex;
+    justify-content: right;
+    align-items: center;
+    padding-top: 10px;
+}
+
+.new-comment > .controls > .control {
+    display: inline;
+    margin-left: 5px;
+
+    /* For some reason the button is like 0.5px smaller and it annoys me */
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    font-weight: bold;
+    user-select: none;
+
+    background-color: #0773fb;
+    color: white;
+    cursor: pointer;
+
+    /* Just cus it triggers me */
+    /* This isn't really matching the theme of the rest of the site */
+    transition: all 0.1s linear;
+}
+
+.new-comment > .controls > .control:hover {
+    background-color: #fbb307;
+}
+
+/* Send button */
+.new-comment > .controls > .control.submit > .ui-icon {
+    margin-right: 5px;
+}
+
+/* Anon check */
+.new-comment > .controls > .control.anonymous {
+    padding: 5px;
+}
+
+.new-comment > .controls > .control.anonymous > input {
+    margin-right: 5px;
+}
+
+/* New comment textarea */
+#comment {
+    min-height: var(--my-avatar-size);
+    padding: 5px;
+    width: 100%;
+
+    /* Disable these */
+    resize: none;
+    outline: none;
+    overflow: auto;
+
+    /* Add a drop shadow */
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+}
+
+.comment {
+    /* Shadow */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+
+    /* Padding */
+    padding: 10px;
+
+    /* Margin */
+    margin: 10px;
+    padding-bottom: 15px;
+
+    /* Border */
+    border: 1px solid #f0f0f0;
+    border-radius: 5px;
+
+    transition: all 0.2s ease-in;
+}
+
+.comment:hover {
+    background-color: #fdfdfd;
+}
+
+.comment > .header {
+    display: flex;
+    align-items: center;
+}
+
+.comment > .header > .poster {
+    cursor: pointer;
+}
+
+.comment > .header > .poster > * > .author {
+    font-weight: bolder;
+    color: black;
+}
+
+.comment > .header > .poster > * > .author:hover {
+    text-decoration: underline;
+}
+
+.comment > .header > .poster > * > .avatar {
+    width: var(--avatar-size);
+    height: var(--avatar-size);
+    border-radius: 50%;
+}
+
+.comment > .header > .timestamp {
+    color: grey;
+    font-size: smaller;
+    margin-left: 10px;
+}
+
+.content {
+    margin-left: var(--avatar-size);
+    padding-left: 10px;
+    padding-right: 10px;
+}

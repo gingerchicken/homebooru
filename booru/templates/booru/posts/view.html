@@ -89,7 +89,6 @@
 							</div>
 						{% endif %}
 					</div>
-					<br>
 					<div style="margin-bottom: 1em;">
 						<p id="note-count"></p>
 					</div>
@@ -98,11 +97,68 @@
 				</div>
 			</div>
 		</div>
+		<div id="comment-section">
+			<span class="title">
+				<span class="ui-icon ui-icon-caret-2-n"></span> Comments
+			</span>
+			<div class="comments">
+				{% for comment in comments %}
+					<div class="comment">
+						<div class="header">
+							<span class="poster">
+								{% if comment.is_anonymous %}
+									<a>
+										<img src="{% static 'layout/booru-logo.png' %}" class="avatar" />
+										<span class="author">Anonymous</span>
+									</a>
+								{% else %}
+									<a href="/accounts/profile/{{comment.user.id}}">
+										<img src="{% static 'layout/booru-logo.png' %}" class="avatar" />
+										<span class="author">{{comment.user}}</span>
+									</a>
+								{% endif %}
+							</span>
+							<span class="timestamp">{{comment.created}}</span>
+						</div>
+						<div class="content">
+							{{comment}}
+						</div>
+					</div>
+				{% endfor %}
+				{% with comments_pagination as paginator %}
+					{% include "booru/components/paginator.html" %}
+				{% endwith %}
+				<div class="new-comment" style="display:none;">
+					<div class="new-message">
+						<div class="avatar">
+							<a {% if user.is_authenticated %}href="/accounts/profile/{{user.id}}"{% endif %}>
+								<img src="{% static 'layout/booru-logo.png' %}" class="avatar" />
+								{{user}}
+							</a>
+						</div>
+						<textarea name="comment" id="comment"></textarea>
+					</div>
+					<div class="controls">
+						{% if user.is_authenticated %}
+							<div class="control anonymous">
+								<input type="checkbox" name="post-anonymous">Post anonymously
+							</div>
+						{% endif %}
+						<div class="control submit button" type="submit" name="submit">
+							<span class="ui-icon ui-icon-comment option"></span>Send
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 
 	<script>
 		// Since JavaScript must be enabled, display the moderation-options div.
 		$('#moderation-options').show();
+		
+		// Also display the comment section.
+		$('.new-comment').show();
 	</script>
 {% endblock %}
 
