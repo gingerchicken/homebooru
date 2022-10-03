@@ -149,6 +149,22 @@
 #comment-section > .title {
     font-weight: bolder;
     font-size: larger;
+    display: inline-flex;
+    color: #337ab7;
+    cursor: pointer;
+}
+
+#comment-section > .title:hover {
+    color: #33CFFF;
+}
+
+#comment-section > .title > * {
+    margin-right: 5px;
+}
+
+#comment-section > .title > .ui-icon {
+    font-weight: normal;
+    font-size: medium;
 }
 
 /* New Comment */

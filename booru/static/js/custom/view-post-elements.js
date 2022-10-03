@@ -71,10 +71,27 @@ function downloadOriginal(src) {
  */
 function toggleCommentBox() {
     // Get the new comment form
-    const form = $('#comment-section > .comments');
+    let form = $('#comment-section > .comments');
 
     // Toggle the form's visibility
     form.toggle();
+
+    // Get the comments title
+    let title = $('#comment-section > .title');
+
+    // Get the ui-icon
+    let icon = title.find('.ui-icon');
+
+    const NORTH = 'ui-icon-caret-2-n';
+    const SOUTH = 'ui-icon-caret-2-s';
+
+    // If the form is visible then make it a north arrow
+    if (form.is(':visible')) {
+        icon.removeClass(SOUTH).addClass(NORTH);
+    } else {
+        // Otherwise make it a south arrow
+        icon.removeClass(NORTH).addClass(SOUTH);
+    }
 
     return false;
 }
