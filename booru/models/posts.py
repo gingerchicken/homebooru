@@ -227,7 +227,7 @@ class Post(models.Model):
         return results
 
     @staticmethod
-    def get_search_tags(search_result = models.QuerySet(), depth = 512, sort_by = lambda tag: tag.total_posts):
+    def get_search_tags(search_result = models.QuerySet(), depth = 512, sort_by = lambda tag: tag.total_posts, reverse : bool = True):
         """Get the tags from a search result"""
 
         # ================================
@@ -250,7 +250,7 @@ class Post(models.Model):
         val_tags = [(tag, sort_by(tag)) for tag in tags.values()]
 
         # Sort the tags by the value of the sort by function
-        val_tags.sort(key=lambda x: x[1], reverse=True)
+        val_tags.sort(key=lambda x: x[1], reverse=reverse)
 
         # Create a new list of just the tags
         tags = [tag for tag, val in val_tags]

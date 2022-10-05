@@ -596,6 +596,33 @@ class PostSearchTest(TestCase):
         # Make sure they're in the correct order
         self.assertEqual(tag_names, expected_names)
     
+    def test_get_search_tags_different_lambda(self):
+        """Sorts the tags differently depending on the lambda passed"""
+
+        # Create a lambda that sorts by the tag name
+        sort_by_name = lambda tag: tag.tag
+
+        results = Post.search('')
+
+        tags = Post.get_search_tags(results, sort_by=sort_by_name, reverse=False)
+        self.assertEqual(len(tags), 4)
+
+        # Get the list of tag names
+        tag_names = [tag.tag for tag in tags]
+
+        # We should expect a list of tags sorted by the total posts
+        expected_tags = [tag for tag in tags]
+
+        # Sort the tags by total_posts
+        expected_tags.sort(key=sort_by_name)
+        expected_tags = [tag.tag for tag in expected_tags]
+
+        # Make sure it starts with tag1
+        self.assertEqual(tag_names[0], 'tag1')
+
+        # Make sure they're in the correct order
+        self.assertEqual(tag_names, expected_tags)
+    
     def test_parameter_md5(self):
         # Create a bunch of posts
         for i in range(0, 100):
