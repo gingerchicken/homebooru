@@ -227,15 +227,16 @@ class Post(models.Model):
         return results
 
     @staticmethod
-    def get_search_tags(search_result = models.QuerySet(), depth = 512):
+    def get_search_tags(search_result = models.QuerySet(), depth = 512, sort_by = lambda tag: tag.total_posts):
         """Get the tags from a search result"""
 
+        # ================================
         # Search result should be a query set of posts
-
         # Get all of the tags from the posts, each post will have many tags
         # tags = search_result.values_list('tags', flat=True)
 
         # You see you'd like to think that the top solution would work but it doesn't
+        # ================================
 
         # Create a new empty query set
         tags = {}
@@ -244,12 +245,17 @@ class Post(models.Model):
             for tag in post.tags.all():
                 tags[tag.tag] = tag
 
-        # Convert the tags to a list
-        tags = list(tags.values())
+        # Generate a tuple of the tag and the value of the sort by function
+        # This way, if it is something like total posts, the value will only be calculated once per tag (i.e. it will be cached and not recalculated)
+        val_tags = [(tag, sort_by(tag)) for tag in tags.values()]
 
-        # Sort tags by total posts
-        tags.sort(key=lambda tag: tag.total_posts, reverse=True)
+        # Sort the tags by the value of the sort by function
+        val_tags.sort(key=lambda x: x[1], reverse=True)
 
+        # Create a new list of just the tags
+        tags = [tag for tag, val in val_tags]
+
+        # Return the tags
         return tags
 
     @staticmethod
