@@ -42,7 +42,7 @@ def browse(request):
     pagination.page_url = '/browse?tags=' + search_phrase
 
     # Find the top tags
-    top_tags = Post.get_search_tags(posts)[:homebooru.settings.BOORU_BROWSE_TAGS_PER_PAGE]
+    top_tags = Post.get_search_tags(posts, depth=homebooru.settings.BOORU_BROWSE_POST_TAGS_DEPTH)[:homebooru.settings.BOORU_BROWSE_TAGS_PER_PAGE]
 
     # Render the browse.html template with the posts
     return render(request, 'booru/posts/browse.html', {
