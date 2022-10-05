@@ -227,7 +227,7 @@ class Post(models.Model):
         return results
 
     @staticmethod
-    def get_search_tags(search_result = models.QuerySet(), depth = 512, sort_by = lambda tag: tag.total_posts, reverse : bool = True):
+    def get_search_tags(search_result = models.QuerySet(), depth = 512, sort_by = None, reverse : bool = True):
         """Get the tags from a search result"""
 
         # ================================
@@ -237,6 +237,10 @@ class Post(models.Model):
 
         # You see you'd like to think that the top solution would work but it doesn't
         # ================================
+
+        # Check if the sort_by is a valid value
+        if sort_by is None:
+            sort_by = Post.get_search_tags_lambda()
 
         # Create a new empty query set
         tags = {}
@@ -257,6 +261,24 @@ class Post(models.Model):
 
         # Return the tags
         return tags
+    
+    @staticmethod
+    def get_search_tags_lambda(sort_by : str = None):
+        """Get the lambda to be used for the `get_search_tags` function"""
+
+        # Check if the sort_by is a valid value
+        if sort_by is None:
+            # Default it to the value of the setting
+            sort_by = settings.BOORU_BROWSE_TAGS_SORT
+
+        # Create a dictionary of the sort by options
+        sort_by_options = {
+            'total': lambda tag: tag.total_posts,
+            'name': lambda tag: tag.tag
+        }
+
+        # Return the lambda
+        return sort_by_options[sort_by]
 
     @staticmethod
     def get_next_folder(folder_size=256):
