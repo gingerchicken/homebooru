@@ -213,9 +213,15 @@ BOORU_DEFAULT_RATING_PK = 'safe'
 
 BOORU_SHOW_FFMPEG_OUTPUT = os.environ.get("BOORU_SHOW_FFMPEG_OUTPUT", 'False').lower() == 'true' and DEBUG
 
-BOORU_POSTS_PER_PAGE    = 45 # How many posts to display in the browse page
-BOORU_TAGS_PER_PAGE     = 22 # How many tags to display on the tag search page
-BOORU_COMMENTS_PER_PAGE = 5  # How many comments to display on the post page
+BOORU_POSTS_PER_PAGE         = 45 # How many posts to display in the browse page
+BOORU_TAGS_PER_PAGE          = 22 # How many tags to display on the tag search page
+BOORU_COMMENTS_PER_PAGE      = 5  # How many comments to display on the post page
+BOORU_BROWSE_TAGS_PER_PAGE   = 32 # How many tags to display on the browse page
+BOORU_BROWSE_POST_TAGS_DEPTH = 45 # How many posts to enumerate for tags to display on the browse page
+
+BOORU_BROWSE_TAGS_SORT = os.environ.get("BOORU_BROWSE_TAGS_SORT", "total") # How to sort the tags on the browse page
+if BOORU_BROWSE_TAGS_SORT not in ["total", "name"]:
+    raise ValueError("Invalid BOORU_BROWSE_TAGS_SORT value")
 
 # Fixtures
 FIXTURE_DIRS = [

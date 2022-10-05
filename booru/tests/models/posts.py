@@ -596,6 +596,33 @@ class PostSearchTest(TestCase):
         # Make sure they're in the correct order
         self.assertEqual(tag_names, expected_names)
     
+    def test_get_search_tags_different_lambda(self):
+        """Sorts the tags differently depending on the lambda passed"""
+
+        # Create a lambda that sorts by the tag name
+        sort_by_name = lambda tag: tag.tag
+
+        results = Post.search('')
+
+        tags = Post.get_search_tags(results, sort_by=sort_by_name, reverse=False)
+        self.assertEqual(len(tags), 4)
+
+        # Get the list of tag names
+        tag_names = [tag.tag for tag in tags]
+
+        # We should expect a list of tags sorted by the total posts
+        expected_tags = [tag for tag in tags]
+
+        # Sort the tags by total_posts
+        expected_tags.sort(key=sort_by_name)
+        expected_tags = [tag.tag for tag in expected_tags]
+
+        # Make sure it starts with tag1
+        self.assertEqual(tag_names[0], 'tag1')
+
+        # Make sure they're in the correct order
+        self.assertEqual(tag_names, expected_tags)
+    
     def test_parameter_md5(self):
         # Create a bunch of posts
         for i in range(0, 100):
@@ -1432,3 +1459,70 @@ class CommentsTest(TestCase):
 
         # Make sure the comment is the correct one
         self.assertEqual(comments[0], self.comment)
+
+class GetSearchTagsLambdaTest(TestCase):
+    def setUp(self) -> None:
+        # Save the settings.BOORU_BROWSE_TAGS_SORT
+        self.og_sort = homebooru.settings.BOORU_BROWSE_TAGS_SORT
+
+        # Create a tag
+        self.tag = Tag.create_or_get("test")
+        self.tag.save()
+
+        # Create a post and add the tag
+        self.post = Post.create_from_file(testutils.FELIX_PATH)
+        self.post.save()
+        self.post.tags.add(self.tag)
+
+        # Save the post
+        self.post.save()
+    
+    def tearDown(self) -> None:
+        homebooru.settings.BOORU_BROWSE_TAGS_SORT = self.og_sort
+        super().tearDown()
+
+    def test_total(self):
+        """Returns lambda that gets total"""
+
+        # Get the lambda
+        l = Post.get_search_tags_lambda("total")
+
+        # Get the total
+        total = l(self.tag)
+
+        # Make sure the total is correct
+        self.assertEqual(total, 1)
+
+    def test_name(self):
+        """Returns lambda that gets name"""
+
+        # Get the lambda
+        l = Post.get_search_tags_lambda("name")
+
+        # Get the name
+        name = l(self.tag)
+
+        # Make sure the name is correct
+        self.assertEqual(name, "test")
+    
+    def test_defaults_to_setting(self):
+        # Make sure that it defaults to settings.BOORU_BROWSE_TAGS_SORT
+        l = Post.get_search_tags_lambda()
+
+        # Get the total
+        total = l(self.tag)
+
+        # Make sure the total is correct
+        self.assertEqual(total, 1)
+
+        # Change the setting to name
+        homebooru.settings.BOORU_BROWSE_TAGS_SORT = "name"
+
+        # Get the lambda
+        l = Post.get_search_tags_lambda()
+
+        # Get the name
+        name = l(self.tag)
+
+        # Make sure the name is correct
+        self.assertEqual(name, "test")
