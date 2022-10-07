@@ -96,6 +96,8 @@ class ViewPost {
                 msg = 'An unknown error occurred.';
                 break;
         }
+
+        return msg;
     }
 
     /**
@@ -111,8 +113,8 @@ class ViewPost {
             // Show an error if it was not accepted
             let error = new OverlayError();
 
-            let msg = await resp.text();
-            error.show(this.#getStringError(resp) || msg);
+            let msg = await this.#getStringError(resp);
+            error.show(msg);
         }
 
         return resp;
