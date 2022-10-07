@@ -7,4 +7,4 @@ if [ "$UNIT_TEST" = "True" ]; then
 fi
 
 # Run the celery worker
-celery -A homebooru worker -l INFO
+celery -A homebooru worker -l INFO -c $CELERY_WORKERS
