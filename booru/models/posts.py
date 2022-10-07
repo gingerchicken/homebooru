@@ -227,7 +227,7 @@ class Post(models.Model):
         return results
 
     @staticmethod
-    def get_search_tags(search_result = models.QuerySet(), depth = 512, sort_by = None, reverse : bool = True):
+    def get_search_tags(search_result = models.QuerySet(), depth = 512, sort_by = None, reverse : bool = None):
         """Get the tags from a search result"""
 
         # ================================
@@ -238,9 +238,15 @@ class Post(models.Model):
         # You see you'd like to think that the top solution would work but it doesn't
         # ================================
 
+        default_sort_by, default_reverse = Post.get_search_tags_lambda()
+
         # Check if the sort_by is a valid value
         if sort_by is None:
-            sort_by = Post.get_search_tags_lambda()
+            sort_by = default_sort_by
+        
+        # Check if the reverse is a valid value
+        if reverse is None:
+            reverse = default_reverse
 
         # Create a new empty query set
         tags = {}
@@ -273,12 +279,15 @@ class Post(models.Model):
 
         # Create a dictionary of the sort by options
         sort_by_options = {
-            'total': lambda tag: tag.total_posts,
-            'name': lambda tag: tag.tag
+            'total': (lambda tag: tag.total_posts, True),
+            'name': (lambda tag: tag.tag, False)
         }
 
+        # Get the sort by option and if we should reverse it
+        lam, reverse = sort_by_options[sort_by]
+
         # Return the lambda
-        return sort_by_options[sort_by]
+        return lam, reverse
 
     @staticmethod
     def get_next_folder(folder_size=256):

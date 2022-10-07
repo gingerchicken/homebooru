@@ -1485,7 +1485,7 @@ class GetSearchTagsLambdaTest(TestCase):
         """Returns lambda that gets total"""
 
         # Get the lambda
-        l = Post.get_search_tags_lambda("total")
+        l, r = Post.get_search_tags_lambda("total")
 
         # Get the total
         total = l(self.tag)
@@ -1497,7 +1497,7 @@ class GetSearchTagsLambdaTest(TestCase):
         """Returns lambda that gets name"""
 
         # Get the lambda
-        l = Post.get_search_tags_lambda("name")
+        l, r = Post.get_search_tags_lambda("name")
 
         # Get the name
         name = l(self.tag)
@@ -1507,7 +1507,7 @@ class GetSearchTagsLambdaTest(TestCase):
     
     def test_defaults_to_setting(self):
         # Make sure that it defaults to settings.BOORU_BROWSE_TAGS_SORT
-        l = Post.get_search_tags_lambda()
+        l, r = Post.get_search_tags_lambda()
 
         # Get the total
         total = l(self.tag)
@@ -1519,10 +1519,28 @@ class GetSearchTagsLambdaTest(TestCase):
         homebooru.settings.BOORU_BROWSE_TAGS_SORT = "name"
 
         # Get the lambda
-        l = Post.get_search_tags_lambda()
+        l, r = Post.get_search_tags_lambda()
 
         # Get the name
         name = l(self.tag)
 
         # Make sure the name is correct
         self.assertEqual(name, "test")
+    
+    def test_name_reverse(self):
+        """Returns reverse as false when given name"""
+
+        # Get the lambda
+        l, r = Post.get_search_tags_lambda("name")
+
+        # Make sure reverse is false
+        self.assertFalse(r)
+    
+    def test_total_reverse(self):
+        """Returns reverse as true when given total"""
+
+        # Get the lambda
+        l, r = Post.get_search_tags_lambda("total")
+
+        # Make sure reverse is true
+        self.assertTrue(r)
