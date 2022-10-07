@@ -53,5 +53,8 @@ ENV BOORU_ANON_COMMENTS=True
 ENV UNIT_TEST_DISPLAY_COVERAGE=True
 ENV BOORU_SHOW_FFMPEG_OUTPUT=False
 
+# Celery
+ENV CELERY_WORKERS=8
+
 # Run the start.sh script with bash
 CMD "/app/start.sh"
