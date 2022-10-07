@@ -96,6 +96,8 @@ class ViewPost {
                 msg = 'An unknown error occurred.';
                 break;
         }
+
+        return msg;
     }
 
     /**
@@ -111,8 +113,8 @@ class ViewPost {
             // Show an error if it was not accepted
             let error = new OverlayError();
 
-            let msg = await resp.text();
-            error.show(this.#getStringError(resp) || msg);
+            let msg = await this.#getStringError(resp);
+            error.show(msg);
         }
 
         return resp;
@@ -271,6 +273,18 @@ class ViewPost {
      * @returns {Promise<Response>} response
     */
     async favourite() {
+        // Make sure that we are logged in
+        if (!this.#isAuthorised) {
+            // Show an error message
+            let error = new OverlayError();
+            error.show('You must be logged in to favourite a post.');
+
+            // This must be done as it will try and request something along the lines of /null/favourites
+            // which will cause an error ...
+
+            return;
+        }
+
         // Ask the user if they're sure they want to favourite the post
         let confirm = new OverlayConfirm();
 
