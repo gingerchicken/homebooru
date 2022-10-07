@@ -288,6 +288,10 @@ div#mobileTags > ul > li {
     word-wrap: break-word;
 }
 
+#thumbnails-container {
+    text-align: center;
+}
+
 .thumbnail-preview {
     display: inline-block;
     background: #fff;
