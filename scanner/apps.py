@@ -24,13 +24,16 @@ class ScannerConfig(AppConfig):
         from .models import ScannerWatchDog
 
         # Delete them all
-        print('Removing watchdogs')
-        ScannerWatchDog.objects.all().delete()
+        watchdogs = ScannerWatchDog.objects.all()
+        if watchdogs.count() > 0:
+            print('Removing watchdogs')
+            ScannerWatchDog.objects.all().delete()
 
         # Set all scanners as not running
         from .models import Scanner
-
-        print('Setting all scanners as not running (inactive)')
-        for scanner in Scanner.objects.all():
-            scanner.is_active = False
-            scanner.save()
+        active_scanners = Scanner.objects.all().filter(is_active=True)
+        if active_scanners.count() > 0:
+            print('Setting all scanners as not running (inactive)')
+            for scanner in active_scanners:
+                scanner.is_active = False
+                scanner.save()
