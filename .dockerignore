@@ -13,3 +13,6 @@ docker-compose.yml
 
 # Celery
 celerybeat-schedule
+
+# Migration files
+*/migrations/*
