@@ -15,8 +15,18 @@ COPY sec/apply-ratelimit.conf /etc/nginx/snippets/sec-apply-ratelimit.conf
 # Create the certs directory
 RUN mkdir /certs/
 
-# Self-signed certificate
-RUN openssl req -new -newkey rsa:4096 -nodes -x509 -keyout /certs/booru.key -out /certs/booru.crt -days 365 -subj "/C=US/ST=California/L=San Francisco/O=Homebooru/OU=Homebooru/CN=booru.local"
+# Copy the self-sign script
+COPY self-sign.sh /certs/self-sign.sh
 
-# Create the pem file
-RUN openssl dhparam -out /certs/dhparam.pem 4096
+# Copy the start script
+COPY start.sh /start.sh
+
+# Make the scripts executable
+RUN chmod +x /certs/self-sign.sh
+RUN chmod +x /start.sh
+
+# Environment variables
+ENV SELF_SIGN=True
+
+# Run the start script
+CMD "/start.sh"
