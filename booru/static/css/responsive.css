@@ -640,3 +640,7 @@ div.forum-list-space {
     border: 0px;
     background: #fbb307;
 }
+
+.search-box {
+    margin-bottom: 16px;
+}
