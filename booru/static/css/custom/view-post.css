@@ -34,7 +34,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1;
+    z-index: 20;
 }
 
 #image-container>#image-overlay>img {
@@ -46,7 +46,7 @@
 
 #image-container .image-tools {
     /* Allow overlaying */
-    z-index: 2;
+    z-index: 21;
     position: fixed;
 
     /* Make sure it is at the bottom */
