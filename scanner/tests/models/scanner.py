@@ -367,6 +367,30 @@ class ScannerCreatePostTest(TestCase):
 
         # Make sure that add_posts_on_failure is true
         self.assertTrue(self.scanner.add_posts_on_failure)
+    
+    def test_gets_mode_rating_ignore_not_found(self):
+        """Selects the most common rating ignoring not found"""
+
+        questionable = Rating.objects.get(name='questionable')
+        explicit = Rating.objects.get(name='explicit')
+
+        # Update some of the results to be questionable
+        for i in range(1, len(self.results)):
+            self.results[i].raw_rating = str(questionable)
+            self.results[i].found = False
+            self.results[i].save()
+        
+        # Update the first result to be found and explicit
+        self.results[0].found = True
+        self.results[0].raw_rating = str(explicit)
+        self.results[0].save()
+
+        # Create the post
+        post = self.scanner.create_post(self.result_path)
+        post.save()
+
+        # Make sure that the post rating is explicit
+        self.assertEqual(post.rating, explicit)
 
 
 class ScannerShouldSearchTest(TestCase):

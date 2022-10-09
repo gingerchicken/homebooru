@@ -122,19 +122,27 @@ class Scanner(models.Model):
         # Get all the results
         results = SearchResult.objects.filter(md5=md5)
 
+        # Get all the results that were a success
+        success_results = results.filter(found=True)
+
         # Make sure that we got some results
         if len(results) == 0:
             return None
         
         # Find the mostly used rating
         rating = boorutils.mode([
-            result.rating for result in results
+            result.rating for result in success_results
         ])
+
+        # Make sure that it isn't None
+        rating = rating if rating is not None else Rating.get_default()
 
         # Find the most common source
         source = boorutils.mode([
-            result.source for result in results
+            result.source for result in success_results
         ])
+
+        # This is allowed to be null, so we don't need to check it
 
         # Combine the tags
         tags = {}
@@ -144,7 +152,7 @@ class Scanner(models.Model):
             tags[str(tag)] = tag
         
         # Automatically add the auto failure tags
-        if self.add_posts_on_failure and not results.filter(found=True).exists():
+        if self.add_posts_on_failure and not success_results.exists():
             for tag in self.auto_failure_tags.all():
                 tags[str(tag)] = tag
 
