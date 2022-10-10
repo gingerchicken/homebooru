@@ -16,6 +16,7 @@ urlpatterns = [
     # Tags
     path('tags', views.tags, name='tags'),
     path('tags/edit', views.edit_tag, name='edit_tag'),
+    path('tags/autocomplete/<str:tag>', views.autocomplete, name='autocomplete'),
 
     # Accounts
     path('accounts/login', views.login, name='login'),
