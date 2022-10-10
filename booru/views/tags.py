@@ -1,11 +1,14 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+from django.db import models
 
 from booru.pagination import Paginator
 from booru.models.tags import Tag, TagType
 import homebooru.settings
 
 from .filters import *
+
+import json
 
 def tags(request):
     # Get the search phrase url parameter
@@ -97,3 +100,24 @@ def edit_tag(request):
 
         # Redirect to the tags page
         return HttpResponseRedirect(f"/tags?tag={tag.tag}")
+
+def autocomplete(request, tag):
+    # Get the tags include the post count
+    tags = Tag.objects.filter(tag__istartswith=tag)
+
+    # Annotate the tags with the post count
+    tags = tags.annotate(**{
+        'total': models.Count('posts')
+    })
+
+    # Sort by the total posts
+    tags = tags.order_by('-total')
+
+    # Limit it to the autocomplete limit
+    tags = tags[:homebooru.settings.BOORU_AUTOCOMPLETE_MAX_TAGS]
+
+    # Convert to an array
+    flat = [{'tag': tag.tag, 'total': tag.total, 'type': str(tag.tag_type)} for tag in tags]
+
+    # Return the tags as json
+    return HttpResponse(json.dumps(flat), content_type="application/json")

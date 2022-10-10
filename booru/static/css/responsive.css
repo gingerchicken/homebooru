@@ -640,3 +640,43 @@ div.forum-list-space {
     border: 0px;
     background: #fbb307;
 }
+
+/* Search Boxes */
+.search-box {
+    margin-bottom: 16px;
+}
+
+.autocomplete {
+    position: fixed;
+    z-index: 10;
+    background: #fff;
+    border: 1px solid #ccc;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    width: fit-content;
+}
+
+.autocomplete > .option {
+    padding: 5px;
+    cursor: pointer;
+    margin: 1px;
+}
+
+.autocomplete > .option:hover {
+    background: #f0f0f0;
+}
+
+.autocomplete > .option > .name, .count {
+    display: inline-block
+}
+
+.autocomplete > .option > .name {
+    padding-right: 10px;
+    color: rgb(51, 122, 183);
+}
+
+.autocomplete > .option > .count {
+    color: #a0a0a0!important;
+    float: right;
+}
