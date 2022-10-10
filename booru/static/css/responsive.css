@@ -661,6 +661,7 @@ div.forum-list-space {
     padding: 5px;
     cursor: pointer;
     margin: 1px;
+    text-align: left;
 }
 
 .autocomplete > .option:hover {
