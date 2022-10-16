@@ -262,3 +262,16 @@ if DIRECTORY_SCAN_ENABLED:
             'task': 'scanner.tasks.register_all_watchdogs',
             'schedule': 30, # Every 30 seconds
         }
+
+# Advanced Search
+ADVANCED_SEARCH_ENABLED = os.environ.get('ADVANCED_SEARCH_ENABLED', 'False').lower() == 'true'
+
+if ADVANCED_SEARCH_ENABLED:
+    INSTALLED_APPS += [
+        'advsearch.apps.AdvsearchConfig',
+    ]
+
+    # Add middleware
+    MIDDLEWARE += [
+        'advsearch.middleware.BrowseMiddleware',
+    ]

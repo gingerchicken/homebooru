@@ -24,3 +24,6 @@ flower                  # Celery monitoring
 # Scanner
 requests                # HTTP client
 watchdog                # Filesystem monitoring
+
+# Advanced Search
+git+https://github.com/gingerchicken/blogic@main # Boolean logic parser
