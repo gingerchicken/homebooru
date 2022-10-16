@@ -1,0 +1,54 @@
+{% extends "booru/posts/browse.html" %}
+{% load static %}
+
+{% block head %}
+    {{ block.super }}
+    
+    <!-- TODO add this to a static file -->
+    <style>
+        .adv-toggle {
+            padding: 5px;
+            text-align: center;
+        }
+
+        input.advanced {
+            font-family: monospace;
+        }
+    </style>
+{% endblock %}
+
+{% block before_tags %}
+    {% if adv %}
+        <div id="alert-container"></div>
+        <div class="row">
+            <div class="col-xs-12">
+                <form action="" method="get">
+                    <div class="row">
+                        <div class="col-xs-12">	<a href="javascript:;" onclick="Homebooru.Search.saveTagSearch() ;return false;"><span class="ui-icon ui-icon-heart" style="color: #aaa; font-size: 25px; padding: 0px 35px 0px 0px; vertical-align: top;" title="Save this search. Check your account page."> </span></a>
+                            <input id="tags-search" name="tags" style="padding: 7px; width: calc(100% - 175px);" type="text" value="{{ search_param }}" placeholder="Ex: blue_sky cloud 1girl" class="ui-autocomplete-input advanced" autocomplete="off">
+                            <input name="commit" class="new_secondary_search" type="submit" value="Search">
+                            <input type="hidden" name="adv" value="1">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    {% else %}
+        {{ block.super }}
+    {% endif %}
+{% endblock %}
+
+{% block main_tags %}
+    <div class="adv-toggle">
+        <a href="?tags={{search_param}}{% if not adv %}&adv=1{%endif%}">
+            <span id="open-arrow" class="ui-icon ui-icon-caret-2-e-w" title="Advanced Search"> </span>
+            {% if not adv %}
+                Advanced Search
+            {% else %}
+                Traditional Search
+            {% endif %}
+        </a>
+
+    </div>
+    {{ block.super }}
+{% endblock %}

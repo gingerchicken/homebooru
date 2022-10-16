@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import render
+from django.template.response import TemplateResponse
 
 from booru.models import Post, Rating, PostFlag, Tag, Comment
 from booru.pagination import Paginator
@@ -45,7 +46,7 @@ def browse(request):
     top_tags = Post.get_search_tags(posts, depth=homebooru.settings.BOORU_BROWSE_POST_TAGS_DEPTH)[:homebooru.settings.BOORU_BROWSE_TAGS_PER_PAGE]
 
     # Render the browse.html template with the posts
-    return render(request, 'booru/posts/browse.html', {
+    return TemplateResponse(request, 'booru/posts/browse.html', {
         'posts': posts,
         'search_param': search_phrase,
         'tags': top_tags,
