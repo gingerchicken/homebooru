@@ -12,8 +12,11 @@ class BrowseMiddleware:
         return response
 
     def process_template_response(self, request, response):
-        if response.template_name == 'booru/posts/browse.html':
-            response.template_name = 'advsearch/posts/browse.html'
+        if response.template_name != 'booru/posts/browse.html':
+            return response
+
+        # We're on the browse page, so we can do our thing
+        response.template_name = 'advsearch/posts/browse.html'
         
         # Check if we have the 'advanced' GET parameter
         if request.GET.get('adv', '0') == '1':
