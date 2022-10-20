@@ -14,6 +14,10 @@
         input.advanced {
             font-family: monospace;
         }
+
+        .error {
+            font-family: monospace;
+        }
     </style>
 {% endblock %}
 
@@ -51,4 +55,15 @@
 
     </div>
     {{ block.super }}
+{% endblock %}
+
+{% block main_content %}
+    {% if error %}
+        <h1>
+            You silly goose!
+        </h1>
+        Check the syntax of the search phrase and try again. <span>There error was the following: <span class="error">{{ error }}</span>.</span>
+    {% else %}
+        {{ block.super }}
+    {% endif %}
 {% endblock %}
