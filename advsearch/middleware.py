@@ -1,26 +1,33 @@
 from django.shortcuts import render
 
-from booru.views import browse as booru_browse
+from .views import browse
 
-    # Swap out the template with our own (i.e. process_template_response)
 class BrowseMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        response = self.get_response(request)
-        return response
+        # Make sure that it is the browse page
+        if request.path != '/browse':
+            return self.get_response(request)
 
-    def process_template_response(self, request, response):
-        if response.template_name != 'booru/posts/browse.html':
-            return response
+        # Check if we have the 'advanced' GET parameter
+        if not self.perform_advanced(request):
+            return self.get_response(request)
 
         # We're on the browse page, so we can do our thing
-        response.template_name = 'advsearch/posts/browse.html'
-        
+        return browse(request)
+    
+    def perform_advanced(self, request):
         # Check if we have the 'advanced' GET parameter
-        if request.GET.get('adv', '0') == '1':
-            # Add `adv_only` to the context
-            response.context_data['adv'] = True
+        return request.GET.get('adv', '0') == '1'
 
+    def update_context(self, request, response):
+        response.context_data['adv'] = self.perform_advanced(request)
+
+    def process_template_response(self, request, response):
+        # Override the default template so that we can add features to the page
+
+        # Return the response
+        response.template_name = 'advsearch/posts/browse.html' if response.template_name == 'booru/posts/browse.html' else response.template_name
         return response
