@@ -77,4 +77,10 @@ def search_posts(phrase : str):
         # Append the newly found posts
         posts = posts | current_posts
     
+    # Remove duplicates
+    posts = posts.distinct()
+
+    # Sort by id
+    posts = posts.order_by('-id')
+
     return posts
