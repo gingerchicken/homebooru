@@ -19,14 +19,15 @@ class BrowseMiddleware:
         return browse(request)
     
     def perform_advanced(self, request):
-        # Check if we have the 'advanced' GET parameter
+        """Check if we have the 'advanced' GET parameter"""
+        
         return request.GET.get('adv', '0') == '1'
 
     def update_context(self, request, response):
         response.context_data['adv'] = self.perform_advanced(request)
 
     def process_template_response(self, request, response):
-        # Override the default template so that we can add features to the page
+        """Override the default template so that we can add features to the page"""
 
         # Return the response
         response.template_name = 'advsearch/posts/browse.html' if response.template_name == 'booru/posts/browse.html' else response.template_name
