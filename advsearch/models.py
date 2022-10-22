@@ -8,6 +8,12 @@ from booru.models import Post, Tag
 def search_posts(phrase : str):
     """Search for posts based on a phrase"""
 
+    # Check if the phrase is empty
+    phrase = phrase.strip()
+    if phrase == "":
+        # Return all
+        return Post.objects.all()
+
     # Get the truth table
     truth_table = blogic.evaluator.evaluate_all(phrase)
 
