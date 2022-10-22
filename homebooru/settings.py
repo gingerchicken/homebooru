@@ -167,6 +167,11 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = Path(os.environ.get('STATIC_ROOT', '/static/'))
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'booru/static/'),
+    os.path.join(BASE_DIR, 'advsearch/static/'), # TODO only include if advsearch is enabled
+]
+
 if not DEBUG:
     # Pipeline Configuration (Compressing and minifying static files)
     # https://django-pipeline.readthedocs.io/en/latest/

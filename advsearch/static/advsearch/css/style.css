@@ -1,0 +1,12 @@
+.adv-toggle {
+    padding: 5px;
+    text-align: center;
+}
+
+input.advanced {
+    font-family: monospace;
+}
+
+.error {
+    font-family: monospace;
+}

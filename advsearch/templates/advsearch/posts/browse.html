@@ -4,21 +4,7 @@
 {% block head %}
     {{ block.super }}
     
-    <!-- TODO add this to a static file -->
-    <style>
-        .adv-toggle {
-            padding: 5px;
-            text-align: center;
-        }
-
-        input.advanced {
-            font-family: monospace;
-        }
-
-        .error {
-            font-family: monospace;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static "advsearch/css/style.css" %}">
 {% endblock %}
 
 {% block before_tags %}
