@@ -49,7 +49,7 @@ class AdvancedAutoComplete extends AutoComplete {
 
     async getOperator(searchPhrase) {
         // Get the last tag
-        let lastTag = searchPhrase.trim().split(' ').pop();
+        let lastTag = searchPhrase.trim().split(' ').pop(); // Whitespace is ignored in logic processing so we cannot guarantee that the last tag is an operator
 
         // Get the related operators
         let operators = Object.keys(AdvancedAutoComplete.OPERATORS);
