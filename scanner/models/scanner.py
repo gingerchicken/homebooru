@@ -17,6 +17,8 @@ import datetime
 import magic
 from pathlib import Path
 
+import time
+
 class ScannerError(Exception):
     pass
 
@@ -266,6 +268,9 @@ class Scanner(models.Model):
                 # Make the path absolute
                 path = os.path.abspath(path)
 
+                # Update the status
+                self.__set_status(f'Finding files ({path})')
+
                 # Get the md5 hash of the file
                 md5 = boorutils.get_file_checksum(path)
 
@@ -309,8 +314,15 @@ class Scanner(models.Model):
         # Store the created posts
         created_posts = []
 
+        # Current counter
+        cur = 0
+
         # Iterate through all the files to search for
         for (md5, path) in file_hashes.items():
+            # Update the status
+            cur += 1
+            self.__set_status(f'Looking up {len(file_hashes)} files ({cur / len(file_hashes) * 100} %)')
+
             try:
                 # Search for the file
                 if not self.search_file(path) and not self.add_posts_on_failure: continue
@@ -331,8 +343,12 @@ class Scanner(models.Model):
 
         total_errors = 0
 
+        cur = 0
+
         # Iterate through all the files to create posts for
         for (md5, path) in post_hashes.items():
+            cur += 1
+            self.__set_status(f'Creating {len(post_hashes)} new posts ({cur / len(post_hashes) * 100} %)')
             # Create the post
             try:
                 post = self.create_post(path)
