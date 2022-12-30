@@ -26,7 +26,7 @@ class Pool(models.Model):
         PoolPost = apps.get_model('booru', 'PoolPost')
 
         # Get all the posts in the pool
-        posts = PoolPost.objects.filter(pool=self).order_by('added_at')
+        posts = PoolPost.objects.filter(pool=self).order_by('display_order')
 
         # Return the posts
         return posts
@@ -41,8 +41,33 @@ class PoolPost(models.Model):
     # Post
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
 
-    # Date added
-    added_at = models.DateTimeField(auto_now_add=True)
+    # Order
+    display_order = models.IntegerField(null=True, blank=True)
+
+    def get_next_order_number(self):
+
+        # Get all of the pool posts in the pool
+        pool_posts = PoolPost.objects.filter(pool=self.pool)
+
+        # Get the last pool post
+        last_pool_post = pool_posts.last()
+
+        # If there is no last pool post, return 0
+        if last_pool_post is None:
+            return 0
+
+        # Return the last pool post's display order + 1
+        return last_pool_post.display_order + 1
+
+    # Override the save method
+    def save(self, *args, **kwargs):
+        # Check if the display order is not set
+        if self.display_order is None:
+            # Get the next order number
+            self.display_order = self.get_next_order_number()
+        
+        # Call the super method
+        super().save(*args, **kwargs)
 
     class Meta:
         unique_together = ('pool', 'post')
