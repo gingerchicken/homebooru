@@ -401,3 +401,15 @@ def post_comment(request, post_id):
 
         # Send a 201
         return HttpResponse(status=201)
+
+def random(request):
+    # Check if the total number of posts is 0
+    if Post.objects.count() == 0:
+        # Redirect to the home page
+        return HttpResponseRedirect(reverse('index'))
+
+    # Get the random post
+    post = Post.objects.order_by('?').first()
+
+    # Redirect to the post
+    return HttpResponseRedirect(reverse('view', kwargs={'post_id': post.id}))
