@@ -12,6 +12,7 @@ urlpatterns = [
     path('post/<int:post_id>', views.view, name='view'),
     path('post/<int:post_id>/flag', views.post_flag, name='post_flag'),
     path('post/<int:post_id>/comments', views.post_comment, name='post_comment'),
+    path('random', views.random, name='random'),
 
     # Tags
     path('tags', views.tags, name='tags'),
