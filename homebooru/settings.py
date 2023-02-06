@@ -202,8 +202,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 BOORU_ANON_COMMENTS = os.environ.get('BOORU_ANON_COMMENTS', 'True').lower() == 'true'
 BOORU_STORAGE_PATH = Path(os.environ.get("BOORU_STORAGE_PATH", "data/storage"))
-BOORU_ALLOWED_FILE_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "webm", "mp4", "webp"]
-BOORU_VIDEO_FILE_EXTENSIONS = ["webm", "mp4"]
+BOORU_ALLOWED_FILE_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "webm", "mp4", "webp", "x-m4v"]
+BOORU_VIDEO_FILE_EXTENSIONS = ["webm", "mp4", "x-m4v"]
 BOORU_STORAGE_URL = '/'
 BOORU_STORAGE_SUBFOLDERS = ['media', 'thumbnails', 'samples']
 BOORU_UPLOAD_FOLDER = Path('/tmp/uploads')

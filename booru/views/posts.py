@@ -213,6 +213,7 @@ def upload(request):
 
         # Check if the file type is allowed
         if file_type not in homebooru.settings.BOORU_ALLOWED_FILE_EXTENSIONS:
+            print(file_type)
             return HttpResponse('File type not allowed', status=400)
 
         # Get the filename
