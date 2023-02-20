@@ -46,6 +46,8 @@ class PoolPost(models.Model):
 
     def get_next_order_number(self):
 
+        # TODO why don't you just use auto increment?
+
         # Get all of the pool posts in the pool
         pool_posts = PoolPost.objects.filter(pool=self.pool)
 
