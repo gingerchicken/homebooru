@@ -1125,3 +1125,18 @@ class PoolPostPoolTest(TestCase):
 
         # Sends a 404
         self.assertEqual(resp.status_code, 404)
+    
+    def test_remove_invalid_post_id(self):
+        """Rejects when the post id is invalid"""
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Give perms
+        self.givePermissions(self.user)
+
+        # Send the request
+        resp = self.send_remove_request('huevo', self.pool.pk)
+
+        # Sends a 404
+        self.assertEqual(resp.status_code, 404)
