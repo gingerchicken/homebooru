@@ -1110,3 +1110,18 @@ class PoolPostPoolTest(TestCase):
 
         # Sends a 403
         self.assertEqual(resp.status_code, 403)
+    
+    def test_remove_no_post(self):
+        """Rejects when the post doesn't exist"""
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Give perms
+        self.givePermissions(self.user)
+
+        # Send the request
+        resp = self.send_remove_request(42423, self.pool.pk)
+
+        # Sends a 404
+        self.assertEqual(resp.status_code, 404)
