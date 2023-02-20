@@ -13,6 +13,9 @@ urlpatterns = [
     path('post/<int:post_id>/flag', views.post_flag, name='post_flag'),
     path('post/<int:post_id>/comments', views.post_comment, name='post_comment'),
 
+    # Pools
+    path('pools/<int:pool_id>', views.post_pool, name='post_pool'),
+
     # Tags
     path('tags', views.tags, name='tags'),
     path('tags/edit', views.edit_tag, name='edit_tag'),

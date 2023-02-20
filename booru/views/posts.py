@@ -2,7 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import render
 
-from booru.models import Post, Rating, PostFlag, Tag, Comment
+from booru.models import Post, Rating, PostFlag, Tag, Comment, Pool, PoolPost
 from booru.pagination import Paginator
 
 from .filters import *
@@ -398,6 +398,51 @@ def post_comment(request, post_id):
             content=comment_text
         )
         comment.save()
+
+        # Send a 201
+        return HttpResponse(status=201)
+
+def post_pool(request, pool_id):
+    # Get the user
+    user = request.user
+
+    # Check if the user is logged in
+    if not user.is_authenticated:
+        return HttpResponse(status=403, content='You must be logged in to manage pools.')
+
+    # Get the pool from the pool_id
+    pool = None
+    try:
+        pool = Pool.objects.get(id=pool_id)
+    except Pool.DoesNotExist:
+        return HttpResponse(status=404)
+
+    # Get the post from the post_id (if it exists)
+    post = None
+    try:
+        post_id = request.POST.get('post', '')
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        return HttpResponse(status=404)
+    
+    if request.method == 'POST':
+        # Create a post pool
+        # Check if the user can create post pools
+        if not user.has_perm('booru.add_poolpost'):
+            # Send a 403
+            return HttpResponse(status=403, content='You do not have permission to add posts to pools.')
+        
+        # Check that the user has not already added the post to the pool
+        if PoolPost.objects.filter(pool=pool, post=post).exists():
+            # Send a 409
+            return HttpResponse(status=409, content='The post is already in the pool.')
+        
+        # Create a post pool
+        pool_post = PoolPost(
+            pool=pool,
+            post=post
+        )
+        pool_post.save()
 
         # Send a 201
         return HttpResponse(status=201)
