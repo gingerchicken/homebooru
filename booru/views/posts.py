@@ -417,13 +417,22 @@ def post_pool(request, pool_id):
     except Pool.DoesNotExist:
         return HttpResponse(status=404)
 
-    # Get the post from the post_id (if it exists)
-    post = None
-    try:
-        post_id = request.POST.get('post', '')
-        post = Post.objects.get(id=post_id)
-    except Post.DoesNotExist:
-        return HttpResponse(status=404)
+    def get_post(post_id=None):
+        """Gets the post from the request."""
+
+        if post_id is None:
+            post_id = request.POST.get('post', None)
+
+        # Get the post from the post_id (if it exists)
+        post = None
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            return False
+        except ValueError:
+            return False # Invalid post id
+        
+        return post
     
     if request.method == 'POST':
         # Create a post pool
@@ -432,6 +441,12 @@ def post_pool(request, pool_id):
             # Send a 403
             return HttpResponse(status=403, content='You do not have permission to add posts to pools.')
         
+        # Get the post
+        post = get_post()
+        if not post:
+            # Send a 404
+            return HttpResponse(status=404, content='The post does not exist.')
+
         # Check that the user has not already added the post to the pool
         if PoolPost.objects.filter(pool=pool, post=post).exists():
             # Send a 409
@@ -446,3 +461,28 @@ def post_pool(request, pool_id):
 
         # Send a 201
         return HttpResponse(status=201)
+    
+    if request.method == 'DELETE':
+        # Delete a post pool
+        # Check if the user can delete post pools
+        if not user.has_perm('booru.delete_poolpost'):
+            # Send a 403
+            return HttpResponse(status=403, content='You do not have permission to remove posts from pools.')
+
+        # Get the post from the URL parameters
+        post = get_post(request.GET.get('post', None))
+        if not post:
+            # Send a 404
+            return HttpResponse(status=404, content='The post does not exist.')
+
+        pool_post = PoolPost.objects.filter(pool=pool, post=post)
+        # Check that the user has not already added the post to the pool
+        if not pool_post.exists():
+            # Send a 404
+            return HttpResponse(status=404, content='The post is not in the pool.')
+        
+        # Delete the post pool
+        pool_post.delete()
+
+        # Send a 200
+        return HttpResponse(status=200)

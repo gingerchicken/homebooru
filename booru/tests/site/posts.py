@@ -940,12 +940,13 @@ class PoolPostPoolTest(TestCase):
     def givePermissions(self, user):
         """Gives the user the required permissions"""
 
-        # Get the permission
-        perm = Permission.objects.get(codename='add_poolpost')
+        for perm_name in ['add_poolpost', 'change_poolpost', 'delete_poolpost']:
+            # Get the permission
+            perm = Permission.objects.get(codename=perm_name)
 
-        # Give the permission
-        user.user_permissions.add(perm)
-        user.save()
+            # Give the permission
+            user.user_permissions.add(perm)
+            user.save()
     
     def send_request(self, post_id, pool_id):
         """Sends a request to the post comment view"""
@@ -982,6 +983,9 @@ class PoolPostPoolTest(TestCase):
 
         # Login
         self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Give perms
+        self.givePermissions(self.user)
 
         # Send the request
         resp = self.send_request(42423, self.pool.pk)
@@ -1036,3 +1040,73 @@ class PoolPostPoolTest(TestCase):
 
         # Sends a 400
         self.assertEqual(resp.status_code, 409)
+    
+    def send_remove_request(self, post_id, pool_id):
+        """Sends a request to remove a post from a pool"""
+
+        return self.client.delete(
+            reverse('post_pool', kwargs={'pool_id': pool_id}) + '?post=' + str(post_id)
+        )
+    
+    def test_remove(self):
+        """Removes a post from a pool"""
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Give perms
+        self.givePermissions(self.user)
+
+        # Add the post to the pool
+        PoolPost(pool=self.pool, post=self.post).save()
+
+        # Send the request
+        resp = self.send_remove_request(self.post.id, self.pool.pk)
+
+        # Sends a 204
+        self.assertEqual(resp.status_code, 200)
+
+        # Check that the post is not in the pool
+        self.assertTrue(len(self.pool.posts.all()) == 0)
+    
+    def test_remove_not_in_pool(self):
+        """Rejects when the post is not in the pool"""
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Give perms
+        self.givePermissions(self.user)
+
+        # Send the request
+        resp = self.send_remove_request(self.post.id, self.pool.pk)
+
+        # Sends a 404
+        self.assertEqual(resp.status_code, 404)
+    
+    def test_remove_no_perms(self):
+        """Rejects when the user doesn't have perms"""
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Add the post to the pool
+        PoolPost(pool=self.pool, post=self.post).save()
+
+        # Send the request
+        resp = self.send_remove_request(self.post.id, self.pool.pk)
+
+        # Sends a 403
+        self.assertEqual(resp.status_code, 403)
+    
+    def test_remove_as_anonymous(self):
+        """Rejects when the user is anonymous"""
+
+        # Add the post to the pool
+        PoolPost(pool=self.pool, post=self.post).save()
+
+        # Send the request
+        resp = self.send_remove_request(self.post.id, self.pool.pk)
+
+        # Sends a 403
+        self.assertEqual(resp.status_code, 403)
