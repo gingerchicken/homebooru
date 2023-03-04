@@ -403,19 +403,47 @@ def post_comment(request, post_id):
         return HttpResponse(status=201)
 
 def post_pool(request, pool_id):
-    # Get the user
-    user = request.user
-
-    # Check if the user is logged in
-    if not user.is_authenticated:
-        return HttpResponse(status=403, content='You must be logged in to manage pools.')
-
     # Get the pool from the pool_id
     pool = None
     try:
         pool = Pool.objects.get(id=pool_id)
     except Pool.DoesNotExist:
         return HttpResponse(status=404)
+
+    if request.method == 'GET':
+        # Get the posts in the pool
+        posts = pool.posts.all()
+
+        # TODO make this a function already...
+        # Get the page number
+        page = request.GET.get('page', 1)
+        
+        try:
+            page = int(page)
+        except ValueError:
+            page = 1
+
+        if page < 1:
+            page = 1
+        
+        # Paginate the posts
+        posts, paginator = Paginator.paginate(posts, page, homebooru.settings.BOORU_POSTS_PER_PAGE)
+
+        return render(request, 'booru/pools/view.html', {
+            'pool': pool,
+            'posts': posts,
+            'paginator': paginator
+        })
+
+
+    # API type beat
+
+    # Get the user
+    user = request.user
+
+    # Check if the user is logged in
+    if not user.is_authenticated:
+        return HttpResponse(status=403, content='You must be logged in to manage pools.')
 
     def get_post(post_id=None):
         """Gets the post from the request."""
