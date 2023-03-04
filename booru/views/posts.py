@@ -486,3 +486,26 @@ def post_pool(request, pool_id):
 
         # Send a 200
         return HttpResponse(status=200)
+
+def pools(request):
+    # Get all the pools
+    pools = Pool.objects.all()
+
+    # Get the page number
+    page = request.GET.get('page', 1)
+
+    try:
+        page = int(page)
+    except ValueError:
+        page = 1
+    
+    if page < 1:
+        page = 1
+
+     # Paginate the pools
+    pools, paginator = Paginator.paginate(pools, page, homebooru.settings.BOORU_POOLS_PER_PAGE)
+
+    return render(request, 'booru/pools/browse.html', {
+        'pools': pools,
+        'paginator': paginator
+    })

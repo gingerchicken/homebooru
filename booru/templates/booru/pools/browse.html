@@ -1,0 +1,47 @@
+{% extends "booru/pools/base/main.html" %}
+{% load static %}
+
+{% block main %}
+    <div class="padding15">
+        {% if pools|length > 0 %}
+            <h3>Pool Listing</h3>
+            <table class="pool-table">
+                {% for pool in pools %}
+                    <tr>
+                        <td class="icon">
+                            <a href="/pools/{{pool.id}}"><img src="{% static 'layout/icons/universal.png' %}" alt="pool"></a>
+                        </td>
+
+                        <td class="pool-info">
+                            <div class="name">
+                                <a href="/pools/{{pool.id}}">{{ pool }}</a>
+                            </div>
+
+                            <div class="description">
+                                {{ pool.description }}
+                            </div>
+
+                            <div class="meta">
+                                <span>Created by {% if pool.creator %} <a href="/accounts/profile/{{pool.creator.id}}">{{pool.creator}}</a> {% else %} {{pool.creator}} {% endif %} on {{pool.created_at}}</span>
+                            </div>
+                        </td>
+
+                        <td class="key-data total-images">
+                            {{ pool.posts|length }} Images
+                        </td>
+
+                        <td class="key-data publicity">
+                            {% if pool.public %}
+                                <span class="public">PUBLIC</span>
+                            {% else %}
+                                <span class="private">PRIVATE</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <h1>Nobody here but us chickens!</h1>If you wish to see something in these sections, you might want to create something first!
+        {% endif %}
+    </div>
+{% endblock %}

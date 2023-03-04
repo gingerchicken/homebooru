@@ -1,0 +1,44 @@
+table.pool-table {
+    width: 100%;
+    color: #5a5a5a;
+}
+
+table.pool-table tr {
+    vertical-align: middle;
+    text-align: center;
+}
+
+table.pool-table tr td {
+    padding: 10px;
+    border: 1px solid #f0f0f0;
+    margin: 5px;
+}
+
+table.pool-table .icon {
+    width: 60px;
+}
+
+table.pool-table .pool-info {
+    text-align: left;
+    font-size: 11px;
+    width: 75%;
+}
+
+table.pool-table .pool-info .meta {
+    font-size: 10px;
+    color: #878686;
+}
+
+table.pool-table .key-data {
+    font-weight: bold;
+    min-width: 50px;
+}
+
+table.pool-table .key-data.total-images {
+    font-size: 14px;
+    min-width: 100px;
+}
+
+table.pool-table .key-data.publicity {
+    font-size: 18px;
+}

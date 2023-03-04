@@ -219,6 +219,7 @@ BOORU_COMMENTS_PER_PAGE      = 5  # How many comments to display on the post pag
 BOORU_BROWSE_TAGS_PER_PAGE   = 32 # How many tags to display on the browse page
 BOORU_BROWSE_POST_TAGS_DEPTH = 45 # How many posts to enumerate for tags to display on the browse page
 BOORU_AUTOCOMPLETE_MAX_TAGS  = 15 # How many tags to display in the autocomplete dropdown
+BOORU_POOLS_PER_PAGE         = 25 # How many pools to display on the pool page
 
 BOORU_BROWSE_TAGS_SORT = os.environ.get("BOORU_BROWSE_TAGS_SORT", "total") # How to sort the tags on the browse page
 if BOORU_BROWSE_TAGS_SORT not in ["total", "name"]:

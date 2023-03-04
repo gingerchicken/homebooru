@@ -1,0 +1,15 @@
+{% extends "booru/base/main.html" %}
+{% load static %}
+
+{% block navbar %}
+	{% include "booru/pools/components/nav-bar.html" %}
+{% endblock %}
+
+{% block page_name %}
+    Pools
+{% endblock %}
+
+{% block head %}
+    <!-- View Post Stylesheet -->
+	<link rel="stylesheet" type="text/css" href="{% static 'css/custom/pools.css' %}">
+{% endblock %}
