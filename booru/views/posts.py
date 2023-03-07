@@ -516,27 +516,79 @@ def post_pool(request, pool_id):
         return HttpResponse(status=200)
 
 def pools(request):
-    # Get all the pools
-    pools = Pool.objects.all()
+    if request.method == 'GET':
+        # Get all the pools
+        pools = Pool.objects.all()
 
-    # Get the page number
-    page = request.GET.get('page', 1)
+        # Get the page number
+        page = request.GET.get('page', 1)
 
-    try:
-        page = int(page)
-    except ValueError:
-        page = 1
+        try:
+            page = int(page)
+        except ValueError:
+            page = 1
+        
+        if page < 1:
+            page = 1
+
+        # Paginate the pools
+        pools, paginator = Paginator.paginate(pools, page, homebooru.settings.BOORU_POOLS_PER_PAGE)
+
+        return render(request, 'booru/pools/browse.html', {
+            'pools': pools,
+            'paginator': paginator
+        })
     
-    if page < 1:
-        page = 1
+    if request.method == 'POST':
+        # Get the user
+        user = request.user
 
-     # Paginate the pools
-    pools, paginator = Paginator.paginate(pools, page, homebooru.settings.BOORU_POOLS_PER_PAGE)
+        # Check if the user is logged in
+        if not user.is_authenticated:
+            return HttpResponse(status=403, content='You must be logged in to create pools.')
 
-    return render(request, 'booru/pools/browse.html', {
-        'pools': pools,
-        'paginator': paginator
-    })
+        # Check if the user has permission to create pools
+        if not user.has_perm('booru.add_pool'):
+            return HttpResponse(status=403, content='You do not have permission to create pools.')
+
+        # Get the pool name
+        pool_name = request.POST.get('name', None)
+        
+        # Get the pool description
+        pool_description = request.POST.get('description', '')
+
+        # Check if the pool name is empty
+        if pool_name is None or len(pool_name) < 3:
+            return HttpResponse(status=400, content='Pool name must be at least 3 characters long.')
+
+        # Check if the pool name is too long
+        if len(pool_name) > 255: # TODO make this a constant
+            return HttpResponse(status=400, content='Pool name cannot be longer than 255 characters.')
+
+        # Check if the pool description is too long
+        if len(pool_description) > 1024: # TODO make this a constant
+            return HttpResponse(status=400, content='Pool description cannot be longer than 1024 characters.')
+
+        # Check if the pool name is already taken
+        if Pool.objects.filter(name=pool_name).exists():
+            return HttpResponse(status=409, content='A pool with that name already exists.')
+
+        # Create the pool
+        pool = Pool(
+            name=pool_name,
+            creator=user,
+            description=pool_description
+        )
+        pool.save()
+
+        # Send the pool as JSON
+        return HttpResponse(status=200, content_type='application/json', content=json.dumps(
+            {
+                'id': pool.pk,
+                'name': pool.name,
+                'description': pool.description
+            }
+        ))
 
 def new_pool(request):
     return render(request, 'booru/pools/new.html')
