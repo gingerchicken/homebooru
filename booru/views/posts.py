@@ -537,3 +537,6 @@ def pools(request):
         'pools': pools,
         'paginator': paginator
     })
+
+def new_pool(request):
+    return render(request, 'booru/pools/new.html')
