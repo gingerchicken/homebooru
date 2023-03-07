@@ -953,7 +953,7 @@ class PoolPostPoolTest(TestCase):
 
         # Send the request
         return self.client.post(
-            reverse('post_pool', kwargs={'pool_id': pool_id}),
+            reverse('pool', kwargs={'pool_id': pool_id}),
             {'post': post_id}
         )
 
@@ -1045,7 +1045,7 @@ class PoolPostPoolTest(TestCase):
         """Sends a request to remove a post from a pool"""
 
         return self.client.delete(
-            reverse('post_pool', kwargs={'pool_id': pool_id}) + '?post=' + str(post_id)
+            reverse('pool', kwargs={'pool_id': pool_id}) + '?post=' + str(post_id)
         )
     
     def test_remove(self):

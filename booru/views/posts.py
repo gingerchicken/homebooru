@@ -402,7 +402,7 @@ def post_comment(request, post_id):
         # Send a 201
         return HttpResponse(status=201)
 
-def post_pool(request, pool_id):
+def pool(request, pool_id):
     # Get the pool from the pool_id
     pool = None
     try:
@@ -591,4 +591,24 @@ def pools(request):
         ))
 
 def new_pool(request):
-    return render(request, 'booru/pools/new.html')
+    err = None
+    if request.method == 'POST':
+        resp = pools(request)
+
+        content = resp.content.decode('utf-8')
+
+        # If it was successful, redirect to the pool
+        if resp.status_code == 200:
+            # Get the JSON
+            content = json.loads(content)            
+
+            return HttpResponseRedirect(reverse('pool', kwargs={
+                'pool_id': content['id']
+            }))
+
+        # Get the error
+        err = content
+
+    return render(request, 'booru/pools/new.html', {
+        'error': err
+    })

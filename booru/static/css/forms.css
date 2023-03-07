@@ -31,3 +31,10 @@
 .center-form input {
     margin-bottom: 10px;
 }
+
+.form-error {
+    color: red;
+    font-weight: bold;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
