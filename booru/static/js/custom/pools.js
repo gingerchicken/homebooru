@@ -6,8 +6,8 @@ function validateCreateForm(form) {
         throw 'Pool name must be at least 3 characters long.';
     }
 
-    if (name.length > 64) {
-        throw 'Pool name must be at most 64 characters long.';
+    if (name.length > 255) {
+        throw 'Pool name must be at most 255 characters long.';
     }
 
     let description = data.get('description');
