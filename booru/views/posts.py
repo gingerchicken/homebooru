@@ -528,7 +528,7 @@ def pools(request):
             pool_results = Pool.search(search_phrase)
 
             # Limit the results
-            pool_results = pool_results[:homebooru.settings.BOORU_POSTS_PER_PAGE]
+            pool_results = pool_results[:homebooru.settings.BOORU_POOLS_PER_SEARCH_PAGE]
 
             # Convert the pools to JSON
             results = [{
