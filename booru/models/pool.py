@@ -33,6 +33,29 @@ class Pool(models.Model):
     
     def __str__(self):
         return self.name
+    
+    @staticmethod
+    def search(phrase : str()):
+        """Searches for all pools that include the phrase in their name or description"""
+
+        if phrase is None or phrase == "":
+            return Pool.objects.all().order_by('-created_at')
+        
+        # Try to convert the phrase to an integer
+        potential_pk = None
+        try:
+            potential_pk = int(phrase)
+        except ValueError:
+            potential_pk = -1
+
+        # Get the pools that include the phrase in their name or description or if the primary key is the phrase
+        pools = Pool.objects.filter(models.Q(name__icontains=phrase) | models.Q(description__icontains=phrase) | models.Q(pk=potential_pk))
+
+        # Order the pools by creation date
+        pools = pools.order_by('-created_at')
+
+        # Return the pools
+        return pools
 
 class PoolPost(models.Model):
     # Pool

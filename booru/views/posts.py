@@ -517,6 +517,31 @@ def pool(request, pool_id):
 
 def pools(request):
     if request.method == 'GET':
+        # Check for JSON parameter
+        # TODO make this better.
+        if 'json' in request.GET:
+            # Get the search phrase url parameter
+            search_phrase = request.GET.get('search', '').strip()
+            print(search_phrase)
+
+            # Search with the given search phrase
+            pool_results = Pool.search(search_phrase)
+
+            # Limit the results
+            pool_results = pool_results[:homebooru.settings.BOORU_POSTS_PER_PAGE]
+
+            # Convert the pools to JSON
+            results = [{
+                'id': pool.pk,
+                'name': pool.name,
+                'description': pool.description,
+                'total_posts': pool.posts.count(),
+                'creator': pool.creator.username
+            } for pool in pool_results]
+
+            # Send the results as JSON
+            return HttpResponse(status=200, content_type='application/json', content=json.dumps(results))
+
         # Get all the pools
         pools = Pool.objects.all()
 
