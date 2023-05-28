@@ -3,14 +3,14 @@
 
 {% block main %}
     <div class="padding15">
+        <div class="search-container">
+            <form action="" method="get">
+                <span class="search">
+                    <input name="search" type="text" id="search-input" class="form-control" value="{{ search_phrase }}" placeholder="Search for a pool...">
+                </span><span class="search-button"><input name="commit" class="secondary_search" type="submit" value="Search"></span>
+            </form>
+        </div>
         {% if pools|length > 0 %}
-            <div class="search-container">
-                <form action="" method="get">
-                    <span class="search">
-                        <input name="search" type="text" id="search-input" class="form-control" value="" placeholder="Search for a pool...">
-                    </span><span class="search-button"><input name="commit" class="secondary_search" type="submit" value="Search"></span>
-                </form>
-            </div>
             <h3>Pool Listing</h3>
             {% include "booru/pools/components/pool-table.html" %}
         {% else %}

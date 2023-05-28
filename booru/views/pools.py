@@ -149,8 +149,13 @@ def pools(request):
             # Send the results as JSON
             return HttpResponse(status=200, content_type='application/json', content=json.dumps(results))
 
+        # Get the search phrase url parameter
+        search_phrase = request.GET.get('search', '').strip()
+
+        # TODO is there any sanitization that needs to be done here?
+
         # Get all the pools
-        pools = Pool.objects.all()
+        pools = Pool.search(search_phrase)
 
         # Get the page number
         page = request.GET.get('page', 1)
@@ -168,7 +173,8 @@ def pools(request):
 
         return render(request, 'booru/pools/browse.html', {
             'pools': pools,
-            'paginator': paginator
+            'paginator': paginator,
+            'search_phrase': search_phrase
         })
     
     if request.method == 'POST':
