@@ -1,3 +1,197 @@
+class PoolOverlay extends OverlayMessage {
+    #selectedPoolId = null;
+    
+    constructor(elementId) {
+        super(elementId);
+    }
+
+    get icon() {
+        return 'ui-icon-help';
+    }
+
+    setSelectedPool(poolId) {
+        this.#selectedPoolId = poolId;
+    }
+
+    get selectedPool() {
+        return this.#selectedPoolId;
+    }
+
+    createPoolList(pools = []) {
+        // Create a table
+        let table = document.createElement('table');
+        table.classList.add('pool-table');
+
+        // Create the headers
+        let headers = document.createElement('tr');
+        // Name, Description, Creator
+        headers = ['Name', 'Description', 'Creator', 'Posts'].map(text => {
+            let th = document.createElement('th');
+            th.innerText = text;
+
+            return th;
+        });
+
+        // Add the headers to the table
+        for (let header of headers) {
+            table.appendChild(header);
+        }
+
+        // Add the pools to the table
+        for (let pool of pools) {
+            let row = document.createElement('tr');
+
+            // Add the name
+            let name = document.createElement('td');
+            // Create a link
+            let link = document.createElement('a');
+            link.href = `/pools/${pool.id}`;
+            // Make it open in a new tab
+            link.target = '_blank';
+            link.innerText = pool.name;
+            name.appendChild(link);
+            row.appendChild(name);
+
+            // Add the description
+            let description = document.createElement('td');
+            description.innerText = pool.description || 'No description';
+            row.appendChild(description);
+
+            // Add the creator
+            let creator = document.createElement('td');
+            creator.innerText = pool.creator;
+            row.appendChild(creator);
+
+            // Add the description
+            let totalPosts = document.createElement('td');
+            totalPosts.innerText = pool.total_posts;
+            row.appendChild(totalPosts);
+
+            // Add on click event
+            row.addEventListener('click', () => {
+                // Remove the selected class from all rows
+                for (let row of table.querySelectorAll('tr')) {
+                    row.classList.remove('selected');
+                }
+
+                if (pool.id === this.selectedPool) {
+                    this.setSelectedPool(null);
+                    return;
+                }
+
+                // Set the selected pool
+                this.setSelectedPool(pool.id);
+                row.classList.add('selected');
+            });
+
+            // Add the row to the table
+            table.appendChild(row);
+        }
+
+        return table;
+    }
+
+    async createTableFromSearch(phrase = '') {
+        let pools = [];
+
+        // Get the pools from the server
+        let response = await fetch(`/pools?search=${phrase}&json=true`);
+
+        // Get the response as json
+        let data = await response.json();
+
+        // Add the pools to the list
+        for (let pool of data) {
+            pools.push({
+                name: pool.name,
+                description: pool.description,
+                total_posts: pool.total_posts,
+                creator: pool.creator,
+                id: pool.id
+            });
+        }
+
+        // Remove the no pools message
+        let noPools = this.element.querySelector('.no-pools');
+        if (noPools) {
+            noPools.remove();
+        }
+
+        // Check if there are any pools
+        if (pools.length === 0) {
+            // Create a message
+            let message = document.createElement('p');
+            message.innerText = 'No pools found.';
+            message.classList.add('no-pools');
+
+            return message;
+        }
+
+        // Create the table
+        let table = this.createPoolList(pools);
+
+        return table;
+    }
+
+    async show() {
+        return new Promise(async (resolve, reject) => {
+            let addButton = new OverlayButton('Add', () => {
+                this.hide();
+
+                resolve(this.selectedPool);
+            });
+
+            let cancelButton = new OverlayButton('Cancel', () => {
+                this.hide();
+
+                reject('cancelled');
+            });
+
+            // Create the base message
+            super.show('Add the image to a given pool', 'Pooling', addButton, cancelButton);
+            const messageBox = this.element.querySelector('.message');
+
+            // Create the form
+            let form = document.createElement('form');
+            form.classList.add('pool-add-form');
+
+            // Create the search bar
+            let search = document.createElement('input');
+            search.type = 'text';
+            search.placeholder = 'Search for a pool ...';
+            search.classList.add('pool-search');
+            search.addEventListener('input', async () => {
+                // Remove the table
+                let table = messageBox.querySelector('.pool-table');
+                if (table) {
+                    table.remove();
+                    // Reset the selected pool
+                    this.setSelectedPool(null);
+                }
+
+                // Create the table
+                table = await this.createTableFromSearch(search.value);
+
+                // Add the table to the message box
+                form.appendChild(table);
+            });
+
+            // Add the search bar to the form
+            form.appendChild(search);
+
+            // Create the table
+            // TODO get this from the server
+            let table = await this.createTableFromSearch();
+
+            // Add the table to the message box
+            form.appendChild(table);
+
+            // Add the form to the message box
+            messageBox.appendChild(form);
+        });
+    }
+}
+
 class ViewPost {
     /**
      * Constructor for post viewer front-end
@@ -355,6 +549,66 @@ class ViewPost {
         // Reload the page
         location.reload();
         
+        return resp;
+    }
+
+    /**
+     * Add post to pool
+     * @returns {Promise<Response>} response
+     */
+    async pool() {
+        // Make sure that we are logged in
+        if (!this.#isAuthorised) {
+            // Show an error message
+            let error = new OverlayError();
+            error.show('You must be logged in to add a post to a pool.');
+
+            // This must be done as it will try and request something along the lines of /null/favourites
+            // which will cause an error ...
+
+            return;
+        }
+
+        // Show the pool overlay
+        let overlay = new PoolOverlay();
+        let selectedId;
+
+        try {
+            selectedId = await overlay.show();
+        } catch (e) {
+            // Handle cancelled
+            if (e === 'cancelled') return;
+
+            // Else throw the error
+            throw e;
+        }
+
+        // Handle no pool selected
+        if (!selectedId) {
+            // Show an error message
+            let error = new OverlayError();
+            error.show('You must select a pool to add the post to.');
+            
+            return;
+        }
+
+        let resp = await this.request('POST', `/pools/${selectedId}`, {
+            post: this.postId
+        });
+
+        if (resp.ok) {
+            // Show a success message
+            let message = new OverlaySuccess();
+            message.show('Successfully added this post to the pool.', 'Success');
+            return resp;
+        }
+
+        // Show an error if it was not accepted
+        let error = new OverlayError();
+        let msg = (await resp.text()).trim() || this.#getStringError(resp);
+
+        error.show(msg);
+
         return resp;
     }
 }

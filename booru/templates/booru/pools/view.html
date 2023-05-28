@@ -1,0 +1,39 @@
+{% extends "booru/pools/base/main.html" %}
+{% load static %}
+
+{% block page_name %}
+    {{pool.name}}
+{% endblock %}
+
+{% block navbar %}
+	{% include "booru/pools/components/nav-bar.html" %}
+    {% include "booru/pools/components/pool-nav-bar.html" %}
+{% endblock %}
+
+
+{% block main %}
+    <div class="padding15">
+        <div class="pool-header">
+            <h1>{{ pool.name }}</h1>
+            <p>{{ pool.description }}</p>
+            <p>Created by {% if pool.creator %} <a href="/accounts/profile/{{pool.creator.id}}">{{pool.creator}}</a> {% else %} {{pool.creator}} {% endif %} on {{pool.created_at}}</p>
+        </div>
+
+        <div class="pool-content">
+            {% if posts|length > 0 %}
+                <div id="thumbnails-container">
+                    {% for pool_post in posts %}
+                        {% with post=pool_post.post %}
+                            {% include "booru/posts/components/thumbnail.html" %}
+                        {% endwith %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <h1>Nobody here but us chickens!</h1>If you wish to see something in these sections, you might want to create something first!
+            {% endif %}
+        </div>
+        <div class="pool-save-changes" hidden>
+            <button class="button" onclick="saveChanges()">Save Changes</button>
+        </div>
+    </div>
+{% endblock %}
