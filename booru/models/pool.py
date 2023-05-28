@@ -49,7 +49,12 @@ class Pool(models.Model):
             potential_pk = -1
 
         # Get the pools that include the phrase in their name or description or if the primary key is the phrase
-        pools = Pool.objects.filter(models.Q(name__icontains=phrase) | models.Q(description__icontains=phrase) | models.Q(pk=potential_pk))
+        pools = Pool.objects.filter(
+            models.Q(name__icontains=phrase)
+            | models.Q(description__icontains=phrase)
+            | models.Q(pk=potential_pk)
+            | models.Q(creator__username__icontains=phrase)
+        )
 
         # Order the pools by creation date
         pools = pools.order_by('-created_at')
