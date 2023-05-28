@@ -76,7 +76,7 @@ if [ "$UNIT_TEST" = "True" ]; then
     fi
 
     # Run the unit tests
-    coverage run --omit=*/tests/*.py,*/migrations/*.py --source=$SRCS manage.py test --verbosity 2
+    coverage run --omit=*/tests/*,*/migrations/*.py --source=$SRCS manage.py test --verbosity 2
 
     # Save the exit code of the unit tests
     UNIT_TEST_EXIT_CODE=$?
