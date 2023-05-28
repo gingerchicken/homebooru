@@ -158,7 +158,7 @@ def pools(request):
         pools = Pool.search(search_phrase)
 
         # Get the page number
-        page = request.GET.get('page', 1)
+        page = request.GET.get('pid', 1)
 
         try:
             page = int(page)
@@ -170,6 +170,7 @@ def pools(request):
 
         # Paginate the pools
         pools, paginator = Paginator.paginate(pools, page, homebooru.settings.BOORU_POOLS_PER_PAGE)
+        paginator.page_url = reverse('pools') + '?search=' + search_phrase
 
         return render(request, 'booru/pools/browse.html', {
             'pools': pools,
