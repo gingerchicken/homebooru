@@ -115,6 +115,7 @@ class PoolSearchTest(TestCase):
 
         # Create a pool
         self.pool = Pool(name='Test Pool', creator=self.user)
+        self.pool.description = 'Bird pictures'
         self.pool.save()
 
         # Add a post
@@ -126,7 +127,8 @@ class PoolSearchTest(TestCase):
         pool_post2.save()
 
         # Create another pool
-        self.pool2 = Pool(name='Test Pool 2', creator=self.user)
+        self.pool2 = Pool(name='Test Pool 2', creator=self.user2)
+        self.pool2.description = 'Cat pictures'
         self.pool2.save()
 
         # Add a post
@@ -153,6 +155,88 @@ class PoolSearchTest(TestCase):
 
         # Search for the middle of the pool name
         pools = Pool.search('Pool')
+
+        # Check the results
+        self.assertEqual(pools.count(), 2)
+        self.assertEqual(pools.first(), self.pool2)
+        self.assertEqual(pools.last(), self.pool)
+    
+    def test_search_pool_description(self):
+        """Search for a pool by description"""
+
+        # Search for the pool (bird)
+        pools = Pool.search('bird')
+
+        # Check the results
+        self.assertEqual(pools.count(), 1)
+        self.assertEqual(pools.first(), self.pool)
+
+        # Search for the pool (cat)
+        pools = Pool.search('Cat')
+
+        # Check the results
+        self.assertEqual(pools.count(), 1)
+        self.assertEqual(pools.first(), self.pool2)
+
+        # Search for a shared part of the pool description
+        pools = Pool.search('pictures')
+
+        # Check the results
+        self.assertEqual(pools.count(), 2)
+        self.assertEqual(pools.first(), self.pool2)
+        self.assertEqual(pools.last(), self.pool)
+    
+    def test_search_pool_creator(self):
+        """Search for a pool by creator"""
+
+        # Search for the pool (billy)
+        pools = Pool.search('billy')
+
+        # Check the results
+        self.assertEqual(pools.count(), 1)
+        self.assertEqual(pools.last(), self.pool)
+
+        # Search for the pool (bobby)
+        pools = Pool.search('bobby')
+
+        # Check the results
+        self.assertEqual(pools.count(), 1)
+        self.assertEqual(pools.first(), self.pool2)
+
+        # Search for a shared part of the creator's username
+        pools = Pool.search('b')
+
+        # Check the results
+        self.assertEqual(pools.count(), 2)
+        self.assertEqual(pools.first(), self.pool2)
+        self.assertEqual(pools.last(), self.pool)
+
+    def test_search_pool_pk(self):
+        """Search for a pool by primary key"""
+
+        pools = [
+            self.pool, self.pool2
+        ]
+
+        for pool in pools:
+            # Search for the pool
+            pools = Pool.search(str(pool.pk))
+
+            # Check the results
+            self.assertEqual(pools.count(), 1)
+            self.assertEqual(pools.first(), pool)
+        
+        # Search for a non-existent pool
+        pools = Pool.search('-1')
+
+        # Check the results
+        self.assertEqual(pools.count(), 0)
+    
+    def test_search_pool_no_phrase(self):
+        """Search for a pool with no phrase"""
+
+        # Search for the pool
+        pools = Pool.search('')
 
         # Check the results
         self.assertEqual(pools.count(), 2)
