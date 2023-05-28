@@ -1,10 +1,12 @@
-from .models.posts import *
-from .models.tags import *
-from .models.profile import *
-from .models.comments import *
+from .selective import import_required, TestInstance
 
-from .site import *
+import_required([
+    TestInstance('posts', 'booru.tests.models.posts'),
+    TestInstance('tags', 'booru.tests.models.tags'),
+    TestInstance('profile', 'booru.tests.models.profile'),
+    TestInstance('comments', 'booru.tests.models.comments'),
+    TestInstance('pagination', 'booru.tests.pagination'),
+    TestInstance('boorutils', 'booru.tests.boorutils'),
 
-from .pagination import *
-
-from .boorutils import *
+    TestInstance('site', 'booru.tests.site')
+], globals(), locals())
