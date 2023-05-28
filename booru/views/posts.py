@@ -213,6 +213,7 @@ def upload(request):
 
         # Check if the file type is allowed
         if file_type not in homebooru.settings.BOORU_ALLOWED_FILE_EXTENSIONS:
+            print(file_type)
             return HttpResponse('File type not allowed', status=400)
 
         # Get the filename
@@ -379,7 +380,7 @@ def post_comment(request, post_id):
 
             is_anon = True
 
-        # Get the comment text
+        # Get the comment textposts,site_homepage
         comment_text = request.POST.get('comment', '')
 
         # Strip whitespace
@@ -402,6 +403,19 @@ def post_comment(request, post_id):
         # Send a 201
         return HttpResponse(status=201)
 
+def random(request):
+    # Check if the total number of posts is 0
+    if Post.objects.count() == 0:
+        # Redirect to the home page
+        return HttpResponseRedirect(reverse('index'))
+
+    # Get the random post
+    post = Post.objects.order_by('?').first()
+
+    # Redirect to the post
+    return HttpResponseRedirect(reverse('view', kwargs={'post_id': post.id}))
+
+ 
 def pool(request, pool_id):
     # Get the pool from the pool_id
     pool = None

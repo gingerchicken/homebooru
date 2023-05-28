@@ -30,6 +30,7 @@ services:
 
       # Unit Testing
       - UNIT_TEST
+      - DISABLED_TESTS
 
       # Booru
       - BOORU_STORAGE_PATH=/storage/
