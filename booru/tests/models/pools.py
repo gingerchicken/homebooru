@@ -242,3 +242,27 @@ class PoolSearchTest(TestCase):
         self.assertEqual(pools.count(), 2)
         self.assertEqual(pools.first(), self.pool2)
         self.assertEqual(pools.last(), self.pool)
+
+    def test_search_user_id(self):
+        """Returns pools for a given user ID"""
+
+        # Create a new pool and assign it to the user
+        self.pool3 = Pool(name='Test Pool 3', creator=self.user)
+        self.pool3.save()
+
+        user_id = self.user.pk
+
+        # Search for the pools
+        pools = Pool.search(str(user_id))
+
+        # Check the results
+        self.assertEqual(pools.count(), 2)
+        self.assertEqual(pools.first(), self.pool3)
+        self.assertEqual(pools.last(), self.pool)
+
+        # Search for the pools
+        pools = Pool.search(str(self.user2.pk))
+
+        # Check the results
+        self.assertEqual(pools.count(), 1)
+        self.assertEqual(pools.first(), self.pool2)

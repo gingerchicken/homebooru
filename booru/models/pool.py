@@ -54,6 +54,7 @@ class Pool(models.Model):
             | models.Q(description__icontains=phrase)
             | models.Q(pk=potential_pk)
             | models.Q(creator__username__icontains=phrase)
+            | models.Q(creator__pk=potential_pk) # TODO maybe make it such that you search for userid:123 ?
         )
 
         # Order the pools by creation date
