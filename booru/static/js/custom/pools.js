@@ -124,8 +124,9 @@ class DeleteMode {
     }
 
     static clickThumbnail(element) {
-        if (!DeleteMode.poolDeleteMode) return;
+        if (!DeleteMode.poolDeleteMode) return false;
         DeleteMode.handleThumbnailDeleteSelection(element);
+        return true;
 
     }
 
@@ -137,7 +138,7 @@ class DeleteMode {
 
         $('.thumbnail-preview').click(function (e) {
             try {
-                DeleteMode.clickThumbnail(this);
+                return !DeleteMode.clickThumbnail(this);
             } catch (e) {
                 let err = new OverlayError();
                 err.show(e);
