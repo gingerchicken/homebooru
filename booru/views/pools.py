@@ -23,7 +23,7 @@ def pool(request, pool_id):
 
         # TODO make this a function already...
         # Get the page number
-        page = request.GET.get('page', 1)
+        page = request.GET.get('pid', 1)
         
         try:
             page = int(page)
@@ -35,6 +35,10 @@ def pool(request, pool_id):
         
         # Paginate the posts
         posts, paginator = Paginator.paginate(posts, page, homebooru.settings.BOORU_POSTS_PER_PAGE)
+
+        paginator.page_url = reverse('pool', kwargs={
+            'pool_id': pool_id
+        }) + '?'
 
         return render(request, 'booru/pools/view.html', {
             'pool': pool,
