@@ -44,7 +44,10 @@ class DeleteMode {
     static poolDeleteMode = false;
     static selectedThumbnails = {};
 
-    static async handleChanges() {
+    /**
+     * Updates the save changes button.
+     */
+    static #handleSaveButtonChanges() {
         let selected = Object.keys(DeleteMode.selectedThumbnails);
         if (selected.length === 0 || !DeleteMode.poolDeleteMode) {
             $('.pool-save-changes').hide();
@@ -55,33 +58,74 @@ class DeleteMode {
         $('.pool-save-changes').show();
     }
 
-    static async handleDeleteChange() {
-        // Update the button text
-        $('.pool-delete').text(DeleteMode.poolDeleteMode ? 'Cancel Deletion' : 'Delete');
+    /**
+     * Updates the delete mode toggle button.
+     */
+    static #handleDeleteButtonChanges() {
+        const e = $('.pool-delete');
 
+        // Update the button text
+        e.text(DeleteMode.poolDeleteMode ? 'Cancel Deletion' : 'Delete');
+
+        // Add/Remove the mode-active class
         if (DeleteMode.poolDeleteMode) {
             // Add .mode-active
-            $('.pool-delete').addClass('mode-active');
+            e.addClass('mode-active');
         } else {
             // Remove .mode-active
-            $('.pool-delete').removeClass('mode-active');
+            e.removeClass('mode-active');
         }
+    }
+
+    /**
+     * Shows the message popup giving instructions on how to use the delete mode.
+     */
+    static #handleMessagePopup() {
+        if (!DeleteMode.poolDeleteMode) return;
+
+        let overlay = new OverlaySuccess();
+        overlay.reloadOnOkay = false;
+        overlay.show('Click on a post that you want to remove, once you have selected all that you need to remove, click on the save button.', 'Pool Delete Mode');
+    }
+
+    /**
+     * Updates the stored thumbnails as well as their classes.
+     */
+    static #handleStoredThumbnails() {
+        if (DeleteMode.poolDeleteMode) return;
+
+        // Remove all deletion-selected classes
+        $('.thumbnail-preview').removeClass('deletion-selected');
+
+        // Clear the selected thumbnails
+        DeleteMode.selectedThumbnails = {};
+    }
+
+    static handleDisplayPagination() {
+        const e = $('.pagination');
         
+        if (DeleteMode.poolDeleteMode) e.hide();
+        else e.show();
+    }
 
-        if (DeleteMode.poolDeleteMode) {
-            let overlay = new OverlaySuccess();
-            overlay.reloadOnOkay = false;
-            overlay.show('Click on a post that you want to remove, once you have selected all that you need to remove, click on the save button.', 'Pool Delete Mode');
-        } else {
-            // Remove all deletion-selected classes
-            $('.thumbnail-preview').removeClass('deletion-selected');
+    /**
+     * Updates all the changes that need to be made when the delete mode is toggled.
+     */
+    static async handleDeleteChange() {
+        // Update the display pagination
+        DeleteMode.handleDisplayPagination();
 
-            // Clear the selected thumbnails
-            DeleteMode.selectedThumbnails = {};
-        }
+        // Update the delete button
+        DeleteMode.#handleDeleteButtonChanges();
+
+        // Update the message popup
+        DeleteMode.#handleMessagePopup();
+
+        // Update the stored thumbnails
+        DeleteMode.#handleStoredThumbnails();
 
         // Update the save changes button
-        DeleteMode.handleChanges();
+        DeleteMode.#handleSaveButtonChanges();
     }
 
     static async handleThumbnailDeleteSelection(element) {
@@ -115,7 +159,7 @@ class DeleteMode {
         }
 
         // Update the save changes button
-        DeleteMode.handleChanges();
+        DeleteMode.#handleSaveButtonChanges();
     }
 
     static toggle() {
