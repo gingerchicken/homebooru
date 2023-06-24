@@ -33,8 +33,13 @@
             {% endif %}
         </div>
         <div class="pool-save-changes" hidden>
-            <button class="button" onclick="saveChanges()">Save Changes</button>
+            <button class="button">Save Changes</button>
         </div>
         {% include "booru/components/paginator.html" %}
     </div>
+
+    <script>
+        // This is a hack to get the csrf token into the javascript, I am sorry.
+        DeleteMode.csrfToken = "{{ csrf_token }}";
+    </script>
 {% endblock %}

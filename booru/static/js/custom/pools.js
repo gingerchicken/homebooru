@@ -39,6 +39,31 @@ async function createPool(payload) {
     }
 }
 
+function getPoolId() {
+    // Get the URL path
+    let path = window.location.pathname;
+
+    // It should be something like /pools/1
+    // Split the path by /
+    let split = path.split('/');
+    if (split.length !== 3) {
+        throw 'Invalid pool path.';
+    }
+
+    // Get the pool id
+    let poolId = split[2];
+
+    // Convert the pool id to an integer
+    poolId = parseInt(poolId);
+
+    // Check if the pool id is a number
+    if (isNaN(poolId)) {
+        throw 'Invalid pool id.';
+    }
+
+    return poolId;
+}
+
 // Encapsulates the delete mode.
 class DeleteMode {
     static poolDeleteMode = false;
@@ -174,6 +199,44 @@ class DeleteMode {
 
     }
 
+    static async saveChanges() {
+        // Get the pool id
+        let poolId = getPoolId();
+
+        // Get the selected thumbnails as a list of post ids
+        let selected = Object.keys(DeleteMode.selectedThumbnails).map(e => parseInt(e));
+
+        // Send the request
+        let response = await fetch(`/pools/${poolId}`, {
+            method: 'DELETE',
+            body: JSON.stringify({
+                posts: selected
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': DeleteMode.csrfToken
+            }
+        });
+
+        // Check if the response was successful
+        if (response.status !== 200) {
+            // Get the body's data as a string
+            let data = await response.text();
+
+            // Show the error as an overlay
+            let err = new OverlayError();
+            err.show(data);
+            return;
+        }
+
+        // Successfully deleted the posts
+        let overlay = new OverlaySuccess();
+        overlay.show('Successfully deleted the posts from the pool.');
+
+        // Disable delete mode
+        if (DeleteMode.poolDeleteMode) DeleteMode.toggle();
+    }
+
     static bind() {
         $('.pool-delete').click(function (e) {
             DeleteMode.toggle();
@@ -190,7 +253,14 @@ class DeleteMode {
 
             return false;
         });
+
+        $('.pool-save-changes').click(function (e) {
+            DeleteMode.saveChanges();
+            return true;
+        });
     }
+
+    static csrfToken = '';
 }
 
 $(document).ready(function () {
