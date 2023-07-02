@@ -1044,8 +1044,14 @@ class PoolPostPoolTest(TestCase):
     def send_remove_request(self, post_id, pool_id):
         """Sends a request to remove a post from a pool"""
 
+        body = {
+            'posts': [post_id]
+        }
+
         return self.client.delete(
-            reverse('pool', kwargs={'pool_id': pool_id}) + '?post=' + str(post_id)
+            reverse('pool', kwargs={'pool_id': pool_id}),
+            body,
+            content_type='application/json'
         )
     
     def test_remove(self):
