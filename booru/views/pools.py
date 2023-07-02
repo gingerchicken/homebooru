@@ -152,7 +152,7 @@ def pool(request, pool_id):
             # Check that the user has not already added the post to the pool
             if not pool_post.exists():
                 # Send a 404
-                return HttpResponse(status=404, content='The post (' + post + ') is not in the pool.')
+                return HttpResponse(status=404, content='The post (' + str(post) + ') is not in the pool.')
             
             # Delete the post pool
             pool_post.delete()
