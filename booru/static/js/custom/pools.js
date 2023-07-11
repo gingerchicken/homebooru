@@ -214,7 +214,7 @@ class DeleteMode {
             }),
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': DeleteMode.csrfToken
+                'X-CSRFToken': csrfToken
             }
         });
 
@@ -259,8 +259,269 @@ class DeleteMode {
             return true;
         });
     }
+}
 
-    static csrfToken = '';
+class ContentCreationTab {
+    #tabName;
+    #highlight;
+    #parent;
+
+    constructor(parent, tabName) {
+        this.#parent = parent;
+        this.#tabName = tabName;
+    }
+
+    get tabName() {
+        return this.#tabName;
+    }
+
+    get tabId() {
+        return this.#tabName.toLowerCase() + '-tab';
+    }
+
+    /**
+     * Sets the highlight state of the tab.
+     */
+    set highlight(value) {
+        if (value) {
+            // Add the highlight class
+            $(`.${this.tabId}`).addClass('selected');
+        } else {
+            // Remove the highlight class
+            $(`.${this.tabId}`).removeClass('selected');
+        }
+
+        this.#highlight = value;
+    }
+
+    /**
+     * Gets the highlight state of the tab.
+     * @returns {Boolean} True if the tab is highlighted, false otherwise.
+    */
+    get highlight() {
+        return this.#highlight;
+    }
+
+    createContainer() {
+        let div = document.createElement('div');
+        div.classList.add('tab-content');
+        div.classList.add(this.tabId);
+
+        return div;
+    }
+
+    createTab() {
+        let id = this.tabId;
+
+        let div = document.createElement('div');
+        div.classList.add('tab');
+        div.classList.add(id);
+
+        // Create the tab's content
+        let content = document.createElement('div');
+        content.classList.add('tab-content');
+        // Add the tab name to the content
+        content.innerText = this.tabName;
+
+        // Add the content to the tab
+        div.appendChild(content);
+
+        // Add the click event
+        div.addEventListener('click', () => {
+            this.#parent.selectTab(this.tabName);
+        });
+
+        return div;
+    }
+}
+
+class SingularContentCreationTab extends ContentCreationTab {
+    constructor(parent) {
+        super(parent, 'Singular');
+    }
+
+    createContainer() {
+        let div = super.createContainer();
+
+        // Create the input
+        let input = document.createElement('input');
+        input.classList.add('singular-input');
+        input.type = 'text';
+        input.placeholder = 'Post ID';
+
+        // Create a label
+        let label = document.createElement('label');
+        label.innerText = 'Post ID';
+
+        // Add the label to the container
+        div.appendChild(label);
+
+        // Add the input to the contain
+        div.appendChild(input);
+
+        return div;
+    }
+}
+
+class MultipleContentCreationTab extends ContentCreationTab {
+    constructor(parent) {
+        super(parent, 'Range');
+    }
+
+    createContainer() {
+        let div = super.createContainer();
+
+        // Create an input container in the form of a table
+        // Such that it looks like this:
+
+        // | From | To |
+        // |  1   | 2  |
+
+        let table = document.createElement('table');
+        table.classList.add('range-input-table');
+
+        // Create the from input
+        let fromInput = document.createElement('input');
+        fromInput.classList.add('from-input');
+        fromInput.type = 'text';
+        fromInput.placeholder = 'First ID to include';
+
+        // Create the to input
+        let toInput = document.createElement('input');
+        toInput.classList.add('to-input');
+        toInput.type = 'text';
+        toInput.placeholder = 'Final ID to include';
+
+        // Create the title row
+        let titleRow = document.createElement('tr');
+
+        // Create the from title
+        let fromTitle = document.createElement('th');
+        fromTitle.innerText = 'End';
+
+        // Create the to title
+        let toTitle = document.createElement('th');
+        toTitle.innerText = 'Start';
+
+        // Add the titles to the title row
+        titleRow.appendChild(fromTitle);
+        titleRow.appendChild(toTitle);
+
+        // Create the input row
+        let inputRow = document.createElement('tr');
+
+        // Create the td for the from input
+        let fromInputTd = document.createElement('td');
+
+        // Create the td for the to input
+        let toInputTd = document.createElement('td');
+
+        // Add the inputs to the input row
+        fromInputTd.appendChild(fromInput);
+        toInputTd.appendChild(toInput);
+
+        // Add the input row to the table
+        inputRow.appendChild(fromInputTd);
+        inputRow.appendChild(toInputTd);
+
+        // Add the title row to the table
+        table.appendChild(titleRow);
+
+        // Add the input row to the table
+        table.appendChild(inputRow);
+
+        // Add the table to the container
+        div.appendChild(table);
+
+        return div;
+    }
+}
+
+class PoolPostOverlay extends OverlayMessage {    
+    #tabs;
+
+    constructor(elementId) {
+        super(elementId);
+        
+        this.#tabs = [
+            new SingularContentCreationTab(this),
+            new MultipleContentCreationTab(this)
+        ];
+    }
+
+    get icon() {
+        return 'ui-icon-help';
+    }
+
+    #createTabs() {
+        // Create the tabs
+        let tabContainer = document.createElement('div');
+        tabContainer.classList.add('tabs');
+
+        for (let tab of this.#tabs) {
+            // Create the tab
+            let tabElement = tab.createTab(tab.tabName);
+
+            // Add the tab to the container
+            tabContainer.appendChild(tabElement);
+        }
+
+        // Add the tabs to the overlay
+        return tabContainer;
+    }
+
+    selectTab(tabName) {
+        for (let tab of this.#tabs) {
+            tab.highlight = tab.tabName === tabName;
+        }
+
+        // Destroy the current content
+        $(this.element).find('.message > .tab-content').remove();
+
+        // Create the new content
+        let content = this.#tabs.find(e => e.tabName === tabName).createContainer();
+
+        // Add the content to the overlay
+        $(this.element).find('.message').append(content);
+    }
+
+    show() {
+        let cancelButton = new OverlayButton('Cancel', () => {
+            this.hide();
+        });
+
+        let okButton = new OverlayButton('Okay', () => {
+            // Get the text.
+            let text = this.toString();
+
+            // Verify the text.
+            if (!this.verify(text)) {
+                // Show the error.
+
+                // Create an Okay button that re-shows this overlay.
+                let okayButton = new OverlayButton('Okay', () => {
+                    this.show();
+                });
+
+                let err = new OverlayError();
+                err.show('Invalid input, check that what you entered and try again.', 'Invalid Input', okayButton);
+                return;
+            }
+
+            // Hide the overlay.
+            this.hide();
+
+            // Add the post to the pool.
+            this.addPost(text);
+        });
+
+        super.show('', 'Add Content', okButton, cancelButton);
+
+        // Add the tabs
+        $(this.element).find('.message').append(this.#createTabs());
+
+        this.selectTab(this.#tabs[0].tabName);
+    }
 }
 
 $(document).ready(function () {
@@ -280,6 +541,11 @@ $(document).ready(function () {
             let err = new OverlayError();
             err.show(e);
         });
+    });
+
+    $('.pool-add-post').click(function (e) {
+        let overlay = new PoolPostOverlay();
+        overlay.show();
     });
 
     DeleteMode.bind();

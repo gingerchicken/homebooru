@@ -40,6 +40,6 @@
 
     <script>
         // This is a hack to get the csrf token into the javascript, I am sorry.
-        DeleteMode.csrfToken = "{{ csrf_token }}";
+        csrfToken = "{{ csrf_token }}";
     </script>
 {% endblock %}

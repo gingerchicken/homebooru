@@ -95,3 +95,52 @@ table.pool-table .key-data.publicity {
     font-weight: bold;
     color: red!important;
 }
+
+/* Adding content */
+.message-box > .message > .tabs {
+    display: flex;
+    margin-top: 5px;
+}
+
+.tabs > .tab {
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.tabs > .tab.selected {
+    background-color: #b8d8ff;
+}
+
+.message > .tab-content {
+    padding: 10px;
+    /* border: 1px solid #e0e0e0; */
+    margin-top: 5px;
+}
+
+.message > .tab-content > label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    margin-right: 10px;
+}
+
+/* Singular input */
+/* TODO make it span the entire div */
+
+/* Range input table */
+.range-input-table {
+    width: 100%;
+}
+
+.range-input-table tr {
+    vertical-align: middle;
+    text-align: center;
+}
+
+.range-input-table > tr th {
+    font-weight: bold!important;
+}
