@@ -56,23 +56,43 @@ def pool(request, pool_id):
     if not user.is_authenticated:
         return HttpResponse(status=403, content='You must be logged in to manage pools.')
 
-    def get_post(post_id=None):
-        """Gets the post from the request."""
+    def get_posts(post_ids=None, single=True):
+        """Gets a list of posts from the request."""
 
-        if post_id is None:
+        # Get the post ids from the request
+        if post_ids is None:
+            post_ids = request.POST.get('posts', None)
+
+        # Handle backwards compatibility for single posts
+        if post_ids is None and single:
             post_id = request.POST.get('post', None)
 
-        # Get the post from the post_id (if it exists)
-        post = None
-        try:
-            post = Post.objects.get(id=post_id)
-        except Post.DoesNotExist:
-            return False
-        except ValueError:
-            return False # Invalid post id
+            # If the post id is None, then return False since there is no post
+            if post_id is None:
+                return False
+
+            # Create a list of post ids with the single post id
+            post_ids = [post_id]
         
-        return post
-    
+        # Check that the body is not empty
+        if post_ids is None:
+            return False
+
+        posts = []
+        for post_id in post_ids:
+            # Get the post from the post_id (if it exists)
+            post = None
+            try:
+                post = Post.objects.get(id=post_id)
+            except Post.DoesNotExist:
+                return False
+            except ValueError:
+                return False
+            
+            posts.append(post)
+
+        return posts
+
     if request.method == 'POST':
         # Create a post pool
         # Check if the user can create post pools
@@ -81,22 +101,29 @@ def pool(request, pool_id):
             return HttpResponse(status=403, content='You do not have permission to add posts to pools.')
         
         # Get the post
-        post = get_post()
-        if not post:
+        posts = get_posts(single=True)
+        if not posts:
             # Send a 404
-            return HttpResponse(status=404, content='The post does not exist.')
+            return HttpResponse(status=404, content='One or more posts in the posts list do not exist.')
 
-        # Check that the user has not already added the post to the pool
-        if PoolPost.objects.filter(pool=pool, post=post).exists():
-            # Send a 409
-            return HttpResponse(status=409, content='The post is already in the pool.')
+        # Here's an edge case that I want to handle, if there is only one post and it is already in the list, then warn the user
+        if len(posts) == 1:
+            # Check that the user has not already added the post to the pool
+            if PoolPost.objects.filter(pool=pool, post=posts[0]).exists():
+                # Send a 409
+                return HttpResponse(status=409, content='The post is already in the pool.')
         
-        # Create a post pool
-        pool_post = PoolPost(
-            pool=pool,
-            post=post
-        )
-        pool_post.save()
+        for post in posts:
+            # Check if it already exists in the pool
+            if PoolPost.objects.filter(pool=pool, post=post).exists():
+                continue # Skip this post
+
+            # Create a post pool
+            pool_post = PoolPost(
+                pool=pool,
+                post=post
+            )
+            pool_post.save()
 
         # Send a 201
         return HttpResponse(status=201)
@@ -134,18 +161,7 @@ def pool(request, pool_id):
             return HttpResponse(status=400, content='The body cannot be empty.')
 
         # Create an array of posts
-        posts = []
-
-        # Get the posts from the post ids
-        for post_id in post_ids:
-            # Get the post from the post_id (if it exists)
-            post = get_post(post_id)
-            if not post:
-                # Send a 404
-                return HttpResponse(status=404, content='The post does not exist.')
-
-            # Add the post to the array
-            posts.append(post)
+        posts = get_posts(post_ids=post_ids, single=False)
 
         for post in posts:
             pool_post = PoolPost.objects.filter(pool=pool, post=post)
