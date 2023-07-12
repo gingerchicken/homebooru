@@ -333,6 +333,27 @@ class ContentCreationTab {
 
         return div;
     }
+
+    async performAdd() {
+        throw 'Not implemented.';
+    }
+
+    async addPosts(post) {
+        let poolId = getPoolId();
+
+        let formData = new FormData();
+        formData.append('post', post);
+
+        let resp = await fetch(`/pools/${poolId}`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrfToken
+            }
+        });
+
+        return resp;
+    }
 }
 
 class SingularContentCreationTab extends ContentCreationTab {
@@ -360,6 +381,39 @@ class SingularContentCreationTab extends ContentCreationTab {
         div.appendChild(input);
 
         return div;
+    }
+
+    async performAdd() {
+        // Get the input
+        let input = $('.singular-input');
+
+        console.log(input.val());
+
+        // Get the number
+        let postId = parseInt(input.val());
+
+        // Check if the number is valid
+        if (isNaN(postId)) {
+            throw 'Invalid post id, it must be a number greater than or equal to 0.';
+        }
+
+        // Ensure that it is greater than or equal to 0
+        if (postId < 0) {
+            throw 'The post id must be greater than or equal to 0.';
+        }
+
+        // Send the request
+        let resp = await this.addPosts([postId]);
+
+        // Check if the response was successful
+        if (resp.ok === false) {
+            // Get the body's data as a string
+            let data = await resp.text();
+            throw data;
+        }
+
+        // Successfully added the post
+        return true;
     }
 }
 
@@ -490,29 +544,30 @@ class PoolPostOverlay extends OverlayMessage {
             this.hide();
         });
 
-        let okButton = new OverlayButton('Okay', () => {
-            // Get the text.
-            let text = this.toString();
+        let okButton = new OverlayButton('Okay', async () => {
+            let tab = this.#tabs.find(e => e.highlight);
 
-            // Verify the text.
-            if (!this.verify(text)) {
-                // Show the error.
-
-                // Create an Okay button that re-shows this overlay.
-                let okayButton = new OverlayButton('Okay', () => {
-                    this.show();
-                });
-
+            if (tab === undefined) {
                 let err = new OverlayError();
-                err.show('Invalid input, check that what you entered and try again.', 'Invalid Input', okayButton);
+                err.show('Please select a tab.');
                 return;
             }
 
-            // Hide the overlay.
-            this.hide();
+            // Perform the add
+            try {
+                await tab.performAdd();
+            }
+            catch (e) {
+                let err = new OverlayError();
+                err.show(e);
+                
+                // TODO recover from error and re-populate the overlay
+                throw e;
+                return;
+            }
 
-            // Add the post to the pool.
-            this.addPost(text);
+            let overlay = new OverlaySuccess();
+            overlay.show('Successfully added the post(s) to the pool.');
         });
 
         super.show('', 'Add Content', okButton, cancelButton);
