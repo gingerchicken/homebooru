@@ -172,6 +172,11 @@ def pool(request, pool_id):
         # Create an array of posts
         posts = get_posts(post_ids=post_ids, single=False)
 
+        # Ensure that all the posts exist
+        if not posts:
+            # Send a 404
+            return HttpResponse(status=404, content='One or more posts in the posts list do not exist.')
+
         for post in posts:
             pool_post = PoolPost.objects.filter(pool=pool, post=post)
             # Check that the user has not already added the post to the pool
