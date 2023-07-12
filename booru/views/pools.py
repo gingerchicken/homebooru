@@ -63,6 +63,13 @@ def pool(request, pool_id):
         if post_ids is None:
             post_ids = request.POST.get('posts', None)
 
+            # Check if this is a string
+            if isinstance(post_ids, str):
+                # TODO here we are trusting that the string is something not massively long, of course this could be a problem
+
+                # Split the string into a list (sometimes formData can be funky)
+                post_ids = post_ids.split(',')
+
         # Handle backwards compatibility for single posts
         if post_ids is None and single:
             post_id = request.POST.get('post', None)
@@ -113,6 +120,8 @@ def pool(request, pool_id):
                 # Send a 409
                 return HttpResponse(status=409, content='The post is already in the pool.')
         
+        # TODO limit the amount of posts that can be added to a pool at once
+
         for post in posts:
             # Check if it already exists in the pool
             if PoolPost.objects.filter(pool=pool, post=post).exists():
