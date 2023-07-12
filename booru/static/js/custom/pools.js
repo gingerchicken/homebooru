@@ -338,17 +338,22 @@ class ContentCreationTab {
         throw 'Not implemented.';
     }
 
-    async addPosts(post) {
+    async addPosts(posts) {
         let poolId = getPoolId();
 
         let formData = new FormData();
-        formData.append('post', post);
+        formData.append('posts', posts);
 
         let resp = await fetch(`/pools/${poolId}`, {
             method: 'POST',
             body: formData,
             headers: {
                 'X-CSRFToken': csrfToken
+                // Don't fully understand why I cannot just send this as JSON and the backend just reads it
+                // as a list of integers, but it doesn't work. Let's just send it as form data. (perhaps I am being a gibbon!)
+                // >:(
+
+                // 'Content-Type': 'application/json'
             }
         });
 
