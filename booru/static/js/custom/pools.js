@@ -494,6 +494,57 @@ class MultipleContentCreationTab extends ContentCreationTab {
 
         return div;
     }
+
+    async performAdd() {
+        let fromInput = $('.from-input');
+        let toInput = $('.to-input');
+
+        // Get the numbers
+        let from = parseInt(fromInput.val());
+        let to = parseInt(toInput.val());
+
+        // Check that the numbers are valid
+        if (isNaN(from) || isNaN(to)) {
+            throw 'Invalid post ids, they must be numbers greater than or equal to 0.';
+        }
+
+        // Ensure that they are greater than or equal to 0
+        if (from < 0 || to < 0) {
+            throw 'The post ids must be greater than or equal to 0.';
+        }
+
+        // Ensure that from is less than to
+        if (from > to) {
+            throw 'The start post id must be less than the end post id.';
+        }
+
+        // Ensure that they are not equal
+        if (from === to) {
+            throw 'The start post id cannot be equal to the end post id, if you are trying to add a single post, use the singular tab.';
+        }
+
+        // Create the range
+        let range = [];
+        for (let i = from; i <= to; i++) {
+            range.push(i);
+        }
+
+        // Reverse the range
+        range.reverse();
+
+        // Send the request
+        let resp = await this.addPosts(range);
+
+        // Check if the response was successful
+        if (resp.ok === false) {
+            // Get the body's data as a string
+            let data = await resp.text();
+            throw data;
+        }
+
+        // Successfully added the posts
+        return true;
+    }
 }
 
 class PoolPostOverlay extends OverlayMessage {    
