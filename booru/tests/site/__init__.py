@@ -8,4 +8,5 @@ import_required([
     TestInstance('site_filters', 'booru.tests.site.filters'),
     TestInstance('site_posts', 'booru.tests.site.posts'),
     TestInstance('site_random', 'booru.tests.site.random'),
+    TestInstance('site_pools', 'booru.tests.site.pools'),
 ], globals(), locals())

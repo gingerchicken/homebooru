@@ -26,3 +26,10 @@ admin.site.register(Profile)
 # Comments
 from .models import Comment
 admin.site.register(Comment)
+
+# Pools
+from .models import Pool
+admin.site.register(Pool)
+
+from .models import PoolPost
+admin.site.register(PoolPost)

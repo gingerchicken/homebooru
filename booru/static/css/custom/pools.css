@@ -1,0 +1,146 @@
+/* Pool table */
+table.pool-table {
+    width: 100%;
+    color: #5a5a5a;
+}
+
+table.pool-table tr {
+    vertical-align: middle;
+    text-align: center;
+}
+
+table.pool-table tr td {
+    padding: 10px;
+    border: 1px solid #f0f0f0;
+    margin: 5px;
+}
+
+table.pool-table .icon {
+    width: 60px;
+}
+
+table.pool-table .pool-info {
+    text-align: left;
+    font-size: 11px;
+    width: 75%;
+}
+
+table.pool-table .pool-info .meta {
+    font-size: 10px;
+    color: #878686;
+}
+
+table.pool-table .key-data {
+    font-weight: bold;
+    min-width: 50px;
+}
+
+table.pool-table .key-data.total-images {
+    font-size: 14px;
+    min-width: 100px;
+}
+
+table.pool-table .key-data.publicity {
+    font-size: 18px;
+}
+
+/* Content view */
+.pool-content {
+    padding: 15px;
+
+    /* Add a line on top */
+    border-top: 1px solid #f0f0f0;
+}
+
+.pool-header * {
+    margin: 0;
+}
+
+.pool-header {
+    margin-bottom: 10px;
+}
+
+.pool-header h1 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.pool-save-changes {
+    /* Overlay at the bottom of the screen in the center */
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    width: 175px;
+    height: 50px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    text-align: center;
+    position: fixed;
+    margin-bottom: 25px;
+}
+
+.pool-save-changes button {
+    width: 100%;
+    height: 100%;
+}
+
+.deletion-selected {
+    border-color: red;
+}
+
+/* Nav bar text when a given mode is active */
+.mode-active {
+    font-weight: bold;
+    color: red!important;
+}
+
+/* Adding content */
+.message-box > .message > .tabs {
+    display: flex;
+    margin-top: 5px;
+}
+
+.tabs > .tab {
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.tabs > .tab.selected {
+    background-color: #b8d8ff;
+}
+
+.message > .tab-content {
+    padding: 10px;
+    /* border: 1px solid #e0e0e0; */
+    margin-top: 5px;
+}
+
+.message > .tab-content > label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    margin-right: 10px;
+}
+
+/* Singular input */
+/* TODO make it span the entire div */
+
+/* Range input table */
+.range-input-table {
+    width: 100%;
+}
+
+.range-input-table tr {
+    vertical-align: middle;
+    text-align: center;
+}
+
+.range-input-table > tr th {
+    font-weight: bold!important;
+}

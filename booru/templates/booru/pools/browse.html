@@ -1,0 +1,18 @@
+{% extends "booru/pools/base/main.html" %}
+{% load static %}
+
+{% block main %}
+    <div class="padding15">
+        {% with "Search for a pool..." as search_placeholder and "search" as url_param %}
+            {% include "booru/components/search-bar.html" %}
+        {% endwith %}
+        {% if pools|length > 0 %}
+            <h3>Pool Listing</h3>
+            {% include "booru/pools/components/pool-table.html" %}
+        {% else %}
+            <h1>Nobody here but us chickens!</h1>If you wish to see something in these sections, you might want to create something first!
+        {% endif %}
+
+        {% include "booru/components/paginator.html" %}
+    </div>
+{% endblock %}

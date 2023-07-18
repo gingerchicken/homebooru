@@ -14,6 +14,11 @@ urlpatterns = [
     path('post/<int:post_id>/comments', views.post_comment, name='post_comment'),
     path('random', views.random, name='random'),
 
+    # Pools
+    path('pools', views.pools, name='pools'),
+    path('pools/<int:pool_id>', views.pool, name='pool'),
+    path('pool', views.new_pool, name='new_pool'),
+
     # Tags
     path('tags', views.tags, name='tags'),
     path('tags/edit', views.edit_tag, name='edit_tag'),

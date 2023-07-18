@@ -329,3 +329,49 @@
     padding-left: 10px;
     padding-right: 10px;
 }
+
+/* Pool selection form */
+.pool-add-form > .pool-select {
+    width: 100%;
+}
+table.pool-table {
+    width: 100%;
+    color: #5a5a5a;
+    margin-top: 15px;
+}
+
+table.pool-table tr {
+    vertical-align: middle;
+    text-align: left;
+    cursor: pointer;
+}
+
+table.pool-table tr.selected {
+    background-color: #b8d8ff!important;
+}
+
+table.pool-table tr:hover {
+    background-color: #e6f0ff;
+}
+
+table.pool-table tr td {
+    padding: 10px;
+    border: 1px solid #f0f0f0;
+    margin: 5px;
+}
+
+table.pool-table th {
+    padding: 5px!important;
+    border: 1px solid #f0f0f0;
+    margin: 5px;
+    background-color: #0773fb;
+    color: white;
+    font-weight: bold!important;
+}
+
+/* Search bar */
+.pool-search {
+    width: 100%;
+    margin-top: 15px;
+    padding: 5px;
+}

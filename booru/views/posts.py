@@ -2,7 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import render
 
-from booru.models import Post, Rating, PostFlag, Tag, Comment
+from booru.models import Post, Rating, PostFlag, Tag, Comment, Pool, PoolPost
 from booru.pagination import Paginator
 
 from .filters import *
@@ -380,7 +380,7 @@ def post_comment(request, post_id):
 
             is_anon = True
 
-        # Get the comment text
+        # Get the comment textposts,site_homepage
         comment_text = request.POST.get('comment', '')
 
         # Strip whitespace

@@ -174,6 +174,8 @@ class OverlaySuccess extends OverlayMessage {
         super(elementId);
     }
 
+    reloadOnOkay = true;
+
     get icon() {
         return 'ui-icon-check'
     }
@@ -181,7 +183,8 @@ class OverlaySuccess extends OverlayMessage {
     show(message, title = 'Success', ...args) {
         let successButton = new OverlayButton('Okay', () => {
             // Refresh the page.
-            window.location.reload();
+            if (this.reloadOnOkay) window.location.reload();
+            else this.hide();
         });
 
         super.show(message, title, successButton, ...args);

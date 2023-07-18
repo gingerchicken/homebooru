@@ -1,0 +1,40 @@
+:root {
+    --form-width: 50%;
+    --form-margin: calc((100% - var(--form-width)) / 2);
+}
+
+.center-form-header {
+    font-weight: bolder;
+    font-size: large;
+    margin-bottom: 10px;
+}
+
+.center-form {
+    /* Center */
+    margin-left: var(--form-margin);
+    margin-right: var(--form-margin);
+    width: var(--form-width);
+
+    /* Top margin */
+    margin-top: 15px;
+    margin-bottom: 15px;
+
+    /* Overall padding */
+    padding: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+
+    /* Border */
+    border: 1px solid #e0e0e0;
+}
+
+.center-form input {
+    margin-bottom: 10px;
+}
+
+.form-error {
+    color: red;
+    font-weight: bold;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
