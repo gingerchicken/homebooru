@@ -5,6 +5,8 @@ from django.shortcuts import render
 from booru.models import Post, Pool, PoolPost
 from booru.pagination import Paginator
 
+from booru.tasks import create_pool_posts
+
 import json
 
 import homebooru.settings
@@ -122,17 +124,13 @@ def pool(request, pool_id):
         
         # TODO limit the amount of posts that can be added to a pool at once
 
-        for post in posts:
-            # Check if it already exists in the pool
-            if PoolPost.objects.filter(pool=pool, post=post).exists():
-                continue # Skip this post
-
-            # Create a post pool
-            pool_post = PoolPost(
-                pool=pool,
-                post=post
-            )
-            pool_post.save()
+        # Create all the post pools
+        # Get the pool id for the task
+        pool_id = pool.pk
+        # Get the post ids for the task
+        posts_ids = [post.pk for post in posts]
+        # Send the task
+        create_pool_posts.delay(pool_id, posts_ids)
 
         # Send a 201
         return HttpResponse(status=201)
