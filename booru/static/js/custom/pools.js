@@ -456,11 +456,11 @@ class MultipleContentCreationTab extends ContentCreationTab {
 
         // Create the from title
         let fromTitle = document.createElement('th');
-        fromTitle.innerText = 'End';
+        fromTitle.innerText = 'Start';
 
         // Create the to title
         let toTitle = document.createElement('th');
-        toTitle.innerText = 'Start';
+        toTitle.innerText = 'End';
 
         // Add the titles to the title row
         titleRow.appendChild(fromTitle);
