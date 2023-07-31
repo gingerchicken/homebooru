@@ -8,6 +8,7 @@ import_required([
     TestInstance('pagination', 'booru.tests.pagination'),
     TestInstance('boorutils', 'booru.tests.boorutils'),
     TestInstance('pools', 'booru.tests.models.pools'),
+    TestInstance('automation', 'booru.tests.automation'),
 
     TestInstance('site', 'booru.tests.site')
 ], globals(), locals())

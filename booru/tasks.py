@@ -6,6 +6,9 @@ logger = logging.getLogger(__name__)
 
 from booru.models import Post, Pool, PoolPost
 
+# TODO you might want to make a file for each different category of tasks
+
+# Pool tasks
 @shared_task
 def create_pool_posts(pool_id : int, posts_ids : list):
     """Creates the pool posts for the given pool and posts"""
@@ -56,3 +59,30 @@ def create_pool_posts_range(pool_id : int, start_id : int, end_id : int):
 
     # Bulk create
     PoolPost.objects.bulk_create(pool_posts)
+
+# Automation tasks
+from booru.automation.tag_automation import TagAutomationRegistry
+
+@shared_task
+def perform_automation(post_id : int, force_perform = False):
+    """Performs all automation on a post."""
+
+    # Get the post
+    post = Post.objects.get(id=post_id)
+
+    # Get the registry
+    registry = TagAutomationRegistry()
+
+    # Perform the automation
+    registry.perform_automation(post=post, force_perform=force_perform)
+
+@shared_task
+def perform_all_automation(force_perform = False):
+    """Performs all automation on all posts."""
+
+    # Get all the posts
+    posts = Post.objects.all()
+
+    # Perform automation on each post as a subtask
+    for post in posts:
+        perform_automation.delay(post.id, force_perform=force_perform)
