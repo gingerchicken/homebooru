@@ -5,7 +5,7 @@ from django.shortcuts import render
 from booru.models import Post, Pool, PoolPost
 from booru.pagination import Paginator
 
-from booru.tasks import create_pool_posts
+from booru.tasks import create_pool_posts, create_pool_posts_range
 
 import json
 
@@ -58,6 +58,34 @@ def pool(request, pool_id):
     if not user.is_authenticated:
         return HttpResponse(status=403, content='You must be logged in to manage pools.')
 
+    def get_range():
+        """Gets the range from the request."""
+
+        start_id = request.POST.get('startId', None)
+        end_id = request.POST.get('endId', None)
+
+        # Check that the start and end are not None
+        if start_id is None or end_id is None:
+            return None
+        
+        # Convert the start and end to integers
+        try:
+            start_id = int(start_id)
+            end_id = int(end_id)
+        except ValueError:
+            return None
+        
+        # Check that the start and end are not negative
+        if start_id < 0 or end_id < 0:
+            return None
+        
+        # Check that the start is less than the end
+        if start_id > end_id:
+            return None
+        
+        # Return the start and end
+        return (start_id, end_id)
+
     def get_posts(post_ids=None, single=True):
         """Gets a list of posts from the request."""
 
@@ -109,6 +137,22 @@ def pool(request, pool_id):
             # Send a 403
             return HttpResponse(status=403, content='You do not have permission to add posts to pools.')
         
+        # Handle range case
+        id_range = get_range()
+        if id_range is not None:
+            # TODO this is a bit "retrofity" perhaps consider not just branching off like this
+
+            start_id, end_id = id_range
+
+            # TODO Ensure that the range is not too big
+
+            # Add the range to the pool
+            pool_id = pool.pk
+            create_pool_posts_range.delay(pool_id, start_id, end_id)
+
+            # Send a 201
+            return HttpResponse(status=201)
+
         # Get the post
         posts = get_posts(single=True)
         if not posts:
