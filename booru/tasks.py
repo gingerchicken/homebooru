@@ -4,6 +4,31 @@ from celery import shared_task
 import logging
 logger = logging.getLogger(__name__)
 
+from functools import wraps
+
+# Nicked from https://stackoverflow.com/a/35197449/8736749
+
+def skip_if_running(f):
+    task_name = f'{f.__module__}.{f.__name__}'
+
+    @wraps(f)
+    def wrapped(self, *args, **kwargs):
+        workers = self.app.control.inspect().active()
+
+        for worker, tasks in workers.items():
+            for task in tasks:
+                if (task_name == task['name'] and
+                        tuple(args) == tuple(task['args']) and
+                        kwargs == task['kwargs'] and
+                        self.request.id != task['id']):
+                    print(f'task {task_name} ({args}, {kwargs}) is running on {worker}, skipping')
+
+                    return None
+
+        return f(self, *args, **kwargs)
+
+    return wrapped
+
 from booru.models import Post, Pool, PoolPost
 
 # TODO you might want to make a file for each different category of tasks
@@ -77,6 +102,7 @@ def perform_automation(post_id : int, force_perform = False):
     registry.perform_automation(post=post, force_perform=force_perform)
 
 @shared_task
+@skip_if_running
 def perform_all_automation(force_perform = False):
     """Performs all automation on all posts."""
 
