@@ -264,3 +264,10 @@ if DIRECTORY_SCAN_ENABLED:
             'task': 'scanner.tasks.register_all_watchdogs',
             'schedule': 30, # Every 30 seconds
         }
+
+
+# Automation
+CELERY_BEAT_SCHEDULE['tag_all_images'] = {
+    'task': 'booru.tasks.perform_all_automation',
+    'schedule': 60 * 5, # Every 5 minutes
+}
