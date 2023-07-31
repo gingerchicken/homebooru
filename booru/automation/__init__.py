@@ -6,6 +6,7 @@ def perform_setup():
 
     # Register the automations
     TagAutomationRegistry().register(AnimatedContentTagAutomation())
+    TagAutomationRegistry().register(LargeFileSizeTagAutomation())
 
     # Print the state
     TagAutomationRegistry().print_state()
