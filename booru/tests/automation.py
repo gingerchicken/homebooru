@@ -2,7 +2,7 @@ from django.test import TestCase
 from booru.models.posts import Post
 import booru.tests.testutils as testutils
 
-from booru.automation.tag_automation import TagAutomationRegistry, AnimatedContentTagAutomation
+from booru.automation import TagAutomationRegistry, AnimatedContentTagAutomation
 from booru.models.automation import TagAutomationRecord
 from booru.models.tags import Tag
 
