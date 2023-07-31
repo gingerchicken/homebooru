@@ -11,7 +11,7 @@ __SHOW_LOG = True if homebooru.settings.BOORU_SHOW_FFMPEG_OUTPUT else None
 
 def hash_str(s):
     """Hashes a string using the md5 algorithm"""
-    return hashlib.md5(s.encode('utf-8')).hexdigest()
+    return hashlib.md5(str(s).encode('utf-8')).hexdigest()
 
 def get_file_checksum(path : str) -> str:
     """Gets the checksum of a file"""
