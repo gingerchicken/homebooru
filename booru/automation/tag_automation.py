@@ -144,6 +144,11 @@ class TagAutomationRegistry:
 
         # Try to save it but return false if it already exists
         try:
+            # Check if the record already exists
+            if TagAutomationRecord.objects.filter(post=post).exists():
+                raise Exception("Record already exists.")
+
+            # Save the record
             record.save()
         except Exception as e:
             # Check if we should force perform

@@ -52,5 +52,3 @@ class LargeFileSizeTagAutomation(TagAutomation):
         
         # Create a list of tags
         return [Tag.create_or_get("large_filesize")]
-
-        
