@@ -85,4 +85,5 @@ def perform_all_automation(force_perform = False):
 
     # Perform automation on each post as a subtask
     for post in posts:
-        perform_automation.delay(post.id, force_perform=force_perform)
+        # perform_automation.delay(post.id, force_perform=force_perform)
+        perform_automation(post.id, force_perform=force_perform) # Do it without a delay to prevent spamming requests
