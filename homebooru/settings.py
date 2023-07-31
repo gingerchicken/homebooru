@@ -269,5 +269,5 @@ if DIRECTORY_SCAN_ENABLED:
 # Automation
 CELERY_BEAT_SCHEDULE['tag_all_images'] = {
     'task': 'booru.tasks.perform_all_automation',
-    'schedule': 30, # Every 30 seconds
+    'schedule': 60 * 5, # Every 5 minutes
 }
