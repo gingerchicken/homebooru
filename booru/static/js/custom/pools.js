@@ -359,6 +359,24 @@ class ContentCreationTab {
 
         return resp;
     }
+
+    async addRange(from, to) {
+        let poolId = getPoolId();
+
+        let formData = new FormData();
+        formData.append('startId', from);
+        formData.append('endId', to);
+
+        let resp = await fetch(`/pools/${poolId}`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrfToken
+            }
+        });
+
+        return resp;
+    }
 }
 
 class SingularContentCreationTab extends ContentCreationTab {
@@ -523,17 +541,8 @@ class MultipleContentCreationTab extends ContentCreationTab {
             throw 'The start post id cannot be equal to the end post id, if you are trying to add a single post, use the singular tab.';
         }
 
-        // Create the range
-        let range = [];
-        for (let i = from; i <= to; i++) {
-            range.push(i);
-        }
-
-        // Reverse the range
-        range.reverse();
-
         // Send the request
-        let resp = await this.addPosts(range);
+        let resp = await this.addRange(from, to);
 
         // Check if the response was successful
         if (resp.ok === false) {
