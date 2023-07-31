@@ -101,9 +101,9 @@ def perform_automation(post_id : int, force_perform = False):
     # Perform the automation
     registry.perform_automation(post=post, force_perform=force_perform)
 
-@shared_task
+@shared_task(bind=True)
 @skip_if_running
-def perform_all_automation(force_perform = False):
+def perform_all_automation(self, force_perform = False):
     """Performs all automation on all posts."""
 
     # Get all the posts
