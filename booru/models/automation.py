@@ -26,10 +26,10 @@ class TagSimilarity(models.Model):
     tag_y = models.CharField(max_length=255)
 
     # The probability of x given y
-    prob_x_given_y = models.FloatField()
+    prob_x_impl_y = models.FloatField()
 
     # The probability of y given x
-    prob_y_given_x = models.FloatField()
+    prob_y_impl_x = models.FloatField()
 
     # The number of times x and y have been seen together
     occurrence = models.IntegerField()
@@ -46,12 +46,12 @@ class TagSimilarity(models.Model):
         # If manual is set to True, then the probabilities should be 1 or 0
         # Round them to the nearest integer
         if self.manual:
-            self.prob_x_given_y = round(self.prob_x_given_y)
-            self.prob_y_given_x = round(self.prob_y_given_x)
+            self.prob_x_impl_y = round(self.prob_x_impl_y)
+            self.prob_y_impl_x = round(self.prob_y_impl_x)
 
         # The probabilities should be between 0 and 1
-        self.prob_x_given_y = max(0, min(1, self.prob_x_given_y))
-        self.prob_y_given_x = max(0, min(1, self.prob_y_given_x))
+        self.prob_x_impl_y = max(0, min(1, self.prob_x_impl_y))
+        self.prob_y_impl_x = max(0, min(1, self.prob_y_impl_x))
 
         # Call the parent save method
         super().save(*args, **kwargs)
@@ -64,4 +64,4 @@ class TagSimilarity(models.Model):
         verbose_name_plural = "Tag Similarities"
     
     def __str__(self):
-        return f"{self.tag_x} -> {self.tag_y} ({self.prob_x_given_y}) | {self.tag_y} -> {self.tag_x} ({self.prob_y_given_x})"
+        return f"{self.tag_x} -> {self.tag_y} ({self.prob_x_impl_y}) | {self.tag_y} -> {self.tag_x} ({self.prob_y_impl_x})"
