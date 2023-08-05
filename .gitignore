@@ -141,6 +141,7 @@ GitHub.sublime-settings
 data/db
 */migrations/*.py
 /secret.txt
+booru/fixtures/tagsimilarities.json
 
 # Tests
 assets/TEST_DATA
