@@ -64,7 +64,7 @@ class TagSimilarity(models.Model):
         unique_together = ('tag_x', 'tag_y')
 
         # The plural name is "Tag Similarities"
-        verbose_name_plural = "Tag Similarities"
+        verbose_name_plural = "Tag similarities"
     
     def __str__(self):
         return f"{self.tag_x} -> {self.tag_y} ({self.prob_x_impl_y}) | {self.tag_y} -> {self.tag_x} ({self.prob_y_impl_x})"
