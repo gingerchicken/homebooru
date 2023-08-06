@@ -19,7 +19,10 @@ def perform_setup():
     # Register the automations
     TagAutomationRegistry().register(AnimatedContentTagAutomation())
     TagAutomationRegistry().register(LargeFileSizeTagAutomation())
+    
     TagAutomationRegistry().register(TagmeTagAutomation(order_override=1))
+
+    TagAutomationRegistry().register(ProbableTagDependenceAutomation(order_override=1024))
 
     # Print the state
     import homebooru.settings
