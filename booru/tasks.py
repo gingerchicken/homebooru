@@ -99,7 +99,7 @@ def perform_automation(post_id : int, force_perform = False):
     registry = TagAutomationRegistry()
 
     # Perform the automation
-    registry.perform_automation(post=post, force_perform=force_perform)
+    return registry.perform_automation(post=post, force_perform=force_perform)
 
 @shared_task(bind=True)
 @skip_if_running
