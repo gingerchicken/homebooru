@@ -147,9 +147,7 @@ class TagAutomationRegistry:
             # Check if the record already exists
             if TagAutomationRecord.objects.filter(post=post).exists():
                 raise Exception("Record already exists.")
-
-            # Save the record
-            record.save()
+            
         except Exception as e:
             # Check if we should force perform
             if not force_perform:
@@ -160,9 +158,6 @@ class TagAutomationRegistry:
 
             # Delete the record
             existing_record.delete()
-
-            # Save the new record
-            record.save()
 
         # Get the automations
         automations = self.get_automations_sorted()
@@ -176,6 +171,14 @@ class TagAutomationRegistry:
             if automation.update_post(post):
                 # If the post was updated, set the updated flag
                 updated = True
+
+        try:
+            # Save the record
+            record.save()
+        except Exception as e:
+            # Show a warning
+            print(f"Warning: Failed to save record for post {post}.")
+            print(e)
 
         # Return whether or not the post was updated
         return updated
