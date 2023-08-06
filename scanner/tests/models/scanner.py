@@ -31,6 +31,10 @@ class BoorusTest(TestCase):
     def test_expected_boorus(self):
         """Returns expected boorus"""
 
+        if not scanner_testutils.SHOULD_TEST_EXT_BOORU:
+            self.skipTest('Skipping external booru tests')
+            return
+
         # Add a booru to the scanner
         self.scanner.boorus.add(self.boorus[0])
         self.scanner.save()
@@ -180,6 +184,10 @@ class ScannerCreatePostTest(TestCase):
         # Create a scanner
         self.scanner = Scanner(name='test_scanner', path=booru_testutils.CONTENT_PATH)
         self.scanner.save()
+
+        if not scanner_testutils.SHOULD_TEST_EXT_BOORU:
+            self.skipTest('Skipping external booru tests')
+            return
 
         # Get some booru urls
         self.booru_urls = [i for i in scanner_testutils.VALID_BOORUS]
@@ -398,6 +406,10 @@ class ScannerShouldSearchTest(TestCase):
         self.scanner = Scanner(name='test_scanner', path=booru_testutils.CONTENT_PATH)
         self.scanner.save()
 
+        if not scanner_testutils.SHOULD_TEST_EXT_BOORU:
+            self.skipTest('Skipping external booru tests')
+            return
+
         # Create a booru
         self.booru = Booru(url=scanner_testutils.VALID_BOORUS[0], name='imagebooru')
         self.booru.save()
@@ -498,6 +510,10 @@ class ScannerSearchFileTest(TestCase):
     def setUp(self):
         self.scanner = Scanner(name='test_scanner', path=booru_testutils.CONTENT_PATH)
         self.scanner.save()
+
+        if not scanner_testutils.SHOULD_TEST_EXT_BOORU:
+            self.skipTest('Skipping external booru tests')
+            return
 
         # Create a booru
         self.booru = Booru(url=scanner_testutils.VALID_BOORUS[0], name='imagebooru')
@@ -742,6 +758,10 @@ class ScannerScanTest(TestCase):
             name='Test Scanner'
         )
         self.scanner.save()
+
+        if not scanner_testutils.SHOULD_TEST_EXT_BOORU:
+            self.skipTest('Skipping external booru tests')
+            return
 
         # Create a booru
         self.booru = Booru(

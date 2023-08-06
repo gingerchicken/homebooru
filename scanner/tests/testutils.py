@@ -7,6 +7,8 @@ import shutil
 import booru.boorutils as boorutils
 import booru.tests.testutils as booru_testutils
 
+# Check if we should test the external boorus
+SHOULD_TEST_EXT_BOORU = os.environ.get('SHOULD_TEST_EXT_BOORU', 'True') == 'True'
 
 # Booru image
 BOORU_MD5 = boorutils.get_file_checksum(booru_testutils.BOORU_IMAGE)

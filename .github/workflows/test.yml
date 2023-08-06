@@ -11,6 +11,7 @@ jobs:
       - name: "Build docker-compose stack"
         run: |
           cd .debug
+          echo "SHOULD_TEST_EXT_BOORU=False" >> .env
           docker-compose up -d --build
       - name: "Attach to test container"
         run: docker container attach debug_web_1

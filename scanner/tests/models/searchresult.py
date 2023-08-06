@@ -11,6 +11,10 @@ class ResultStaleTest(TestCase):
     stale_date = datetime(2020, 2, 1)
 
     def setUp(self):
+        if not scanner_testutils.SHOULD_TEST_EXT_BOORU:
+            self.skipTest('Skipping external booru tests')
+            return
+
         # Create a booru
         self.booru = Booru(url=scanner_testutils.VALID_BOORUS[0], name='imagebooru')
         self.booru.save()
@@ -41,6 +45,10 @@ class ResultPruneTest(TestCase):
     stale_date = datetime(2020, 2, 1)
 
     def setUp(self):
+        if not scanner_testutils.SHOULD_TEST_EXT_BOORU:
+            self.skipTest('Skipping external booru tests')
+            return
+
         # Create a new booru
         self.booru = Booru.objects.create(
             name='imageboard',
@@ -78,6 +86,10 @@ class ResultPruneTest(TestCase):
 
 class ResultStrTest(TestCase):
     def setUp(self):
+        if not scanner_testutils.SHOULD_TEST_EXT_BOORU:
+            self.skipTest('Skipping external booru tests')
+            return
+
         self.booru = Booru(url=scanner_testutils.VALID_BOORUS[0], name='imagebooru')
         self.booru.save()
 
@@ -106,6 +118,10 @@ class ResultRatingTest(TestCase):
         ]
 
     def setUp(self):
+        if not scanner_testutils.SHOULD_TEST_EXT_BOORU:
+            self.skipTest('Skipping external booru tests')
+            return
+
         self.booru = Booru(url=scanner_testutils.VALID_BOORUS[0], name='imagebooru')
         self.booru.save()
     
@@ -170,6 +186,10 @@ class ResultRatingTest(TestCase):
 
 class ResultSaveDupePostTest(TestCase):
     def setUp(self):
+        if not scanner_testutils.SHOULD_TEST_EXT_BOORU:
+            self.skipTest('Skipping external booru tests')
+            return
+
         self.booru = Booru(url=scanner_testutils.VALID_BOORUS[0], name='imagebooru')
         self.booru.save()
 
