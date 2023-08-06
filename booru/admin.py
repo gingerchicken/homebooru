@@ -35,5 +35,6 @@ from .models import PoolPost
 admin.site.register(PoolPost)
 
 # Automation
-from .models import TagSimilarity
+from .models import TagSimilarity, TagAutomationRecord
 admin.site.register(TagSimilarity)
+admin.site.register(TagAutomationRecord)

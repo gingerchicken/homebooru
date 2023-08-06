@@ -12,6 +12,9 @@ class TagAutomationRecord(models.Model):
     # The date the record was created
     performed = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.post} @ State {self.state_hash}"
+
     # The post must be unique
     class Meta:
         unique_together = ('post', 'state_hash')
