@@ -9,6 +9,10 @@ class SearchBooruMD5Test(TestCase):
     expected_tags = scanner_testutils.BOORU_TAGS
 
     def setUp(self):
+        if not scanner_testutils.SHOULD_TEST_EXT_BOORU:
+            self.skipTest('Skipping external booru tests')
+            return
+
         booru_url = scanner_testutils.VALID_BOORUS[0]
 
         self.booru = Booru(url=booru_url, name='imagebooru')
@@ -46,6 +50,11 @@ class SearchBooruMD5Test(TestCase):
         self.assertEqual(result.raw_rating, '')
 
 class TestBooruTest(TestCase):
+    def setUp(self) -> None:
+        if not scanner_testutils.SHOULD_TEST_EXT_BOORU:
+            self.skipTest('Skipping external booru tests')
+            return
+
     def test_valid(self):
         """Returns true with valid boorus"""
 
@@ -95,6 +104,10 @@ class SaveBooruTest(TestCase):
 
     def test_accepts_valid(self):
         """Accepts valid boorus"""
+
+        if not scanner_testutils.SHOULD_TEST_EXT_BOORU:
+            self.skipTest('Skipping external booru tests')
+            return
 
         i = 0
         # Get a valid booru
