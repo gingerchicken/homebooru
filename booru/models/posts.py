@@ -82,6 +82,12 @@ class Post(models.Model):
     # Post locked
     locked = models.BooleanField(default=False)
 
+    def __str__(self):
+        tags = self.tags.all().values_list('tag', flat=True)
+        tags = ' '.join(tags)
+
+        return f"Post {self.id} ({tags})"
+
     def save(self, *args, **kwargs):
         """Saves the post to the database."""
 

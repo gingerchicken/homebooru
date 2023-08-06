@@ -134,3 +134,44 @@ class TagAutomationRegistryTest(TestCase):
         # total_tags = Tag.objects.all().count()
         # self.assertEqual(total_tags, 0)
         # TODO this test is having a hissy fit, fix it at some point
+
+from booru.models.automation import TagSimilarity
+
+class TagSimilarityTest(TestCase):
+    def setUp(self):
+        self.sim = TagSimilarity(
+            tag_x="astolfo_(fate)",
+            tag_y="fate/grand_order",
+            prob_x_impl_y=0.95,
+            prob_y_impl_x=0.04,
+            occurrence=123123,
+            manual=False
+        )
+        self.sim.save()
+
+    def test_selects_similar_tag(self):
+        """Selects similar tags"""
+
+        # Find similar tags
+        similar_tags = TagSimilarity.find_similar(self.sim.tag_x, 0.9)
+
+        # Ensure that the tag is in the list
+        self.assertIn(self.sim.tag_y, similar_tags)
+    
+    def test_ignores_out_of_critical(self):
+        """Ignores tags that are out of the critical region"""
+
+        # Find similar tags
+        similar_tags = TagSimilarity.find_similar(self.sim.tag_x, 0.96)
+
+        # Ensure that the tag is not in the list
+        self.assertNotIn(self.sim.tag_y, similar_tags)
+    
+    def test_ignores_irrelevant(self):
+        """Ignores tags that are irrelevant"""
+
+        # Find similar tags
+        similar_tags = TagSimilarity.find_similar("coolmoment", 0.9)
+
+        # Ensure that the list is empty
+        self.assertEqual(len(similar_tags), 0)

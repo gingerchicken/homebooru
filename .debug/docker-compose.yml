@@ -37,6 +37,7 @@ services:
       
       # Scanning
       - DIRECTORY_SCAN_ENABLED
+      - TAG_IMPLICATION_SET=True
     depends_on:
       - db
   redis:
