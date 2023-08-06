@@ -125,3 +125,22 @@ class TagSimilarity(models.Model):
 
         # Return the new tags
         return new_tags
+
+# Hook into the Post save method to re-add the post to be scanned
+from django.db.models.signals import post_save
+from booru.tasks import perform_automation
+
+def post_save_post(sender, instance, created, **kwargs):
+    """Removes the post from the automation records."""
+
+    # Remove the post from the automation records
+    TagAutomationRecord.objects.filter(post=instance).delete()
+
+    # Check if the post was created
+    if created:
+        # Run the automation task
+        # This way we don't have to wait for the next scan but it should get scanned anyway.
+        perform_automation.delay(instance.id)
+
+# Connect the post save signal
+post_save.connect(post_save_post, sender=Post)
