@@ -153,7 +153,7 @@ def deserialize_encoding(np_bytes : bytes) -> np.ndarray:
     # Return the encoding
     return encoding
 
-class FacialScan(models.Model):
+class FaceScan(models.Model):
     """A record of a facial scan."""
     post = models.OneToOneField(Post, on_delete=models.CASCADE)
 
@@ -259,7 +259,7 @@ class Face(models.Model):
     """Face data from a given scan"""
 
     # The scan foreign key
-    scan = models.ForeignKey(FacialScan, on_delete=models.CASCADE)
+    scan = models.ForeignKey(FaceScan, on_delete=models.CASCADE)
 
     # Array of bytes for encoding
     encoding = models.BinaryField()

@@ -176,9 +176,9 @@ class TagSimilarityTest(TestCase):
         # Ensure that the list is empty
         self.assertEqual(len(similar_tags), 0)
 
-from booru.models.automation import FacialScan, Face, FaceGroup
+from booru.models.automation import FaceScan, Face, FaceGroup
 
-class FacialScanTest(TestCase):
+class FaceScanTest(TestCase):
     temp_storage = testutils.TempStorage()
 
     face_path = testutils.JEREMY_FACES[0]
@@ -191,7 +191,7 @@ class FacialScanTest(TestCase):
         self.image.save()
 
         # Create the facial scan
-        self.fscan = FacialScan(
+        self.fscan = FaceScan(
             post=self.image
         )
         self.fscan.save()
@@ -213,7 +213,7 @@ class FacialScanTest(TestCase):
             self.assertIsInstance(face, Face)
 
         # Get the scanner once more
-        fscan = FacialScan.objects.get(post=self.image)
+        fscan = FaceScan.objects.get(post=self.image)
 
         # Ensure that the scanner is marked as scanned
         self.assertTrue(fscan.has_scanned)
@@ -264,7 +264,7 @@ class FacialScanTest(TestCase):
         # Create the scanners
         scanners = [self.fscan]
         for post in posts:
-            scanner = FacialScan(
+            scanner = FaceScan(
                 post=post
             )
             scanner.save()
