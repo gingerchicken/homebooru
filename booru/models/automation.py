@@ -129,6 +129,208 @@ class TagSimilarity(models.Model):
         # Return the new tags
         return new_tags
 
+import face_recognition
+import numpy as np
+import cv2
+import base64
+import pickle
+
+def serialize_encoding(encoding : np.ndarray) -> bytes:
+    """Serializes the encoding to bytes."""
+
+    # Dump the encoding
+    np_bytes = pickle.dumps(encoding)
+
+    # Return the bytes
+    return np_bytes
+
+def deserialize_encoding(np_bytes : bytes) -> np.ndarray:
+    """Deserializes the encoding from bytes."""
+
+    # Load the pickle
+    encoding = pickle.loads(np_bytes)
+
+    # Return the encoding
+    return encoding
+
+class FacialScan(models.Model):
+    """A record of a facial scan."""
+    post = models.OneToOneField(Post, on_delete=models.CASCADE)
+
+    has_scanned = models.BooleanField(default=False)
+
+    def scan(self) -> list:
+        """Scans the post for faces, automatically grouping them and adding them to the database."""
+
+        # Check if the post has already been scanned
+        if self.has_scanned:
+            # Return an empty list
+            return []
+        
+        # Update the scan
+        self.has_scanned = True
+        self.save()
+
+        faces = Face.from_post(self.post)
+
+        results = []
+
+        # Iterate through the faces
+        for face in faces:
+            # Set the scan to this
+            face.scan = self
+
+            # Save the face
+            face.save()
+
+            # Add the face to the results
+            results.append(face)
+
+            # Attempt to group the face
+            group = FaceGroup.get_group(face.get_np_encoding())
+
+            # Check if the group is None
+            if group is None:
+                # Create a new group
+                group = FaceGroup()
+                group.save()
+
+            # Set the group
+            face.group = group
+
+            # Save the group and face
+            group.save()
+            face.save()
+
+        # Return the results
+        return results
+
+    def __str__(self):
+        return f"Facial Scan for {self.post}"
+        
+class FaceGroup(models.Model):
+    """A record of a group of faces."""
+
+    @property
+    def faces(self):
+        """Returns the faces in this group."""
+
+        # Return the faces in this group
+        return Face.objects.filter(group=self)
+    
+    def check_encoding(self, encoding : np.ndarray) -> bool:
+        """Checks if a given facial encoding matches that of the group."""
+
+        # Get the example faces
+        example_faces = self.faces
+
+        # Make sure that they have is_fake set to False
+        example_faces = example_faces.filter(is_fake=False)
+
+        # Get the encodings as numpy arrays
+        encodings = [face.get_np_encoding() for face in example_faces]
+
+        # Check if the encoding matches any of the encodings
+        matches = face_recognition.compare_faces(encodings, encoding)
+
+        # Return if there is a match
+        return any(matches)
+    
+    @staticmethod
+    def get_group(encoding : np.ndarray):
+        """Returns the group that the encoding matches."""
+
+        # Select all the groups
+        groups = FaceGroup.objects.all()
+
+        # Iterate through the groups
+        for group in groups:
+            # Check if the encoding matches
+            if not group.check_encoding(encoding):
+                continue
+            
+            # Success, return the group
+            return group
+        
+        # No group found, return None
+        return None
+
+class Face(models.Model):
+    """Face data from a given scan"""
+
+    # The scan foreign key
+    scan = models.ForeignKey(FacialScan, on_delete=models.CASCADE)
+
+    # Array of bytes for encoding
+    encoding = models.BinaryField()
+
+    # Snippet being the face cropped out, stored as a base64 string (it is only 64x64 pixels)
+    snippet = models.TextField()
+
+    # Is this marked as "not a face"?
+    is_fake = models.BooleanField(default=False)
+
+    # The group that this face belongs to
+    group = models.ForeignKey(FaceGroup, on_delete=models.CASCADE, null=True, blank=True)
+
+    def get_np_encoding(self):
+        """Converts the encoding to a numpy array."""
+        return deserialize_encoding(self.encoding)
+
+    def set_np_encoding(self, encoding : np.ndarray):
+        """Sets the encoding from a numpy array."""
+        self.encoding = serialize_encoding(encoding)
+
+    # TODO create a method for getting the snippet as a PIL image
+
+    @staticmethod
+    def from_post(post) -> list:
+        """Grabs the faces from the post and saves them."""
+
+        # Handle videos and images differently
+        if post.is_video:
+            return [] # TODO - Implement video facial scanning
+        
+        # Get the image path
+        image_path = post.get_media_path()
+
+        # Load the image
+        image = face_recognition.load_image_file(image_path)
+
+        # Get the face locations
+        face_locations = face_recognition.face_locations(image)
+
+        # Get the encodings
+        face_encodings = face_recognition.face_encodings(image, face_locations)
+
+        for encoding, location in zip(face_encodings, face_locations):
+            # Select
+            top, right, bottom, left = location
+
+            # Crop the image
+            face_image = image[top:bottom, left:right]
+
+            # Resize the image
+            face_image = cv2.resize(face_image, (64, 64))
+
+            # Encode the image
+            _, face_image = cv2.imencode(".jpg", face_image)
+
+            # Convert the image to a base64 string
+            face_image = base64.b64encode(face_image).decode("utf-8")
+
+            # Create the face
+            face = Face(
+                snippet=face_image
+            )
+
+            # Set the encoding
+            face.set_np_encoding(encoding)
+
+            # Return the face
+            yield face
+
+
 # Hook into the Post save method to re-add the post to be scanned
 from django.db.models.signals import post_save
 from booru.tasks import perform_automation

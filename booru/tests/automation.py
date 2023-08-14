@@ -175,3 +175,131 @@ class TagSimilarityTest(TestCase):
 
         # Ensure that the list is empty
         self.assertEqual(len(similar_tags), 0)
+
+from booru.models.automation import FacialScan, Face, FaceGroup
+
+class FacialScanTest(TestCase):
+    temp_storage = testutils.TempStorage()
+
+    face_path = testutils.JEREMY_FACES[0]
+
+    def setUp(self):
+        self.temp_storage.setUp()
+
+        # Create a post
+        self.image = Post.create_from_file(self.face_path)
+        self.image.save()
+
+        # Create the facial scan
+        self.fscan = FacialScan(
+            post=self.image
+        )
+        self.fscan.save()
+
+    def tearDown(self):
+        self.temp_storage.tearDown()
+
+    def test_creates_faces(self):
+        """Creates a list of faces"""
+
+        # Get the faces
+        faces = self.fscan.scan()
+
+        # Make sure that there is at least one face
+        self.assertGreater(len(faces), 0)
+
+        # Ensure that the faces are all Face objects
+        for face in faces:
+            self.assertIsInstance(face, Face)
+
+        # Get the scanner once more
+        fscan = FacialScan.objects.get(post=self.image)
+
+        # Ensure that the scanner is marked as scanned
+        self.assertTrue(fscan.has_scanned)
+    
+    def test_creates_groups(self):
+        """Creates groups of faces"""
+
+        # Get the faces
+        faces = self.fscan.scan()
+
+        # Count the faces
+        total_faces = len(faces)
+
+        # Ensure that there is at least one face
+        self.assertGreater(total_faces, 0)
+
+        # Make sure that there are the same number of groups as faces
+        self.assertEqual(len(FaceGroup.objects.all()), total_faces)
+
+    def test_ignores_when_scanned(self):
+        """Once it has scanned once, it doesn't re-scan"""
+
+        # Mark the scanner as scanned
+        self.fscan.has_scanned = True
+        self.fscan.save()
+
+        # Get the faces
+        faces = self.fscan.scan()
+
+        # Ensure that there are no faces
+        self.assertEqual(len(faces), 0)
+
+    def test_groups_faces(self):
+        """Groups the same faces from the same people"""
+
+        # Create the posts
+        posts = []
+        for path in testutils.ALL_FACES:
+            # Check that the post isn't already in the database
+            if path == self.face_path:
+                continue
+
+            post = Post.create_from_file(path)
+            post.save()
+
+            posts.append(post)
+
+        # Create the scanners
+        scanners = [self.fscan]
+        for post in posts:
+            scanner = FacialScan(
+                post=post
+            )
+            scanner.save()
+
+            scanners.append(scanner)
+        
+        # Scan the posts
+        for scanner in scanners:
+            scanner.scan()
+
+        # Get the groups
+        groups = FaceGroup.objects.all()
+
+        # Ensure that there are 3 groups (Jeremy, James, Richard)
+        self.assertEqual(len(groups), 3)
+
+import face_recognition
+from booru.models.automation import serialize_encoding, deserialize_encoding
+
+class SerializeEncodingTest(TestCase):
+    image_path = testutils.JEREMY_FACES[0]
+    
+    def setUp(self):
+        # Get the encoding
+        image = face_recognition.load_image_file(self.image_path)
+        self.encoding = face_recognition.face_encodings(image)[0]
+
+    def test_serialize(self):
+        """Serializes and deserializes an encoding to be the same thing"""
+
+        # Serialize the encoding
+        serialized = serialize_encoding(self.encoding)
+
+        # Deserialize the encoding
+        deserialized = deserialize_encoding(serialized)
+
+        # Ensure that the encodings are the same
+        self.assertTrue((self.encoding == deserialized).all())

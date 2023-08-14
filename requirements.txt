@@ -1,5 +1,5 @@
 # Django
-Django==4.1.2             # Django
+Django==4.1.2           # Django
 djangorestframework     # REST framework for Django
 
 # Production
@@ -24,3 +24,7 @@ flower                  # Celery monitoring
 # Scanner
 requests                # HTTP client
 watchdog                # Filesystem monitoring
+
+# Automation
+face-recognition        # Facial recognition
+opencv-python           # Computer vision
