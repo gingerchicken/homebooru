@@ -1,6 +1,7 @@
 from .tag_automation import TagAutomation
 from booru.models import Post, Tag
 from booru.models.automation import FaceScan
+import random
 import booru.boorutils as boorutils
 
 class FaceRelatedTagAutomation(TagAutomation):
@@ -40,6 +41,9 @@ class FaceRelatedTagAutomation(TagAutomation):
         return tags
     
     def get_state_hash(self) -> str:
+
+        # Really you want to be doing something like this:
+        '''
         # Given that more images were scanned for faces, the state should be different and hence different groups may be detected
 
         # Get the parent hash
@@ -53,3 +57,7 @@ class FaceRelatedTagAutomation(TagAutomation):
 
         # Return the hash
         return hashed
+        '''
+
+        # But this causes a lot of issues with the database, so we'll just return a random hash
+        return boorutils.hash_str(str(random.random()))
