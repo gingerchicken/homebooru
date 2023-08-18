@@ -1,6 +1,7 @@
 import django.db.models as models
 
 from .posts import Post
+from .tags import Tag
 
 class TagAutomationRecord(models.Model):
     """A record of a tag automation's state."""
@@ -210,6 +211,9 @@ class FaceScan(models.Model):
         
 class FaceGroup(models.Model):
     """A record of a group of faces."""
+
+    # The list of tags that are associated with this group
+    tags = models.ManyToManyField(Tag)
 
     @property
     def faces(self):
