@@ -57,5 +57,7 @@ class FaceRelatedTagAutomation(TagAutomation):
         return hashed
         '''
 
+        # TODO ensure that this gets re-scanned as it currently doesn't always get re-scanned ...
+
         # But this causes a lot of issues with the database, so we'll just return a random hash
         return boorutils.hash_str(str(random.random()))
