@@ -206,6 +206,13 @@ class FaceScan(models.Model):
         # Return the results
         return results
 
+    @property
+    def faces(self):
+        """Returns the faces in this scan."""
+
+        # Return the faces in this scan
+        return Face.objects.filter(scan=self)
+
     def __str__(self):
         return f"Facial Scan for {self.post}"
         
