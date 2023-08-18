@@ -272,5 +272,11 @@ CELERY_BEAT_SCHEDULE['tag_all_images'] = {
     'schedule': 60 * 5, # Every 5 minutes
 }
 
+# Facial Recognition
+CELERY_BEAT_SCHEDULE['perform_all_face_scan'] = {
+    'task': 'booru.tasks.perform_all_face_scan',
+    'schedule': 60 * 5, # Every 5 minutes
+}
+
 # Add a similar tag given a threshold (not really sure how else to describe it - read the docs for more info)
 BOORU_AUTOMATIC_TAG_ADD_SIMILARITY_THRESHOLD = 0.95

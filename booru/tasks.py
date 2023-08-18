@@ -113,3 +113,39 @@ def perform_all_automation(self, force_perform = False):
     for post in posts:
         # perform_automation.delay(post.id, force_perform=force_perform)
         perform_automation(post.id, force_perform=force_perform) # Do it without a delay to prevent spamming requests
+
+# Facial recognition tasks
+from booru.models.automation import FaceScan, FaceGroup, Face
+
+@shared_task
+def perform_face_scan(post_id : int):
+    """Performs face scanning on a post."""
+
+    # Get the post
+    post = Post.objects.get(id=post_id)
+
+    # Check if the post has already been scanned
+    if FaceScan.objects.filter(post=post).exists():
+        return # Skip this post
+    
+    # Create a face scan
+    face_scan = FaceScan(
+        post=post
+    )
+    face_scan.save()
+
+    # Start the scan
+    return len(face_scan.scan())
+
+@shared_task(bind=True)
+@skip_if_running
+def perform_all_face_scan(self):
+    """Performs face scanning on all posts."""
+
+    # Get all the posts
+    posts = Post.objects.all()
+
+    # Perform face scanning on each post
+    for post in posts:
+        # Do not delay the task to prevent spamming requests
+        perform_face_scan(post.id)
