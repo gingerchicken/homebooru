@@ -12,33 +12,31 @@ class FaceRelatedTagAutomation(TagAutomation):
     
     def get_tags(self, post : Post) -> list[Tag]:
 
-        # Get the face scan related to this post (ensure it exists)
-        try:
-            face_scan = FaceScan.objects.get(post=post)
-        except FaceScan.DoesNotExist:
+        # Get the face scan related to this post (if it exists)
+        if not FaceScan.objects.filter(post=post).exists():
             return []
+        
+        # Get the face scan
+        face_scan = FaceScan.objects.get(post=post)
         
         # Get the faces found in the scan
         faces = face_scan.faces.all()
 
-        # Go through the face groups and add the tags
-        tags = []
+        new_tags = []
 
+        # Get the face groups
         for face in faces:
-            # Get the group
-            group = face.group
+            for tag in face.tags:
+                # Skip any tags that are already on the post
+                if tag in new_tags:
+                    continue
+                
+                # Add the new tag
+                new_tags.append(tag)
 
-            # Check if it is none
-            if group is None:
-                continue
+        # Return the new tags
+        return new_tags
 
-            # Loop through the tags
-            for tag in group.tags.all():
-                # Add the tag
-                tags.append(tag)
-        
-        # Return the tags
-        return tags
     
     def get_state_hash(self) -> str:
 

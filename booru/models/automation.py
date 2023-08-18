@@ -294,6 +294,17 @@ class Face(models.Model):
 
     # TODO create a method for getting the snippet as a PIL image
 
+    @property
+    def tags(self):
+        """Returns the tags associated with this face."""
+
+        # If the group is None, return an empty QuerySet
+        if self.group is None:
+            return Tag.objects.none()
+        
+        # Return the tags associated with the group
+        return self.group.tags.all()
+
     @staticmethod
     def from_post(post) -> list:
         """Grabs the faces from the post and saves them."""
@@ -340,7 +351,6 @@ class Face(models.Model):
 
             # Return the face
             yield face
-
 
 # Hook into the Post save method to re-add the post to be scanned
 from django.db.models.signals import post_save
