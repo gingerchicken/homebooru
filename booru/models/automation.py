@@ -269,7 +269,7 @@ class Face(models.Model):
     encoding = models.BinaryField()
 
     # Snippet being the face cropped out, stored as a base64 string (it is only 64x64 pixels)
-    snippet = models.TextField()
+    snippet = models.BinaryField()
 
     # Is this marked as "not a face"?
     is_fake = models.BooleanField(default=False)
@@ -321,7 +321,7 @@ class Face(models.Model):
             _, face_image = cv2.imencode(".jpg", face_image)
 
             # Convert the image to a base64 string
-            face_image = base64.b64encode(face_image).decode("utf-8")
+            face_image = base64.b64encode(face_image)
 
             # Create the face
             face = Face(
