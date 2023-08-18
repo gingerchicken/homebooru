@@ -38,3 +38,9 @@ admin.site.register(PoolPost)
 from .models import TagSimilarity, TagAutomationRecord
 admin.site.register(TagSimilarity)
 admin.site.register(TagAutomationRecord)
+
+# Facial Recognition
+from .models import FaceScan, FaceGroup, Face
+admin.site.register(FaceScan)
+admin.site.register(FaceGroup)
+admin.site.register(Face)
