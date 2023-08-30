@@ -30,4 +30,7 @@ urlpatterns = [
     path('accounts/register', views.register, name='register'),
     path('accounts/profile/<int:user_id>', views.profile, name='profile'),
     path('accounts/profile/<int:user_id>/favourites', views.favourites, name='favourites'),
+
+    # Automation
+    path('automation/faces/<int:face_id>', views.face, name='face'),
 ]

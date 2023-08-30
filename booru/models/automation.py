@@ -135,6 +135,8 @@ import numpy as np
 import cv2
 import base64
 import pickle
+import io
+from PIL import Image
 
 def serialize_encoding(encoding : np.ndarray) -> bytes:
     """Serializes the encoding to bytes."""
@@ -351,7 +353,30 @@ class Face(models.Model):
 
             # Return the face
             yield face
+    
+    @property
+    def face_image(self) -> Image:
+        """Returns the image as a jpeg byte stream."""
 
+        # Decode the image
+        try:
+            face_image = base64.b64decode(self.snippet)
+        except TypeError:
+            return None
+
+        # Open the image
+        try:
+            face_image = Image.open(io.BytesIO(face_image))
+        except OSError:
+            return None
+
+        # Get it as a byte stream
+        byte_stream = io.BytesIO()
+        face_image.save(byte_stream, format="JPEG")
+
+        # Return the image
+        return byte_stream
+    
 # Hook into the Post save method to re-add the post to be scanned
 from django.db.models.signals import post_save
 from booru.tasks import perform_automation
