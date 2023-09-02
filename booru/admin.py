@@ -44,7 +44,6 @@ admin.site.register(TagAutomationRecord)
 # Facial Recognition
 from .models import FaceScan, FaceGroup, Face
 admin.site.register(FaceScan)
-admin.site.register(FaceGroup)
 
 # Create a ModelAdmin class to customize the appearance of the admin site
 @admin.register(Face)
@@ -61,3 +60,48 @@ class FaceAdmin(admin.ModelAdmin):
         return format_html('<img src="{}" />', face_image_url)
             
     list_display = ('face', )
+
+@admin.register(FaceGroup)
+class FaceGroupAdmin(admin.ModelAdmin):
+    """Custom admin page for face groups."""
+
+    def random_faces(self, obj):
+        """Returns the face as an image."""
+
+        # The following code gets a list of 5 random faces from the group.
+        # Then, it loops through the faces and gets the URL for each face.
+        # Finally, it returns the HTML for the image tags.
+
+        # Get the faces in the group
+        all_faces = obj.faces
+
+        # Select 5 random faces
+        random_faces = all_faces.order_by('?')[:5]
+
+        # Store the html elements
+        elements = []
+
+        # Loop through the faces
+        for face in random_faces:
+            # Get the face image URL
+            face_image_url = reverse('face', args=[face.id])
+            
+            # Create the img html
+            img_html = format_html('<img src="{}" />', face_image_url)
+
+            # Create a tag for the face
+            face_tag = format_html('<a href="{}">{}</a>', reverse('admin:booru_face_change', args=[face.id]), img_html)
+
+            # Append the image tag to the list of elements
+            elements.append(face_tag)
+
+        # Return the HTML for the image tag
+        return format_html(''.join(elements))
+    
+    def name(self, obj):
+        """Returns the name"""
+
+        return str(obj)
+    
+    # Display the default fields and the random faces
+    list_display = ('name', 'random_faces' )
