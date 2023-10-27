@@ -45,7 +45,7 @@ def perform_automation(post : Post):
         return post.rating
     
     # Get the media path
-    media_path = post.get_media_path()
+    media_path = str(post.get_media_path()) # PosIX path
 
     # Get the NSFW probability
     predicted_rating_score = get_nsfw_probability(media_path)

@@ -1,6 +1,6 @@
 from celery import shared_task
 
-from booru.automation.rating import perform_automation as perform_rating_automation
+from booru.automation.rating import perform_automation
 from booru.models import Post
 
 from .skipper import skip_if_running
@@ -13,7 +13,7 @@ def perform_rating_automation(post_id : int):
     post = Post.objects.get(id=post_id)
 
     # Perform the automation
-    post.rating = perform_rating_automation(post=post)
+    post.rating = perform_automation(post=post)
     post.save()
 
 @shared_task(bind=True)
