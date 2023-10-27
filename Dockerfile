@@ -59,5 +59,8 @@ ENV SHOULD_TEST_EXT_BOORU=False
 # Celery
 ENV CELERY_WORKERS=8
 
+# Tensorflow
+ENV TF_CPP_MIN_LOG_LEVEL=3
+
 # Run the start.sh script with bash
 CMD "/app/start.sh"
