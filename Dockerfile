@@ -1,4 +1,4 @@
-FROM python:3
+FROM python:3.10
 
 # Enviroment variables
 ENV PYTHONDONTWRITEBYTECODE=1
