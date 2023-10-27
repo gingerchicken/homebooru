@@ -163,7 +163,7 @@ class NSFWAutomationRecord(models.Model):
     """A record of a NSFW scan."""
 
     # The post that was scanned
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, unique=True)
+    post = models.OneToOneField(Post, on_delete=models.CASCADE)
 
     # The probability of the post being NSFW
     nsfw_probability = models.FloatField()
