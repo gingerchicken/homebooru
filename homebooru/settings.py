@@ -268,13 +268,13 @@ if DIRECTORY_SCAN_ENABLED:
 
 # Automation
 CELERY_BEAT_SCHEDULE['tag_all_images'] = {
-    'task': 'booru.tasks.perform_all_automation',
+    'task': 'booru.tasks.tag_automation.perform_all_automation',
     'schedule': 60 * 5, # Every 5 minutes
 }
 
 CELERY_BEAT_SCHEDULE['rating_all_images'] = {
-    'task': 'booru.tasks.perform_all_rating_automation',
-    'schedule': 60 * 5
+    'task': 'booru.tasks.rating_automation.perform_all_rating_automation',
+    'schedule': 60 * 5, # Every 5 minutes
 }
 
 # Add a similar tag given a threshold (not really sure how else to describe it - read the docs for more info)

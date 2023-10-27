@@ -189,10 +189,13 @@ class NSFWAutomationRecord(models.Model):
 
 # Hook into the Post save method to re-add the post to be scanned
 from django.db.models.signals import post_save
-from booru.tasks.tag_automation import perform_automation
 
 def post_save_post(sender, instance, created, **kwargs):
     """Removes the post from the automation records."""
+
+    # TODO fix circular import
+    from booru.tasks.tag_automation import perform_automation as perform_tag_automation
+    from booru.tasks.rating_automation import perform_rating_automation
 
     # Remove the post from the automation records
     TagAutomationRecord.objects.filter(post=instance).delete()
@@ -201,7 +204,8 @@ def post_save_post(sender, instance, created, **kwargs):
     if created:
         # Run the automation task
         # This way we don't have to wait for the next scan but it should get scanned anyway.
-        perform_automation.delay(instance.id)
+        perform_tag_automation.delay(instance.id)
+        perform_rating_automation.delay(instance.id)
 
 # Connect the post save signal
 post_save.connect(post_save_post, sender=Post)
