@@ -158,6 +158,9 @@ class RatingThreshold(models.Model):
         
         # Return the rating
         return rating_threshold.rating
+
+    def __str__(self):
+        return f"{self.rating} @ {self.threshold}"
     
 class NSFWAutomationRecord(models.Model):
     """A record of a NSFW scan."""
