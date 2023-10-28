@@ -42,7 +42,7 @@ def perform_automation(post : Post):
     # Check if a NSFW automation record already exists
     if NSFWAutomationRecord.objects.filter(post=post).exists():
         # If so, return
-        return post.rating
+        return None
     
     # Get the media path
     media_path = str(post.get_media_path()) # PosIX path
@@ -62,12 +62,12 @@ def perform_automation(post : Post):
     current_rating_threshold = RatingThreshold.objects.filter(rating=current_rating)
 
     # Get the current rating threshold
-    current_rating_score = current_rating_threshold.first() if current_rating_threshold.exists() else 0.0
+    current_rating_score = current_rating_threshold.first().threshold if current_rating_threshold.exists() else 0.0
 
     # Check if the NSFW probability is greater than the current rating threshold
     if predicted_rating_score <= current_rating_score:
         # If so, return the current rating
-        return current_rating
+        return None
 
     # Get the predicted rating
     predicted_rating = RatingThreshold.get_rating(predicted_rating_score)

@@ -13,8 +13,17 @@ def perform_rating_automation(post_id : int):
     post = Post.objects.get(id=post_id)
 
     # Perform the automation
-    post.rating = perform_automation(post=post)
+    predicted_rating = perform_automation(post=post)
+    
+    # Check if the predicted rating is None
+    if predicted_rating == None:
+        return
+    
+    # Update the post rating
+    post.rating = predicted_rating
     post.save()
+
+    return str(predicted_rating)
 
 @shared_task(bind=True)
 @skip_if_running
