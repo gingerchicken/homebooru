@@ -2,17 +2,17 @@ from booru.models import Post, RatingThreshold, NSFWAutomationRecord
 
 import os
 
-nsfw = None # The NSFW model (if it is loaded)
+n2 = None # The NSFW model (if it is loaded)
 
 # Check if the worker environment variable is set
 if os.environ.get("IS_WORKER", 'False').lower() == 'true':
     # If so, import the NSFW model
-    import opennsfw2 as nsfw
+    import opennsfw2 as n2
 
 def get_nsfw_probability(media_path : str):
     """Tag media as sfw"""
 
-    if nsfw is None:
+    if n2 is None:
         raise Exception("NSFW model not loaded")
 
     # Check if the type is a video
@@ -25,7 +25,7 @@ def get_nsfw_probability(media_path : str):
         video_path = media_path
         
         # Return two lists giving the elapsed time in seconds and the NSFW probability of each frame
-        elapsed_seconds, nsfw_probabilities = nsfw.predict_video_frames(video_path)
+        elapsed_seconds, nsfw_probabilities = n2.predict_video_frames(video_path)
 
         # Get the average of the nsfw probabilities
         average_nsfw_probability = sum(nsfw_probabilities) / len(nsfw_probabilities)
@@ -44,7 +44,7 @@ def get_nsfw_probability(media_path : str):
     nsfw_probability = [0.0]
     
     try:
-        nsfw_probability = nsfw.predict_images([image_path])
+        nsfw_probability = n2.predict_images([image_path])
     except Exception as e:
         pass
 
@@ -54,7 +54,7 @@ def get_nsfw_probability(media_path : str):
 def perform_automation(post : Post):
     """Gets the automated rating for the given post."""
 
-    if nsfw is None:
+    if n2 is None:
         raise Exception("NSFW model not loaded")
 
     # Check if a NSFW automation record already exists
