@@ -23,7 +23,8 @@ def __predict_image(image_path : str):
         print("NSFW model not loaded, loading...", flush=True)
         model = n2.make_open_nsfw_model()
     else:
-        print("NSFW model already loaded!", flush=True)
+        # print("NSFW model already loaded!", flush=True)
+        pass
 
     predictions = model.predict(images, batch_size=8, verbose=0)
     nsfw_probabilities = predictions[:, 1].tolist()
@@ -67,7 +68,8 @@ def get_nsfw_probability(media_path : str):
     try:
         nsfw_probability = __predict_image(image_path)
     except Exception as e:
-        print("Error predicting image:", e, flush=True)
+        # print("Error predicting image:", e, flush=True)
+        pass
 
     # Return the nsfw probability
     return nsfw_probability[0]
