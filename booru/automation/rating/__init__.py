@@ -1,6 +1,8 @@
 from booru.models import Post, RatingThreshold, NSFWAutomationRecord
 
 import os
+import numpy as np
+from PIL import Image
 
 n2 = None # The NSFW model (if it is loaded)
 
@@ -8,6 +10,17 @@ n2 = None # The NSFW model (if it is loaded)
 if os.environ.get("IS_WORKER", 'False').lower() == 'true':
     # If so, import the NSFW model
     import opennsfw2 as n2
+
+def __predict_image(image_path : str):
+    images = np.array([
+        n2.preprocess_image(Image.open(image_path), n2.Preprocessing.YAHOO)
+    ])
+
+    model = n2.make_open_nsfw_model()
+    predictions = model.predict(images, batch_size=8, verbose=0)
+    nsfw_probabilities = predictions[:, 1].tolist()
+
+    return nsfw_probabilities
 
 def get_nsfw_probability(media_path : str):
     """Tag media as sfw"""
@@ -44,7 +57,7 @@ def get_nsfw_probability(media_path : str):
     nsfw_probability = [0.0]
     
     try:
-        nsfw_probability = n2.predict_images([image_path])
+        nsfw_probability = __predict_image(image_path)
     except Exception as e:
         pass
 
