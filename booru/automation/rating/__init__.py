@@ -1,9 +1,19 @@
-import opennsfw2 as nsfw
-
 from booru.models import Post, RatingThreshold, NSFWAutomationRecord
+
+import os
+
+nsfw = None # The NSFW model (if it is loaded)
+
+# Check if the worker environment variable is set
+if os.environ.get("IS_WORKER", 'False').lower() == 'true':
+    # If so, import the NSFW model
+    import opennsfw2 as nsfw
 
 def get_nsfw_probability(media_path : str):
     """Tag media as sfw"""
+
+    if nsfw is None:
+        raise Exception("NSFW model not loaded")
 
     # Check if the type is a video
     # TODO make this more effective
@@ -38,6 +48,9 @@ def get_nsfw_probability(media_path : str):
 
 def perform_automation(post : Post):
     """Gets the automated rating for the given post."""
+
+    if nsfw is None:
+        raise Exception("NSFW model not loaded")
 
     # Check if a NSFW automation record already exists
     if NSFWAutomationRecord.objects.filter(post=post).exists():
