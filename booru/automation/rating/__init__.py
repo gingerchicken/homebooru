@@ -5,6 +5,7 @@ import numpy as np
 from PIL import Image
 
 n2 = None # The NSFW model (if it is loaded)
+model = None
 
 # Check if the worker environment variable is set
 if os.environ.get("IS_WORKER", 'False').lower() == 'true':
@@ -12,11 +13,18 @@ if os.environ.get("IS_WORKER", 'False').lower() == 'true':
     import opennsfw2 as n2
 
 def __predict_image(image_path : str):
+    global model
+
     images = np.array([
         n2.preprocess_image(Image.open(image_path), n2.Preprocessing.YAHOO)
     ])
 
-    model = n2.make_open_nsfw_model()
+    if model is None:
+        print("NSFW model not loaded, loading...", flush=True)
+        model = n2.make_open_nsfw_model()
+    else:
+        print("NSFW model already loaded!", flush=True)
+
     predictions = model.predict(images, batch_size=8, verbose=0)
     nsfw_probabilities = predictions[:, 1].tolist()
 
@@ -59,7 +67,7 @@ def get_nsfw_probability(media_path : str):
     try:
         nsfw_probability = __predict_image(image_path)
     except Exception as e:
-        pass
+        print("Error predicting image:", e, flush=True)
 
     # Return the nsfw probability
     return nsfw_probability[0]
