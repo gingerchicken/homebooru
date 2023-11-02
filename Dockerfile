@@ -24,6 +24,9 @@ RUN apt install -y libyaml-dev
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
+# Download opennsfw model
+RUN python3 -c "import opennsfw2; opennsfw2.make_open_nsfw_model()"
+
 # Copy all of the current code to the /app/ directory
 COPY . /app/
 
