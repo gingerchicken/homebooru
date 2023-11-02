@@ -41,7 +41,12 @@ def get_nsfw_probability(media_path : str):
     image_path = media_path
 
     # Get the nsfw probability
-    nsfw_probability = nsfw.predict_images([image_path])
+    nsfw_probability = [0.0]
+    
+    try:
+        nsfw_probability = nsfw.predict_images([image_path])
+    except Exception as e:
+        pass
 
     # Return the nsfw probability
     return nsfw_probability[0]
