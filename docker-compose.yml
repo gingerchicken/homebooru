@@ -32,6 +32,7 @@ services:
 
       # Booru
       - BOORU_STORAGE_PATH
+      - BOORU_AUTOMATIC_RATING_ENABLED
 
       # Production
       - DEBUG=False
@@ -86,6 +87,7 @@ services:
 
       # Booru
       - BOORU_STORAGE_PATH=/storage/
+      - BOORU_AUTOMATIC_RATING_ENABLED
 
       # - SECRET_KEY
       # - ROLL_SECRET

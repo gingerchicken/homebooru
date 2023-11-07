@@ -3,12 +3,13 @@ from booru.models import Post, RatingThreshold, NSFWAutomationRecord
 import os
 import numpy as np
 from PIL import Image
+import homebooru.settings as settings
 
 n2 = None # The NSFW model (if it is loaded)
 model = None
 
 # Check if the worker environment variable is set
-if os.environ.get("IS_WORKER", 'False').lower() == 'true':
+if settings.IS_WORKER and settings.BOORU_AUTOMATIC_RATING_ENABLED:
     # If so, import the NSFW model
     import opennsfw2 as n2
 
