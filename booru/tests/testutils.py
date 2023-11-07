@@ -24,6 +24,16 @@ NON_IMAGE_PATH     = pathlib.Path(CONTENT_PATH / 'test.txt')
 CORRUPT_IMAGE_PATH = pathlib.Path(CONTENT_PATH / 'corrupt_image.jpg')
 CORRUPT_FELIX_PATH = pathlib.Path(CONTENT_PATH / 'corrupt_felix.png')
 
+# Faces
+FACES_PATH = pathlib.Path(CONTENT_PATH / 'faces')
+
+# Different people
+RICHARD_FACES = list(FACES_PATH.glob('*Richard*'))
+JEREMY_FACES  = list(FACES_PATH.glob('*Jeremy*'))
+JAMES_FACES   = list(FACES_PATH.glob('*James*'))
+
+ALL_FACES = list(set(RICHARD_FACES + JEREMY_FACES + JAMES_FACES))
+
 class TempStorage():
     og_path = None
     temp_storage_path = "/tmp/storage"

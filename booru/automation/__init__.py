@@ -1,6 +1,7 @@
 from .tag_automation import *
 from .metadata import *
 from .tags import *
+from .facial_tags import FaceRelatedTagAutomation
 
 __INITIALISED__ = False
 
@@ -17,6 +18,7 @@ def perform_setup():
     __INITIALISED__ = True
 
     # Register the automations
+    TagAutomationRegistry().register(FaceRelatedTagAutomation())
     TagAutomationRegistry().register(AnimatedContentTagAutomation())
     TagAutomationRegistry().register(LargeFileSizeTagAutomation())
     
