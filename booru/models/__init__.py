@@ -3,4 +3,4 @@ from .posts import *
 from .profile import *
 from .comments import *
 from .pool import *
-from .automation import *
+from booru.models.automation import *

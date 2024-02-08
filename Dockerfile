@@ -1,4 +1,4 @@
-FROM python:3
+FROM python:3.10
 
 # Enviroment variables
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -23,6 +23,9 @@ RUN apt install -y libyaml-dev
 # Copy across the requirements.txt file and install the requirements
 COPY requirements.txt .
 RUN pip install -r requirements.txt
+
+# Download opennsfw model
+RUN python3 -c "import opennsfw2; opennsfw2.make_open_nsfw_model()"
 
 # Copy all of the current code to the /app/ directory
 COPY . /app/
@@ -58,6 +61,10 @@ ENV SHOULD_TEST_EXT_BOORU=False
 
 # Celery
 ENV CELERY_WORKERS=8
+
+# Automation
+ENV TF_CPP_MIN_LOG_LEVEL=3
+ENV BOORU_AUTOMATIC_RATING_ENABLED=True
 
 # Run the start.sh script with bash
 CMD "/app/start.sh"

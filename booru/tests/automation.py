@@ -2,7 +2,7 @@ from django.test import TestCase
 from booru.models.posts import Post
 import booru.tests.testutils as testutils
 
-from booru.automation import TagAutomationRegistry, AnimatedContentTagAutomation
+from booru.automation.tag import TagAutomationRegistry, AnimatedContentTagAutomation
 from booru.models.automation import TagAutomationRecord
 from booru.models.tags import Tag
 
@@ -175,3 +175,36 @@ class TagSimilarityTest(TestCase):
 
         # Ensure that the list is empty
         self.assertEqual(len(similar_tags), 0)
+
+from booru.models import RatingThreshold, Rating
+
+class RatingThresholdTest(TestCase):
+    fixtures = ['booru/fixtures/ratings.json', 'booru/fixtures/rating_thresholds.json']
+
+    def test_get_rating(self):
+        """Returns the correct rating"""
+
+        testing_data = {
+            "safe": [
+                0, 0.1, 0.2
+            ],
+            "questionable": [
+                0.5, 0.6, 0.7
+            ],
+            "explicit": [
+                0.8, 0.9, 1.0
+            ]
+        }
+
+        for rating in testing_data:
+            for threshold in testing_data[rating]:
+                self.assertEqual(RatingThreshold.get_rating(threshold).name, rating)
+        
+    def test_handles_none(self):
+        """Handles no rating threshold"""
+
+        # Delete all the rating thresholds
+        RatingThreshold.objects.all().delete()
+
+        # Ensure that the rating is safe
+        self.assertEqual(RatingThreshold.get_rating(0.1).name, Rating.get_default().name)

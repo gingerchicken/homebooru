@@ -35,6 +35,7 @@ services:
 
       # Booru
       - BOORU_STORAGE_PATH=/storage/
+      - BOORU_AUTOMATIC_RATING_ENABLED
       
       # Scanning
       - DIRECTORY_SCAN_ENABLED
@@ -68,6 +69,7 @@ services:
 
       # Booru
       - BOORU_STORAGE_PATH=/storage/
+      - BOORU_AUTOMATIC_RATING_ENABLED
   beat:
     build: ../
     volumes:

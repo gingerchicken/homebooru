@@ -267,10 +267,24 @@ if DIRECTORY_SCAN_ENABLED:
 
 
 # Automation
-CELERY_BEAT_SCHEDULE['tag_all_images'] = {
-    'task': 'booru.tasks.perform_all_automation',
-    'schedule': 60 * 5, # Every 5 minutes
-}
+# Is the current instance a worker?
+IS_WORKER = os.environ.get("IS_WORKER", 'False').lower() == 'true'
+
+# Should we machine learning be used to detect NSFW content (requires a more powerful machine)
+BOORU_AUTOMATIC_RATING_ENABLED = os.environ.get('BOORU_AUTOMATIC_RATING_ENABLED', 'False').lower() == 'true'
 
 # Add a similar tag given a threshold (not really sure how else to describe it - read the docs for more info)
 BOORU_AUTOMATIC_TAG_ADD_SIMILARITY_THRESHOLD = 0.95
+
+# TODO add an env variable for this to be disabled or enabled
+CELERY_BEAT_SCHEDULE['tag_all_images'] = {
+    'task': 'booru.tasks.tag_automation.perform_all_automation',
+    'schedule': 60 * 5, # Every 5 minutes
+}
+
+if BOORU_AUTOMATIC_RATING_ENABLED:
+    # Add a task to rate all images
+    CELERY_BEAT_SCHEDULE['rating_all_images'] = {
+        'task': 'booru.tasks.rating_automation.perform_all_rating_automation',
+        'schedule': 60 * 5, # Every 5 minutes
+    }

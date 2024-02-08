@@ -24,3 +24,7 @@ flower                  # Celery monitoring
 # Scanner
 requests                # HTTP client
 watchdog                # Filesystem monitoring
+
+# Automation (optional)
+tensorflow              # Machine learning
+opennsfw2               # NSFW image detection

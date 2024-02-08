@@ -1,0 +1,26 @@
+[
+    {
+        "model": "booru.ratingthreshold",
+        "pk": 1,
+        "fields": {
+            "rating": "safe",
+            "threshold": 0
+        }
+    },
+    {
+        "model": "booru.ratingthreshold",
+        "pk": 2,
+        "fields": {
+            "rating": "questionable",
+            "threshold": 0.25
+        }
+    },
+    {
+        "model": "booru.ratingthreshold",
+        "pk": 3,
+        "fields": {
+            "rating": "explicit",
+            "threshold": 0.75
+        }
+    }
+]
