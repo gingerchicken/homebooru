@@ -66,6 +66,27 @@ function downloadOriginal(src) {
     link.click();
 }
 
+function updateFormTitle(form, title = null) {
+    const NORTH_CARET = 'ui-icon-caret-2-n';
+    const SOUTH_CARET = 'ui-icon-caret-2-s';
+
+    // Get the title
+    title = title ? title : form.find('.title');
+
+    // Get the icon
+    let icon = title.find('.ui-icon');
+
+    // If the form is visible then make it a north arrow
+    if (form.is(':visible')) {
+        icon.removeClass(SOUTH_CARET).addClass(NORTH_CARET);
+    } else {
+        // Otherwise make it a south arrow
+        icon.removeClass(NORTH_CARET).addClass(SOUTH_CARET);
+    }
+    
+    return false;
+}
+
 /**
  * Shows the new comment form
  */
@@ -76,22 +97,24 @@ function toggleCommentBox() {
     // Toggle the form's visibility
     form.toggle();
 
-    // Get the comments title
-    let title = $('#comment-section > .title');
+    // Update the form's title
+    updateFormTitle($('#comment-section > .comments'), $('#comment-section > .title'));
 
-    // Get the ui-icon
-    let icon = title.find('.ui-icon');
+    return false;
+}
 
-    const NORTH = 'ui-icon-caret-2-n';
-    const SOUTH = 'ui-icon-caret-2-s';
+/**
+ * Shows the edit form
+ */
+function toggleEditForm() {
+    // Get the edit form
+    let form = $('#edit-box > form');
 
-    // If the form is visible then make it a north arrow
-    if (form.is(':visible')) {
-        icon.removeClass(SOUTH).addClass(NORTH);
-    } else {
-        // Otherwise make it a south arrow
-        icon.removeClass(NORTH).addClass(SOUTH);
-    }
+    // Toggle the form's visibility
+    form.toggle();
+
+    // Update the form's title
+    updateFormTitle(form, $('#edit-box > .title'));
 
     return false;
 }
@@ -163,5 +186,11 @@ $(document).ready(() => {
 
         // Toggle the input
         input.prop('checked', !input.prop('checked'));
+    });
+
+    // Add toggle edit form button
+    $('#edit-box > .title').click((e) => {
+        // Toggle the edit form
+        toggleEditForm();
     });
 });

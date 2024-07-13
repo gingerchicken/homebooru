@@ -80,6 +80,9 @@ def view(request, post_id):
         # Get the sorted tags
         sorted_tags = post.get_sorted_tags()
 
+        # Get the tags as a list (Ordered by tag name) (used for editing tags and info)
+        list_tags = post.tags.all().order_by('tag')
+
         # Get proximate posts
         # TODO make sure this is correct after adding pagination
         proximate_posts = post.get_proximate_posts(Post.search(search_phrase))
@@ -109,7 +112,11 @@ def view(request, post_id):
 
             # Comments
             'comments': comments,
-            'comments_pagination': comments_pagination
+            'comments_pagination': comments_pagination,
+
+            # Edit
+            'ratings': Rating.objects.all(),
+            'list_tags': list_tags
         })
     
     if request.method == 'DELETE':

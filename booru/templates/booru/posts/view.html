@@ -97,6 +97,28 @@
 				</div>
 			</div>
 		</div>
+        <div id="edit-box">
+			<span class="title">
+				<span class="ui-icon ui-icon-caret-2-s"></span> Edit
+			</span>
+            <form method="post" enctype="multipart/form-data" style="display:none;"> 
+                Source:<br>
+                <input type="text" name="source" value="{{post.source}}" size="53" style="width: 100%;">
+                <br><br>
+                Title:<br>
+                <input type="text" name="title" value="{{post.title}}" size="53" style="width: 100%;">
+                <br><br>
+                Tags:<br>
+                <textarea id="tags" class="tagBox ui-autocomplete-input" data-autocomplete="tag-query" name="tags" cols="60" rows="7" tabindex="3" style="width: 100%;" autocomplete="off">{% for tag in list_tags %}{{tag}} {% endfor %}</textarea>
+                <br>
+                Separate tags with spaces. (ex: green_eyes purple green_hair)
+                Rating:<br>
+                {% for rating in ratings %}<input type="radio" name="rating" value="{{ rating }}"{% if rating == post.rating %} checked="checked"{% endif %}>{{ rating|title }} {% endfor %}
+                <br><br>
+                <input type="submit" name="submit" value="Update">
+                <div class="upload-error" hidden></div>
+            </form>
+        </div>
 		<div id="comment-section">
 			<span class="title">
 				<span class="ui-icon ui-icon-caret-2-n"></span> Comments
@@ -159,6 +181,9 @@
 		
 		// Also display the comment section.
 		$('.new-comment').show();
+
+        // And the edit box
+        $('#edit-box').show();
 	</script>
 {% endblock %}
 
