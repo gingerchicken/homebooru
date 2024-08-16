@@ -66,6 +66,27 @@ function downloadOriginal(src) {
     link.click();
 }
 
+function updateFormTitle(form, title = null) {
+    const NORTH_CARET = 'ui-icon-caret-2-n';
+    const SOUTH_CARET = 'ui-icon-caret-2-s';
+
+    // Get the title
+    title = title ? title : form.find('.title');
+
+    // Get the icon
+    let icon = title.find('.ui-icon');
+
+    // If the form is visible then make it a north arrow
+    if (form.is(':visible')) {
+        icon.removeClass(SOUTH_CARET).addClass(NORTH_CARET);
+    } else {
+        // Otherwise make it a south arrow
+        icon.removeClass(NORTH_CARET).addClass(SOUTH_CARET);
+    }
+    
+    return false;
+}
+
 /**
  * Shows the new comment form
  */
@@ -76,22 +97,24 @@ function toggleCommentBox() {
     // Toggle the form's visibility
     form.toggle();
 
-    // Get the comments title
-    let title = $('#comment-section > .title');
+    // Update the form's title
+    updateFormTitle($('#comment-section > .comments'), $('#comment-section > .title'));
 
-    // Get the ui-icon
-    let icon = title.find('.ui-icon');
+    return false;
+}
 
-    const NORTH = 'ui-icon-caret-2-n';
-    const SOUTH = 'ui-icon-caret-2-s';
+/**
+ * Shows the edit form
+ */
+function toggleEditForm() {
+    // Get the edit form
+    let form = $('#edit-box > form');
 
-    // If the form is visible then make it a north arrow
-    if (form.is(':visible')) {
-        icon.removeClass(SOUTH).addClass(NORTH);
-    } else {
-        // Otherwise make it a south arrow
-        icon.removeClass(NORTH).addClass(SOUTH);
-    }
+    // Toggle the form's visibility
+    form.toggle();
+
+    // Update the form's title
+    updateFormTitle(form, $('#edit-box > .title'));
 
     return false;
 }
@@ -118,6 +141,56 @@ function sendComment() {
 
     // Send the comment
     return view.comment(comment, anonymous);
+}
+
+async function sendEdit() {
+    // Get the edit form
+    const form = $('#edit-box > form');
+
+    // Parse it into a FormData object
+    const formData = new FormData(form[0]);
+
+    // Get the title
+    let title = formData.get('title');
+
+    // Get the tags
+    let tags = formData.get('tags');
+    // Get them as an array
+    tags = tags.split(' ');
+    // Strip any whitespace from the tags
+    tags = tags.map(tag => tag.trim());
+    // Remove any empty strings
+    tags = tags.filter(tag => tag !== '');
+    // Join the tags back together
+    tags = tags.join(' ');
+
+    // Check if the tags are empty
+    if (tags.length === 0) {
+        // Show an error message
+        let error = new OverlayError();
+        error.show('Each post must have at least one tag, please check your tags and try again.');
+        return;
+    }
+
+    // Get the rating
+    let rating = formData.get('rating');
+
+    // Get the source
+    let source = formData.get('source');
+
+    // Generate the payload
+    const payload = {
+        rating, tags, title, source
+    }
+
+    // Send the edit
+    let resp = await view.edit(payload);
+
+    // If the response is okay then reload the page
+    if (!resp.ok) return;
+
+    // Reload the page
+    location.reload();
 }
 
 // On document ready
@@ -163,5 +236,18 @@ $(document).ready(() => {
 
         // Toggle the input
         input.prop('checked', !input.prop('checked'));
+    });
+
+    // Add toggle edit form button
+    $('#edit-box > .title').click((e) => {
+        // Toggle the edit form
+        toggleEditForm();
+    });
+
+    // Add the edit submit button
+    $('#edit-box > form > .submit').click((e) => {
+        sendEdit();
+
+        return false;
     });
 });

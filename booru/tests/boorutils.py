@@ -6,6 +6,11 @@ from ..boorutils import *
 
 import homebooru.settings
 
+import random
+
+def random_file():
+    return 'test_output_' + ''.join(random.choices('abcdefghijklmnop1234567890', k=16)) + '.jpg'
+
 class HashStrTest(TestCase):
     def test_hash_str(self):
         self.assertEqual(hash_str("test"), "098f6bcd4621d373cade4e832627b4f6")
@@ -32,9 +37,15 @@ class GetFileChecksumTest(TestCase):
 
 class GenerateThumbnailTest(TestCase):
     original_image = "assets/TEST_DATA/content/felix.jpg"
-    output_image   = "/tmp/thumbnail_felix.png"
 
     def setUp(self):
+        self.output_image = random_file()
+
+        if pathlib.Path(self.output_image).exists():
+            # Delete it
+            pathlib.Path(self.output_image).unlink()
+    
+    def tearDown(self):
         if pathlib.Path(self.output_image).exists():
             # Delete it
             pathlib.Path(self.output_image).unlink()
@@ -97,13 +108,20 @@ class GenerateThumbnailTest(TestCase):
 
 class GenerateSampleTest(TestCase):
     original_image = "assets/TEST_DATA/content/sampleable_image.jpg"
-    output_image   = "/tmp/sampled.png"
 
     def setUp(self):
+        # Generate a "random" output image name
+        self.output_image = random_file()
+
         if pathlib.Path(self.output_image).exists():
             # Delete it
             pathlib.Path(self.output_image).unlink()
     
+    def tearDown(self):
+        # Delete the output image
+        if pathlib.Path(self.output_image).exists():
+            pathlib.Path(self.output_image).unlink()
+
     def test_generates_a_file(self):
         self.assertTrue(generate_sample(self.original_image, self.output_image))
 

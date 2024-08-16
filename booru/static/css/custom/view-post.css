@@ -375,3 +375,18 @@ table.pool-table th {
     margin-top: 15px;
     padding: 5px;
 }
+
+/* Edit box */
+#edit-box > .title {
+    font-weight: bolder;
+    font-size: larger;
+    display: inline-flex;
+    color: #337ab7;
+    cursor: pointer;
+    /* Go right */
+    float: right; /* This is a hack just to get it in the rough area */
+}
+
+#edit-box {
+    margin-bottom: 15px;
+}

@@ -321,7 +321,7 @@ class Scanner(models.Model):
         for (md5, path) in file_hashes.items():
             # Update the status
             cur += 1
-            self.__set_status(f'Looking up {len(file_hashes)} files ({cur / len(file_hashes) * 100} %)')
+            self.__set_status(f'Looking up {len(file_hashes)} files ({round(cur / len(file_hashes) * 100)} %)')
 
             try:
                 # Search for the file
@@ -348,7 +348,7 @@ class Scanner(models.Model):
         # Iterate through all the files to create posts for
         for (md5, path) in post_hashes.items():
             cur += 1
-            self.__set_status(f'Creating {len(post_hashes)} new posts ({cur / len(post_hashes) * 100} %)')
+            self.__set_status(f'Creating {len(post_hashes)} new posts ({round(cur / len(post_hashes) * 100)} %)')
             # Create the post
             try:
                 post = self.create_post(path)

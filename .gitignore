@@ -145,6 +145,7 @@ booru/fixtures/tagsimilarities.json
 
 # Tests
 assets/TEST_DATA
+test_output_*.jpg
 
 # Booru
 data/storage

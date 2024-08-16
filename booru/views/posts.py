@@ -80,6 +80,9 @@ def view(request, post_id):
         # Get the sorted tags
         sorted_tags = post.get_sorted_tags()
 
+        # Get the tags as a list (Ordered by tag name) (used for editing tags and info)
+        list_tags = post.tags.all().order_by('tag')
+
         # Get proximate posts
         # TODO make sure this is correct after adding pagination
         proximate_posts = post.get_proximate_posts(Post.search(search_phrase))
@@ -109,7 +112,11 @@ def view(request, post_id):
 
             # Comments
             'comments': comments,
-            'comments_pagination': comments_pagination
+            'comments_pagination': comments_pagination,
+
+            # Edit
+            'ratings': Rating.objects.all(),
+            'list_tags': list_tags
         })
     
     if request.method == 'DELETE':
@@ -127,7 +134,7 @@ def view(request, post_id):
         # Redirect to the home page
         return HttpResponseRedirect(reverse('index'))
 
-    if request.method == 'POST':
+    if request.method == 'POST': # TODO perhaps this should be a PUT request
         # Get the user
         user = request.user
 
@@ -151,6 +158,95 @@ def view(request, post_id):
         elif post.locked: # Check if the post is locked (as we wouldn't have locked it if it wasn't)
             # Send a 403
             return HttpResponse(status=403, content='Post is locked.')
+
+        # Other changes here (since the post is not locked)
+        if 'rating' in request.POST:
+            raw_rating = request.POST['rating']
+
+            # Attempt to get the rating
+            rating = None
+            try:
+                # Check that the rating is a string
+                if not isinstance(raw_rating, str):
+                    raise ValueError('Rating is not a string')
+
+                rating = Rating.objects.get(name=raw_rating)
+            except Exception as e:
+                pass # Nothing was found
+            
+            # Validate the rating
+            if rating is None:
+                return HttpResponse(status=400, content='Invalid rating')
+
+            # Update the post's rating
+            post.rating = rating
+
+        if 'tags' in request.POST:
+            raw_tags = request.POST['tags']
+
+            # Strip whitespace
+            raw_tags = raw_tags.strip()
+
+            # Split the tags
+            tags_list = raw_tags.split(' ')
+
+            # Strip whitespace
+            tags_list = [tag.strip() for tag in tags_list]
+
+            # Remove empty tags
+            tags_list = [tag for tag in tags_list if len(tag) > 0]
+
+            # Ensure that the tag list is not empty
+            if len(tags_list) == 0:
+                return HttpResponse(status=400, content='No tags specified')
+
+            # Check if all the tags are valid
+            for tag_name in tags_list:
+                if Tag.is_name_valid(tag_name):
+                    continue
+                
+                # Failure
+                return HttpResponse(status=400, content='Invalid tag name: ' + tag_name) # TODO can this be xss'd? 
+
+            # Convert the list to a set to remove duplicates
+            tags_list = list(set(tags_list))
+
+            # Add the tags to the post
+            post.tags.clear()
+            for tag_name in tags_list:
+                tag = Tag.create_or_get(tag_name)
+                post.tags.add(tag)
+
+        if 'source' in request.POST:
+            source = request.POST['source']
+
+            # Strip whitespace
+            source = source.strip()
+
+            # If the source is empty, set it to None
+            if len(source) == 0:
+                source = None
+            elif len(source) > 1000:
+                return HttpResponse(status=400, content='Source is too long')
+
+            # I believe normally it should be a URL but for now just allow anything
+            post.source = source
+        
+        if 'title' in request.POST:
+            title = request.POST['title']
+
+            # Strip whitespace
+            title = title.strip()
+
+            # If the title is empty, set it to None
+            if len(title) == 0:
+                title = None
+            elif len(title) > 512: # Max length
+                return HttpResponse(status=400, content='Title is too long')
+
+            post.title = title
+
+        # TODO there may be other fields that need adding here, such as owner but these are the main ones
 
         post.save()
         return HttpResponse(status=203)

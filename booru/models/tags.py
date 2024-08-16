@@ -106,13 +106,7 @@ class Tag(models.Model):
 
         # Make sure that they don't start with an attribute
         potential_attribute = name.split(':')[0]
-        disallowed_params = {
-            'md5': True,
-            'rating': True,
-            'title': True,
-            'width': True,
-            'height': True
-        }
+        disallowed_params = {'md5', 'rating', 'title', 'width', 'height'}
 
         if potential_attribute in disallowed_params:
             return False
