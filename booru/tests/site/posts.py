@@ -1429,7 +1429,7 @@ class PostEditTags(TestCase):
     def test_rejects_invalid_tags(self):
         """Rejects when the tags are invalid"""
 
-        invalid_tags = ['a' * 1000, 'md5:1234567890abcdef1234567890abcdef']
+        invalid_tags = ['a' * 1000, 'md5:1234567890abcdef1234567890abcdef', '*-*']
         valid_tags = ['cute', '^_^', ':3']
 
         # Compute every combination of invalid and valid tags
