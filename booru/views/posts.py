@@ -134,7 +134,7 @@ def view(request, post_id):
         # Redirect to the home page
         return HttpResponseRedirect(reverse('index'))
 
-    if request.method == 'POST':
+    if request.method == 'POST': # TODO perhaps this should be a PUT request
         # Get the user
         user = request.user
 
@@ -158,6 +158,38 @@ def view(request, post_id):
         elif post.locked: # Check if the post is locked (as we wouldn't have locked it if it wasn't)
             # Send a 403
             return HttpResponse(status=403, content='Post is locked.')
+
+        # Other changes here (since the post is not locked)
+        if 'rating' in request.POST:
+            raw_rating = request.POST['rating']
+
+            # Attempt to get the rating
+            rating = None
+            try:
+                # Check that the rating is a string
+                if not isinstance(raw_rating, str):
+                    raise ValueError('Rating is not a string')
+
+                rating = Rating.objects.get(name=raw_rating)
+            except Exception as e:
+                pass # Nothing was found
+            
+            # Validate the rating
+            if rating is None:
+                return HttpResponse(status=400, content='Invalid rating')
+
+            # Update the post's rating
+            post.rating = rating
+
+        if 'tags' in request.POST:
+            # TODO implement this
+            return HttpResponse(status=501, content='Not implemented')
+
+        if 'source' in request.POST:
+            # TODO implement this
+            return HttpResponse(status=501, content='Not implemented')
+
+        # TODO there may be other fields that need adding here, such as owner but these are the main ones
 
         post.save()
         return HttpResponse(status=203)

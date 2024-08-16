@@ -697,6 +697,90 @@ class PostDeleteFlagTest(TestCase):
         self.assertEqual(flag.user, user2)
         self.assertEqual(flag.reason, 'test')
 
+class PostEditRatingTest(TestCase):
+    fixtures = ['ratings.json']
+
+    def setUp(self):
+        self.temp_storage = testutils.TempStorage()
+        self.temp_storage.setUp()
+
+        # Create a user
+        self.user = User.objects.create_user(username='test', password='huevo')
+        self.user.save()
+
+        # Create a post
+        self.post = Post.create_from_file(
+            testutils.FELIX_PATH
+        )
+        self.post.save()
+
+        # Mark the rating as safe
+        self.safe = Rating.objects.get(name='safe')
+        self.post.rating = self.safe
+        self.post.save()
+
+        # Set the owner of the post
+        self.post.owner = self.user
+        self.post.save()
+        
+    def tearDown(self):
+        self.temp_storage.tearDown()
+
+    def send_request(self, post_id, rating):
+        """Sends a request to the post edit rating view"""
+
+        return self.client.post(
+            '/post/' + str(post_id), {'rating': rating} 
+        )
+    
+    def test_change_rating(self):
+        """Changes the rating of a post"""
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        post_id = self.post.id
+
+        default_rating = Rating.objects.get(name='safe')
+
+        for rating in Rating.objects.all():
+            # Set the post rating
+            self.post.rating = default_rating
+            self.post.save()
+
+            # Send the request
+            resp = self.send_request(post_id, rating.pk)
+
+            # Check the response status code
+            self.assertEqual(resp.status_code, 203)
+
+            # Get the post from the database
+            post = Post.objects.get(id=post_id)
+
+            # Check the post rating
+            self.assertEqual(post.rating, rating)
+
+    def test_disallows_invalid_rating(self):
+        """Rejects invalid rating IDs"""
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        invalid_ratings = ["bababooey", 0, 0.3, True, False]
+
+        for rating in invalid_ratings:
+            # Send the request
+            resp = self.send_request(self.post.id, rating)
+
+            # Check the response status code
+            self.assertEqual(resp.status_code, 400, "Rating: " + str(rating))
+
+            # Get the post from the database
+            post = Post.objects.get(id=self.post.id)
+
+            # Check the post rating
+            self.assertEqual(post.rating, self.safe)
+
 class PostPostCommentTest(TestCase):
     def setUp(self) -> None:
         self.temp_storage = testutils.TempStorage()
