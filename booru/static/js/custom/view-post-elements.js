@@ -143,6 +143,56 @@ function sendComment() {
     return view.comment(comment, anonymous);
 }
 
+async function sendEdit() {
+    // Get the edit form
+    const form = $('#edit-box > form');
+
+    // Parse it into a FormData object
+    const formData = new FormData(form[0]);
+
+    // Get the title
+    let title = formData.get('title');
+
+    // Get the tags
+    let tags = formData.get('tags');
+    // Get them as an array
+    tags = tags.split(' ');
+    // Strip any whitespace from the tags
+    tags = tags.map(tag => tag.trim());
+    // Remove any empty strings
+    tags = tags.filter(tag => tag !== '');
+    // Join the tags back together
+    tags = tags.join(' ');
+
+    // Check if the tags are empty
+    if (tags.length === 0) {
+        // Show an error message
+        let error = new OverlayError();
+        error.show('Each post must have at least one tag, please check your tags and try again.');
+        return;
+    }
+
+    // Get the rating
+    let rating = formData.get('rating');
+
+    // Get the source
+    let source = formData.get('source');
+
+    // Generate the payload
+    const payload = {
+        rating, tags, title, source
+    }
+
+    // Send the edit
+    let resp = await view.edit(payload);
+
+    // If the response is okay then reload the page
+    if (!resp.ok) return;
+
+    // Reload the page
+    location.reload();
+}
+
 // On document ready
 $(document).ready(() => {
     // Add a click listener to #image
@@ -192,5 +242,12 @@ $(document).ready(() => {
     $('#edit-box > .title').click((e) => {
         // Toggle the edit form
         toggleEditForm();
+    });
+
+    // Add the edit submit button
+    $('#edit-box > form > .submit').click((e) => {
+        sendEdit();
+
+        return false;
     });
 });

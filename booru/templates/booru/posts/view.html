@@ -115,8 +115,7 @@
                 Rating:<br>
                 {% for rating in ratings %}<input type="radio" name="rating" value="{{ rating }}"{% if rating == post.rating %} checked="checked"{% endif %}>{{ rating|title }} {% endfor %}
                 <br><br>
-                <input type="submit" name="submit" value="Update">
-                <div class="upload-error" hidden></div>
+                <input type="submit" name="submit" value="Update" class="submit">
             </form>
         </div>
 		<div id="comment-section">
