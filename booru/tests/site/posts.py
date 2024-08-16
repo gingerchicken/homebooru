@@ -1311,7 +1311,7 @@ class PostEditSource(TestCase):
         post = Post.objects.get(id=self.post.id)
 
         # Check the post source
-        self.assertEqual(post.source, '')
+        self.assertEqual(post.source, None)
     
     def test_strips_string(self):
         """
@@ -1321,6 +1321,10 @@ class PostEditSource(TestCase):
         whitespaces = [' ', '  ', '   ', '    ', '     ', '\t\n ', '\t\n\t\n', '\t\n\t\n\t\n']
 
         for whitespace in whitespaces:
+            # Set the source to a non-empty string
+            self.post.source = 'https://example.com'
+            self.post.save()
+
             # Login
             self.assertTrue(self.client.login(username='test', password='huevo'))
 
@@ -1334,7 +1338,27 @@ class PostEditSource(TestCase):
             post = Post.objects.get(id=self.post.id)
 
             # Check the post source
-            self.assertEqual(post.source, '')
+            self.assertEqual(post.source, None)
+
+    def test_rejects_max_length(self):
+        """
+        Rejects a source that is too long
+        """
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Send the request
+        resp = self.send_request(self.post.id, 'a' * (1000 + 1))
+
+        # Sends a 400
+        self.assertEqual(resp.status_code, 400)
+
+        # Get the post from the database
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post source
+        self.assertEqual(post.source, None)
 
 class PostEditTags(TestCase):
     def setUp(self):
@@ -1487,3 +1511,112 @@ class PostEditTags(TestCase):
         # Check the post tags
         self.assertEqual(post.tags.count(), 2)
         self.assertEqual(set([tag.tag for tag in post.tags.all()]), {'felix_argyle', 'catboy'})
+
+class PostEditTitle(TestCase):
+    def setUp(self):
+        self.temp_storage = testutils.TempStorage()
+        self.temp_storage.setUp()
+
+        # Create a user
+        self.user = User.objects.create_user(username='test', password='huevo')
+        self.user.save()
+
+        # Create a post
+        self.post = Post.create_from_file(testutils.FELIX_PATH)
+        self.post.save()
+
+        # Set the post owner
+        self.post.owner = self.user
+        self.post.save()
+    
+    def tearDown(self):
+        self.temp_storage.tearDown()
+    
+    def send_request(self, post_id, title):
+        """Sends a request to the post title view"""
+
+        # Send the request
+        return self.client.post(
+            '/post/' + str(post_id), {'title': title} 
+        )
+    
+    def test_updates_title(self):
+        """Updates the title of a post"""
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Send the request
+        resp = self.send_request(self.post.id, 'test')
+
+        # Sends a 203
+        self.assertEqual(resp.status_code, 203)
+
+        # Get the post from the database
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post title
+        self.assertEqual(post.title, 'test')
+    
+    def test_accepts_empty_string(self):
+        """
+        Accepts an empty string as the title
+        """
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Send the request
+        resp = self.send_request(self.post.id, '')
+
+        # Sends a 203
+        self.assertEqual(resp.status_code, 203)
+
+        # Get the post from the database
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post title
+        self.assertEqual(post.title, None)
+    
+    def test_strips_string(self):
+        """
+        Automatically strips the title string of whitespace
+        """
+
+        whitespaces = [' ', '  ', '   ', '    ', '     ', '\t\n ', '\t\n\t\n', '\t\n\t\n\t\n']
+
+        for whitespace in whitespaces:
+            # Change the title back to something
+            self.post.title = 'test'
+            self.post.save()
+
+            # Login
+            self.assertTrue(self.client.login(username='test', password='huevo'))
+
+            # Send the request
+            resp = self.send_request(self.post.id, whitespace)
+
+            # Sends a 203
+            self.assertEqual(resp.status_code, 203)
+
+            # Make sure the title is empty
+            post = Post.objects.get(id=self.post.id)
+            self.assertEqual(post.title, None)
+    
+    def test_rejects_max_length(self):
+        """Rejects a title that is too long"""
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Send the request
+        resp = self.send_request(self.post.id, 'a' * (512 + 1))
+
+        # Sends a 400
+        self.assertEqual(resp.status_code, 400)
+
+        # Get the post from the database
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post title
+        self.assertEqual(post.title, None)

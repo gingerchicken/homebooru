@@ -223,8 +223,28 @@ def view(request, post_id):
             # Strip whitespace
             source = source.strip()
 
+            # If the source is empty, set it to None
+            if len(source) == 0:
+                source = None
+            elif len(source) > 1000:
+                return HttpResponse(status=400, content='Source is too long')
+
             # I believe normally it should be a URL but for now just allow anything
             post.source = source
+        
+        if 'title' in request.POST:
+            title = request.POST['title']
+
+            # Strip whitespace
+            title = title.strip()
+
+            # If the title is empty, set it to None
+            if len(title) == 0:
+                title = None
+            elif len(title) > 512: # Max length
+                return HttpResponse(status=400, content='Title is too long')
+
+            post.title = title
 
         # TODO there may be other fields that need adding here, such as owner but these are the main ones
 
