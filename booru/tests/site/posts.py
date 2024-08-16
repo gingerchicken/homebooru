@@ -1234,3 +1234,104 @@ class PoolPostPoolTest(TestCase):
 
         # Sends a 404
         self.assertEqual(resp.status_code, 404)
+
+class PostEditSource(TestCase):
+    def setUp(self):
+        self.temp_storage = testutils.TempStorage()
+        self.temp_storage.setUp()
+
+        # Create a user
+        self.user = User.objects.create_user(username='test', password='huevo')
+        self.user.save()
+
+        # Create a post
+        self.post = Post.create_from_file(testutils.FELIX_PATH)
+        self.post.save()
+
+        # Set the post owner
+        self.post.owner = self.user
+        self.post.save()
+    
+    def tearDown(self):
+        self.temp_storage.tearDown()
+    
+    def send_request(self, post_id, source):
+        """Sends a request to the post source view"""
+
+        # Send the request
+        return self.client.post(
+            '/post/' + str(post_id), {'source': source} 
+        )
+    
+    def test_updates_source(self):
+        """Updates the source of a post"""
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Send the request
+        resp = self.send_request(self.post.id, 'https://example.com')
+
+        # Sends a 203
+        self.assertEqual(resp.status_code, 203)
+
+        # Get the post from the database
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post source
+        self.assertEqual(post.source, 'https://example.com')
+
+        # Change the source once more
+        resp = self.send_request(self.post.id, 'https://example2.com')
+
+        # Sends a 203
+        self.assertEqual(resp.status_code, 203)
+
+        # Get the post from the database
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post source
+        self.assertEqual(post.source, 'https://example2.com')
+    
+    def test_accepts_empty_string(self):
+        """
+        Accepts an empty string as the source
+        """
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Send the request
+        resp = self.send_request(self.post.id, '')
+
+        # Sends a 203
+        self.assertEqual(resp.status_code, 203)
+
+        # Get the post from the database
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post source
+        self.assertEqual(post.source, '')
+    
+    def test_strips_string(self):
+        """
+        Automatically strips the source string of whitespace
+        """
+
+        whitespaces = [' ', '  ', '   ', '    ', '     ', '\t\n ', '\t\n\t\n', '\t\n\t\n\t\n']
+
+        for whitespace in whitespaces:
+            # Login
+            self.assertTrue(self.client.login(username='test', password='huevo'))
+
+            # Send the request
+            resp = self.send_request(self.post.id, whitespace)
+
+            # Sends a 203
+            self.assertEqual(resp.status_code, 203)
+
+            # Get the post from the database
+            post = Post.objects.get(id=self.post.id)
+
+            # Check the post source
+            self.assertEqual(post.source, '')

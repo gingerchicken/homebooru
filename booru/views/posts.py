@@ -186,8 +186,13 @@ def view(request, post_id):
             return HttpResponse(status=501, content='Not implemented')
 
         if 'source' in request.POST:
-            # TODO implement this
-            return HttpResponse(status=501, content='Not implemented')
+            source = request.POST['source']
+
+            # Strip whitespace
+            source = source.strip()
+
+            # I believe normally it should be a URL but for now just allow anything
+            post.source = source
 
         # TODO there may be other fields that need adding here, such as owner but these are the main ones
 
