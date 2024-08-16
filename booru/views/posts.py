@@ -182,8 +182,40 @@ def view(request, post_id):
             post.rating = rating
 
         if 'tags' in request.POST:
-            # TODO implement this
-            return HttpResponse(status=501, content='Not implemented')
+            raw_tags = request.POST['tags']
+
+            # Strip whitespace
+            raw_tags = raw_tags.strip()
+
+            # Split the tags
+            tags_list = raw_tags.split(' ')
+
+            # Strip whitespace
+            tags_list = [tag.strip() for tag in tags_list]
+
+            # Remove empty tags
+            tags_list = [tag for tag in tags_list if len(tag) > 0]
+
+            # Ensure that the tag list is not empty
+            if len(tags_list) == 0:
+                return HttpResponse(status=400, content='No tags specified')
+
+            # Check if all the tags are valid
+            for tag_name in tags_list:
+                if Tag.is_name_valid(tag_name):
+                    continue
+                
+                # Failure
+                return HttpResponse(status=400, content='Invalid tag name: ' + tag_name) # TODO can this be xss'd? 
+
+            # Convert the list to a set to remove duplicates
+            tags_list = list(set(tags_list))
+
+            # Add the tags to the post
+            post.tags.clear()
+            for tag_name in tags_list:
+                tag = Tag.create_or_get(tag_name)
+                post.tags.add(tag)
 
         if 'source' in request.POST:
             source = request.POST['source']

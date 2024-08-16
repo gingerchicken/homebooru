@@ -1335,3 +1335,155 @@ class PostEditSource(TestCase):
 
             # Check the post source
             self.assertEqual(post.source, '')
+
+class PostEditTags(TestCase):
+    def setUp(self):
+        self.temp_storage = testutils.TempStorage()
+        self.temp_storage.setUp()
+
+        # Create a user
+        self.user = User.objects.create_user(username='test', password='huevo')
+        self.user.save()
+
+        # Create a post
+        self.post = Post.create_from_file(testutils.FELIX_PATH)
+        self.post.save()
+
+        # Add a tag to the post
+        self.post.tags.add(Tag.create_or_get('felix_argyle'))
+        self.post.save()
+
+        # Set the post owner
+        self.post.owner = self.user
+        self.post.save()
+    
+    def tearDown(self):
+        self.temp_storage.tearDown()
+    
+    def send_request(self, post_id, tags):
+        """Sends a request to the post tags view"""
+
+        # Send the request
+        return self.client.post(
+            reverse('view', kwargs={'post_id': post_id}),
+            {'tags': tags}
+        )
+
+    def test_updates_tags(self):
+        """Overwrites the tags of a post"""
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Send the request
+        resp = self.send_request(self.post.id, 'catboy')
+
+        # Sends a 203
+        self.assertEqual(resp.status_code, 203)
+
+        # Get the post from the database
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post tags
+        self.assertEqual(post.tags.count(), 1)
+        self.assertEqual(post.tags.first().tag, 'catboy')
+    
+    def test_allows_appending_tags(self):
+        """Accepts a list of tags that contain existing post tags"""
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Send the request
+        resp = self.send_request(self.post.id, 'felix_argyle catboy')
+
+        # Sends a 203
+        self.assertEqual(resp.status_code, 203)
+
+        # Get the post from the database
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post tags
+        self.assertEqual(post.tags.count(), 2)
+        self.assertEqual(set([tag.tag for tag in post.tags.all()]), {'felix_argyle', 'catboy'})
+
+    def test_rejects_no_tags(self):
+        """Rejects when there are no tags"""
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Send the request
+        resp = self.send_request(self.post.id, '')
+
+        # Sends a 400
+        self.assertEqual(resp.status_code, 400)
+
+        # Get the post from the database
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post tags
+        self.assertEqual(post.tags.count(), 1)
+        self.assertEqual(post.tags.first().tag, 'felix_argyle')
+    
+    def test_rejects_invalid_tags(self):
+        """Rejects when the tags are invalid"""
+
+        invalid_tags = ['a' * 1000, 'md5:1234567890abcdef1234567890abcdef']
+        valid_tags = ['cute', '^_^', ':3']
+
+        # Compute every combination of invalid and valid tags
+        for invalid_tag in invalid_tags:
+            for valid_tag in valid_tags:
+                # Login
+                self.assertTrue(self.client.login(username='test', password='huevo'))
+
+                # Send the request
+                resp = self.send_request(self.post.id, f'{invalid_tag} {valid_tag}')
+
+                # Sends a 400
+                self.assertEqual(resp.status_code, 400)
+
+                # Get the post from the database
+                post = Post.objects.get(id=self.post.id)
+
+                # Check the post tags
+                self.assertEqual(post.tags.count(), 1)
+                self.assertEqual(post.tags.first().tag, 'felix_argyle')
+        
+        # Only invalid tags
+        for invalid_tag in invalid_tags:
+            # Login
+            self.assertTrue(self.client.login(username='test', password='huevo'))
+
+            # Send the request
+            resp = self.send_request(self.post.id, invalid_tag)
+
+            # Sends a 400
+            self.assertEqual(resp.status_code, 400)
+
+            # Get the post from the database
+            post = Post.objects.get(id=self.post.id)
+
+            # Check the post tags
+            self.assertEqual(post.tags.count(), 1)
+            self.assertEqual(post.tags.first().tag, 'felix_argyle')
+    
+    def test_handles_duplicate_tags(self):
+        """Ignores second interation of tag in list"""
+
+        # Login
+        self.assertTrue(self.client.login(username='test', password='huevo'))
+
+        # Send the request
+        resp = self.send_request(self.post.id, 'catboy felix_argyle catboy')
+
+        # Sends a 203
+        self.assertEqual(resp.status_code, 203)
+
+        # Get the post from the database
+        post = Post.objects.get(id=self.post.id)
+
+        # Check the post tags
+        self.assertEqual(post.tags.count(), 2)
+        self.assertEqual(set([tag.tag for tag in post.tags.all()]), {'felix_argyle', 'catboy'})
