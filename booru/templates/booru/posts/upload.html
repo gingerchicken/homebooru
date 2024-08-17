@@ -9,6 +9,22 @@
             padding-top: 20px;
             color: red;
         }
+        .progress {
+            display: none;
+            width: 100%;
+            background-color: #f3f3f3;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .progress-bar {
+            width: 0%;
+            height: 20px;
+            background-color: #4caf50;
+            text-align: center;
+            color: white;
+            border-radius: 4px;
+        }
     </style>
 {% endblock %}
 
@@ -52,26 +68,29 @@
                     selectedElement.src = URL.createObjectURL(event.target.files[0]);
                     $(selectedElement).show();
                 }
-        </script>
-        <br>
-        Source:<br>
-        <input type="text" name="source" value="" size="53" style="width: 100%;">
-        <br><br>
-        Title:<br>
-        <input type="text" name="title" value="" size="53" style="width: 100%;">
-        <br><br>
-        Tags:<br>
-        <textarea id="tags" class="tagBox ui-autocomplete-input" data-autocomplete="tag-query" name="tags" cols="60" rows="7" tabindex="3" style="width: 100%;" autocomplete="off"></textarea>
-        <br>
-        Separate tags with spaces. (ex: green_eyes purple green_hair)
-        <br><br>
-        Generally, the more specific you are in your tagging, the less you will have to tag. For instance, the tag chun-li will add the street_fighter and capcom tags automatically upon saving. Depending on how the administrator has configured things of course!
-        <br><br>
-        Rating:<br>
-        {% for rating in ratings %}<input type="radio" name="rating" value="{{ rating }}"{% if rating == default_rating %} checked="checked"{% endif %}>{{ rating|title }} {% endfor %}
-        <br><br>
-        <input type="submit" name="submit" value="Upload">
-        <div class="upload-error" hidden></div>
+            </script>
+            <br>
+            Source:<br>
+            <input type="text" name="source" value="" size="53" style="width: 100%;">
+            <br><br>
+            Title:<br>
+            <input type="text" name="title" value="" size="53" style="width: 100%;">
+            <br><br>
+            Tags:<br>
+            <textarea id="tags" class="tagBox ui-autocomplete-input" data-autocomplete="tag-query" name="tags" cols="60" rows="7" tabindex="3" style="width: 100%;" autocomplete="off"></textarea>
+            <br>
+            Separate tags with spaces. (ex: green_eyes purple green_hair)
+            <br><br>
+            Generally, the more specific you are in your tagging, the less you will have to tag. For instance, the tag chun-li will add the street_fighter and capcom tags automatically upon saving. Depending on how the administrator has configured things of course!
+            <br><br>
+            Rating:<br>
+            {% for rating in ratings %}<input type="radio" name="rating" value="{{ rating }}"{% if rating == default_rating %} checked="checked"{% endif %}>{{ rating|title }} {% endfor %}
+            <br><br>
+            <input type="submit" name="submit" value="Upload">
+            <div class="upload-error" hidden></div>
+            <div class="progress">
+                <div class="progress-bar">0%</div>
+            </div>
         </form>
         <br><br><br><br>
         <script type="text/javascript">
@@ -95,6 +114,9 @@
                         // Prevent the default action
                         e.preventDefault();
 
+                        // Show the progress bar
+                        $('.progress').show();
+
                         // Submit the form via fetch
                         let form = $('form')[0];
 
@@ -109,27 +131,35 @@
                             cache: 'default'
                         });
 
-                        // Fetch the request
+                        // Fetch the request with progress tracking
                         (async () => {
-                            let resp = await fetch(request);
+                            let xhr = new XMLHttpRequest();
+                            xhr.open(form.method, form.action, true);
 
-                            // If an error occurred then show it
-                            if (!resp.ok) {
-                                let error = await resp.text();
-                                
-                                // Show the error message
-                                $('.upload-error').html(error);
-                                $('.upload-error').show();
+                            xhr.upload.onprogress = (event) => {
+                                if (event.lengthComputable) {
+                                    let percentComplete = (event.loaded / event.total) * 100;
+                                    $('.progress-bar').css('width', percentComplete + '%');
+                                    if (percentComplete < 100) {
+                                        $('.progress-bar').text(Math.round(percentComplete) + '%');
+                                    } else {
+                                        $('.progress-bar').text('Processing ...');
+                                    }
+                                }
+                            };
 
-                                // Throw an error
-                                throw new Error(error);
-                            }
+                            xhr.onload = async () => {
+                                if (xhr.status >= 200 && xhr.status < 300) {
+                                    let redirectUrl = xhr.responseURL;
+                                    window.location.href = redirectUrl;
+                                } else {
+                                    let error = xhr.responseText;
+                                    $('.upload-error').html(error);
+                                    $('.upload-error').show();
+                                }
+                            };
 
-                            // Get the redirect url
-                            let redirectUrl = resp.url;
-
-                            // Redirect to the new url
-                            window.location.href = redirectUrl;
+                            xhr.send(formData);
                         })()
                     });
             });
