@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block page_name %}
-	{% if post.title %}{{ post.title }}{% else %}{% for tag in post.tags.all %}{{tag.tag}} {% endfor %}{% endif %}
+	{% if post.title and post.title is not None %}{{ post.title }}{% else %}{% for tag in post.tags.all %}{{tag.tag}} {% endfor %}{% endif %}
 {% endblock %}
 
 {% block main_tags %}
@@ -103,10 +103,10 @@
 			</span>
             <form method="post" enctype="multipart/form-data" style="display:none;"> 
                 Source:<br>
-                <input type="text" name="source" value="{{post.source}}" size="53" style="width: 100%;">
+                <input type="text" name="source" value="{% if post.source is not None %}{{post.source}}{% endif %}" size="53" style="width: 100%;">
                 <br><br>
                 Title:<br>
-                <input type="text" name="title" value="{{post.title}}" size="53" style="width: 100%;">
+                <input type="text" name="title" value="{% if post.title is not None %}{{post.title}}{% endif %}" size="53" style="width: 100%;">
                 <br><br>
                 Tags:<br>
                 <textarea id="tags" class="tagBox ui-autocomplete-input" data-autocomplete="tag-query" name="tags" cols="60" rows="7" tabindex="3" style="width: 100%;" autocomplete="off">{% for tag in list_tags %}{{tag}} {% endfor %}</textarea>
