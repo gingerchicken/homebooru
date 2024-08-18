@@ -144,3 +144,11 @@ table.pool-table .key-data.publicity {
 .range-input-table > tr th {
     font-weight: bold!important;
 }
+
+
+.centered-pencil {
+    align-items: center;
+    font-size: 1em!important;
+    color: grey;
+    opacity: 0.5;
+}
