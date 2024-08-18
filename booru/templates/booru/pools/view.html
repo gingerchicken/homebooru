@@ -7,7 +7,9 @@
 
 {% block navbar %}
 	{% include "booru/pools/components/nav-bar.html" %}
-    {% include "booru/pools/components/pool-nav-bar.html" %}
+    {% with pool=pool %}
+        {% include "booru/pools/components/pool-nav-bar.html" %}
+    {% endwith %}
 {% endblock %}
 
 

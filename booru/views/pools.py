@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 
 from booru.models import Post, Pool, PoolPost
 from booru.pagination import Paginator
@@ -359,5 +360,53 @@ def new_pool(request):
         err = content
 
     return render(request, 'booru/pools/new.html', {
+        'error': err
+    })
+
+def edit_pool(request, pool_id):
+    pool = get_object_or_404(Pool, id=pool_id)
+    err = None
+
+    if request.method == 'POST':
+        pool_name = request.POST.get('name', None)
+        pool_description = request.POST.get('description', '')
+
+        def validate_authorization():
+            if not request.user.is_authenticated:
+                return 'You must be logged in to edit pools.'
+            if not request.user.has_perm('booru.change_pool') or request.user != pool.creator:
+                return 'You do not have permission to edit this pool.'
+            return None
+
+        def validate_pool_data():
+            if pool_name is None or len(pool_name) < 3:
+                return 'Pool name must be at least 3 characters long.'
+            if len(pool_name) > 255:
+                return 'Pool name cannot be longer than 255 characters.'
+            if len(pool_description) > 1024:
+                return 'Pool description cannot be longer than 1024 characters.'
+            if Pool.objects.filter(name=pool_name).exclude(id=pool_id).exists():
+                return 'A pool with that name already exists.'
+            return None
+
+        # Validate the authorization
+        err = validate_authorization()
+        
+        # Validate the pool data
+        if not err:
+            err = validate_pool_data()
+        
+        # If there is no error, then update the pool and redirect to the pool
+        if not err:
+            pool.name = pool_name
+            pool.description = pool_description
+            pool.save()
+
+            return HttpResponseRedirect(reverse('pool', kwargs={
+                'pool_id': pool_id
+            }))
+
+    return render(request, 'booru/pools/edit.html', {
+        'pool': pool,
         'error': err
     })

@@ -1,0 +1,25 @@
+{% extends "booru/pools/base/main.html" %}
+{% load static %}
+
+{% block main %}
+    <div class="center-form">
+        <div class="center-form-header">Edit Pool</div>
+        <p>Edit the details of your collection of content.</p>
+        <form method="post" class="pool-edit-form">
+            {% csrf_token %}
+
+            Name:
+            <input type="text" name="name" value="{{ pool.name }}" style="width: 100%;">
+
+            Description:
+            <textarea name="description" cols="60" rows="3" tabindex="3" style="width: 100%;" autocomplete="off">{{ pool.description }}</textarea>
+            <p>Describe your pool in a few words. This will be displayed on the pool's page as well as in search results.</p>
+            
+            {% if error %}
+                <p class="form-error">{{ error }}</p>
+            {% endif %}
+
+            <input name="commit" class="secondary_search" type="submit" value="Update">
+        </form>
+    </div>
+{% endblock %}

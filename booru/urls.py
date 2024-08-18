@@ -18,6 +18,7 @@ urlpatterns = [
     path('pools', views.pools, name='pools'),
     path('pools/<int:pool_id>', views.pool, name='pool'),
     path('pool', views.new_pool, name='new_pool'),
+    path('pools/<int:pool_id>/edit', views.edit_pool, name='edit_pool'),
 
     # Tags
     path('tags', views.tags, name='tags'),
