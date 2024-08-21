@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.apps import apps
+from django.utils import timezone
 
 from .tags import Tag, TagType
 from .posts_search_criteria import *
@@ -534,3 +535,44 @@ class PostFlag(models.Model):
     class Meta:
         # Make sure that only one flag per user per post can exist
         unique_together = ('post', 'user')
+
+class SearchSave(models.Model):
+    """A saved search phrase for a user"""
+
+    # The user that saved the search
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    # The search phrase
+    search_phrase = models.TextField()
+
+    # The date the search was saved
+    date_saved = models.DateTimeField(auto_now_add=True)
+
+    # The date the search was last used
+    date_last_used = models.DateTimeField(auto_now=True)
+
+    def use(self):
+        """Mark the search as used"""
+
+        # Update the date last used
+        self.date_last_used = timezone.now()
+
+        # Save the search
+        self.save()
+
+    @staticmethod
+    def get_latest_searches(user):
+        """Get the latest searches for a user"""
+
+        # Get the searches
+        searches = SearchSave.objects.filter(user=user).order_by('-date_last_used')
+
+        # Return the searches
+        return searches
+
+    def __str__(self):
+        return f"{self.user}'s saved search '{self.search_phrase}'"
+
+    class Meta:
+        # Make sure that only one search save per user can exist
+        unique_together = ('user', 'search_phrase')
