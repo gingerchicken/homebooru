@@ -14,10 +14,10 @@
             </span><span class="search-button"><input name="commit" class="secondary_search" type="submit" value="Search"></span>
         </form>
     </div>
-    {% if content %}
+    {% if searches %}
         
     {% else %}
-        <h1>Nobody here but us chickens!</h1> Maybe try searching for something else?
+        <h1>Nobody here but us chickens!</h1> Looks like you haven't saved any searches yet. Why not try saving a search?
     {% endif %}
     <br>
     {% include "booru/components/paginator.html" %}

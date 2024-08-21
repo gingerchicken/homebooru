@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.db import models
 
 from booru.pagination import Paginator
-from booru.models.tags import Tag, TagType
+from booru.models.tags import Tag, TagType, SearchSave
 import homebooru.settings
 
 from .filters import *
@@ -126,7 +126,29 @@ def saved_searches(request):
     # Get the user
     user = request.user
 
+    # Check if the user is logged in
+    if not user.is_authenticated:
+        # Redirect to the login page
+        return HttpResponseRedirect('/accounts/login')
+
+    # Get the page number url parameter
+    page_number = request.GET.get('pid', '1')
+
+    # Try to convert the page number to an integer
+    try:
+        page_number = int(page_number)
+    except ValueError:
+        page_number = 1
+
+    # Get the saved searches
+    searches = SearchSave.get_latest_searches(user)
+
+    # Paginate the searches
+    searches, paginator = Paginator.paginate(searches, page_number, homebooru.settings.BOORU_SAVED_SEARCHES_PER_PAGE)
+
     # Render the saved_searches.html template with the user
     return render(request, 'booru/tags/saved-searches.html', {
-        'user': user
+        'user': user,
+        'searches': searches,
+        'paginator': paginator
     })
