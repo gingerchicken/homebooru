@@ -1,0 +1,24 @@
+{% extends "booru/tags/base/main.html" %}
+{% load static %}
+
+{% block page_title %}
+    Saved Searches
+{% endblock %}
+
+{% block main_content %}
+    <div class="search-container">
+        <form action="" method="get">
+            <span class="ui-icon ui-icon-heart" style="color: #aaa; font-size: 25px; padding: 0px 35px 0px 0px; vertical-align: top;" title="Save this search. Check your account page."> </span>
+            <span class="search-with-save">
+                <input name="tag" type="text" id="search-input" class="form-control" value="" placeholder="Ex: blue_sky cloud 1girl">
+            </span><span class="search-button"><input name="commit" class="secondary_search" type="submit" value="Search"></span>
+        </form>
+    </div>
+    {% if content %}
+        
+    {% else %}
+        <h1>Nobody here but us chickens!</h1> Maybe try searching for something else?
+    {% endif %}
+    <br>
+    {% include "booru/components/paginator.html" %}
+{% endblock %}

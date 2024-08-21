@@ -121,3 +121,12 @@ def autocomplete(request, tag):
 
     # Return the tags as json
     return HttpResponse(json.dumps(flat), content_type="application/json")
+
+def saved_searches(request):
+    # Get the user
+    user = request.user
+
+    # Render the saved_searches.html template with the user
+    return render(request, 'booru/tags/saved-searches.html', {
+        'user': user
+    })

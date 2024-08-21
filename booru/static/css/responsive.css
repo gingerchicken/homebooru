@@ -692,6 +692,11 @@ div.forum-list-space {
     display: inline-block;
 }
 
+.search-container .search-with-save {
+    width: calc(100% - 180px - 3px - 40px); /* Same as above but with the added width for the 2.5px gap as well as the 30px for the save button */
+    display: inline-block;
+}
+
 .search-container .search-button {
     width: 180px;
     display: inline-block;
