@@ -131,6 +131,28 @@ def saved_searches(request):
         # Redirect to the login page
         return HttpResponseRedirect('/accounts/login')
 
+    # Post
+    if request.method == 'POST':
+        # Get the search phrase
+        search_phrase = request.POST.get('searchPhrase', '').strip()
+
+        # Check if the search phrase is empty
+        if len(search_phrase) == 0:
+            # Return 400 error
+            return HttpResponse("Search phrase cannot be empty.", status=400)
+        
+        # Check if the search phase is not unique
+        if SearchSave.objects.filter(user=user, search_phrase=search_phrase).exists():
+            # Return 409 error
+            return HttpResponse("A saved search phrase already matches this.", status=409)
+
+        # Save the search
+        search = SearchSave(user=user, search_phrase=search_phrase)
+        search.save()
+
+        # Redirect to the saved searches page
+        return HttpResponseRedirect('/tags/savedsearches')
+
     # Get the page number url parameter
     page_number = request.GET.get('pid', '1')
 

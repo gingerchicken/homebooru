@@ -8,17 +8,43 @@
 {% block main_content %}
     <div class="search-container">
         <form action="" method="get">
-            <span class="ui-icon ui-icon-heart" style="color: #aaa; font-size: 25px; padding: 0px 35px 0px 0px; vertical-align: top;" title="Save this search. Check your account page."> </span>
+            <span id="save-search-button" class="ui-icon ui-icon-heart" style="color: #aaa; font-size: 25px; padding: 0px 35px 0px 0px; vertical-align: top;" title="Save this search. Check your account page."> </span>
             <span class="search-with-save">
                 <input name="tag" type="text" id="search-input" class="form-control" value="" placeholder="Ex: blue_sky cloud 1girl">
             </span><span class="search-button"><input name="commit" class="secondary_search" type="submit" value="Search"></span>
         </form>
     </div>
     {% if searches %}
-        
+        {% for search in searches %}
+        <span style="font-size: 1.5em;">
+            <a href="#delete">
+                <span class="ui-icon ui-icon-trash" 
+                      style="margin: 0px 10px 5px 10px;" 
+                      title="Delete this saved search.">
+                </span>
+            </a>
+            <a href="/browse?tags={{search.search_phrase}}">
+                {{ search.search_phrase }}
+            </a> 
+            | {{search.date_saved}} - 
+            <a href="/browse?tags={{search.search_phrase}}">
+                <b>More »</b>
+            </a>
+        </span>
+        {% endfor %}
+    </span>
     {% else %}
         <h1>Nobody here but us chickens!</h1> Looks like you haven't saved any searches yet. Why not try saving a search?
     {% endif %}
     <br>
     {% include "booru/components/paginator.html" %}
+    <script>
+        $(document).ready(function() {
+            // Add the saved search trigger to the button
+            $('#save-search-button').click(function() {
+                saveSearchPhrase('{{ csrf_token }}');
+                return false;
+            })
+        })
+    </script>
 {% endblock %}
