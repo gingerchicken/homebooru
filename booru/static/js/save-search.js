@@ -48,3 +48,32 @@ async function saveSearchPhrase(csfrToken) {
     let errorMessage = new OverlayError();
     errorMessage.show(await resp.text(), 'Error');
 }
+
+async function deleteSearchPhrase(csfrToken, phraseId) {
+    const deleteEndpoint = `/tags/savedsearches/${phraseId}`;
+
+    // Confirm deletion
+    let confirm = new OverlayConfirm();
+    try {
+        await confirm.show('Are you sure you want to delete this search phrase?');
+    } catch (e) {
+        return;
+    }
+
+    let resp = await fetch(deleteEndpoint, {
+        method: "DELETE",
+        headers: {
+            "X-CSRFToken": csfrToken,
+        },
+    });
+
+    if (resp.ok) {
+        // Show success message
+        let message = new OverlaySuccess();
+        message.show('Successfully deleted search phrase.', 'Success');
+        return;
+    }
+
+    let errorMessage = new OverlayError();
+    errorMessage.show(await resp.text(), 'Error');
+}

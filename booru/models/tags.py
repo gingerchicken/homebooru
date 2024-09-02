@@ -6,6 +6,8 @@ import homebooru.settings
 import booru.boorutils as boorutils
 from booru.pagination import Paginator
 
+import urllib.parse
+
 class TagType(models.Model):
     """Describes what a tag's category is."""
 
@@ -206,6 +208,14 @@ class SearchSave(models.Model):
 
         # Return the searches
         return searches
+
+    @property
+    def search_url(self):
+        """Returns the search url for the search"""
+
+        safe_phrase = urllib.parse.quote_plus(self.search_phrase)
+
+        return f"/browse?tags={safe_phrase}"
 
     def __str__(self):
         return f"{self.user}'s saved search '{self.search_phrase}'"

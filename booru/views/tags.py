@@ -174,3 +174,34 @@ def saved_searches(request):
         'searches': searches,
         'paginator': paginator
     })
+
+def saved_search(request, saved_search_id):
+    """
+    Single saved search page
+    """
+
+    # Get the user
+    user = request.user
+
+    # Check if the user is logged in
+    if not user.is_authenticated:
+        # Redirect to the login page
+        return HttpResponseRedirect('/accounts/login')
+    
+    # Get the saved search
+    search = None
+    try:
+        search = SearchSave.objects.get(id=saved_search_id)
+    except SearchSave.DoesNotExist:
+        pass
+    
+    # Check if the search belongs to the user or does not exist
+    if search is None or search.user != user:
+        return HttpResponse("This saved search does not belong to you.", status=403)
+    
+    if request.method == 'DELETE':
+        search.delete()
+        return HttpResponse(status=204)
+
+    # Redirect to the results page
+    return HttpResponseRedirect(search.search_url)

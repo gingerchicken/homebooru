@@ -16,18 +16,18 @@
     </div>
     {% if searches %}
         {% for search in searches %}
-        <span style="font-size: 1.5em;">
-            <a href="#delete">
+        <span class="saved-search">
+            <a class="delete" phrase="{{ search.pk }}">
                 <span class="ui-icon ui-icon-trash" 
                       style="margin: 0px 10px 5px 10px;" 
                       title="Delete this saved search.">
                 </span>
             </a>
-            <a href="/browse?tags={{search.search_phrase}}">
+            <a href="/tags/savedsearches/{{search.pk}}">
                 {{ search.search_phrase }}
             </a> 
             | {{search.date_saved}} - 
-            <a href="/browse?tags={{search.search_phrase}}">
+            <a href="/tags/savedsearches/{{search.pk}}">
                 <b>More »</b>
             </a>
         </span>
@@ -43,6 +43,12 @@
             // Add the saved search trigger to the button
             $('#save-search-button').click(function() {
                 saveSearchPhrase('{{ csrf_token }}');
+                return false;
+            })
+
+            // Add the delete search trigger to the delete icon
+            $('.saved-search .delete').click(function() {
+                deleteSearchPhrase('{{ csrf_token }}', $(this).attr('phrase'));
                 return false;
             })
         })

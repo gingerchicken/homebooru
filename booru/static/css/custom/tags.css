@@ -97,3 +97,8 @@
 .tag-edit-form > .submit {
     margin: 15px;
 }
+
+.saved-search {
+    width: 100%;
+    display: block;
+}
