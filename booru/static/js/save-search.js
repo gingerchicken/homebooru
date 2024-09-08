@@ -40,8 +40,9 @@ async function saveSearchPhrase(csfrToken) {
 
     if (resp.ok) {
         // Show success message
-        let message = new OverlaySuccess();
-        message.show('Successfully saved search phrase.', 'Success');
+        // let message = new OverlaySuccess();
+        // message.show('Successfully saved search phrase.', 'Success');
+        location.reload();
         return;
     }
 
@@ -69,8 +70,9 @@ async function deleteSearchPhrase(csfrToken, phraseId) {
 
     if (resp.ok) {
         // Show success message
-        let message = new OverlaySuccess();
-        message.show('Successfully deleted search phrase.', 'Success');
+        // let message = new OverlaySuccess();
+        // message.show('Successfully deleted search phrase.', 'Success');
+        location.reload();
         return;
     }
 

@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.db import models
+from django.urls import reverse
 
 from booru.pagination import Paginator
 from booru.models.tags import Tag, TagType, SearchSave
@@ -44,7 +45,7 @@ def tags(request):
     tags, paginator = Paginator.paginate(tags, page_number, homebooru.settings.BOORU_TAGS_PER_PAGE)
 
     # Configure paginator
-    paginator.page_url = f"{request.path}?tag={search_phrase}&order_by={order_by}&order_direction={order_direction}"
+    paginator.page_url = f"{reverse('tags')}?tag={search_phrase}&order_by={order_by}&order_direction={order_direction}"
 
     # Render the tags.html template with the tags
     return render(request, 'booru/tags/tags.html', {
@@ -167,6 +168,9 @@ def saved_searches(request):
 
     # Paginate the searches
     searches, paginator = Paginator.paginate(searches, page_number, homebooru.settings.BOORU_SAVED_SEARCHES_PER_PAGE)
+
+    # Configure paginator
+    paginator.page_url = reverse('saved_searches') + "?"
 
     # Render the saved_searches.html template with the user
     return render(request, 'booru/tags/saved-searches.html', {
