@@ -1,4 +1,4 @@
-async function saveSearchPhrase(csfrToken) {
+async function saveSearchPhrase(csfrToken, showSuccessMessage = true, shouldReload = true) {
     // Get the search phrase
     const searchInputIds = ["tags-search", "search-input"] // For some unholy reason, the search input has multiple ids
 
@@ -39,18 +39,22 @@ async function saveSearchPhrase(csfrToken) {
     });
 
     if (resp.ok) {
+        if (!showSuccessMessage)
+            return;
+
         // Show success message
-        // let message = new OverlaySuccess();
-        // message.show('Successfully saved search phrase.', 'Success');
-        location.reload();
+        let message = new OverlaySuccess();
+        message.reloadOnOkay = shouldReload;
+        await message.show('Successfully saved search phrase.', 'Success');
+
         return;
     }
 
     let errorMessage = new OverlayError();
-    errorMessage.show(await resp.text(), 'Error');
+    await errorMessage.show(await resp.text(), 'Error');
 }
 
-async function deleteSearchPhrase(csfrToken, phraseId) {
+async function deleteSearchPhrase(csfrToken, phraseId, showSuccessMessage = true, shouldReload = true) {
     const deleteEndpoint = `/tags/savedsearches/${phraseId}`;
 
     // Confirm deletion
@@ -69,13 +73,18 @@ async function deleteSearchPhrase(csfrToken, phraseId) {
     });
 
     if (resp.ok) {
+        if (!showSuccessMessage)
+            return;
+
         // Show success message
-        // let message = new OverlaySuccess();
-        // message.show('Successfully deleted search phrase.', 'Success');
-        location.reload();
+        let message = new OverlaySuccess();
+        message.reloadOnOkay = shouldReload;
+
+        await message.show('Successfully deleted search phrase.', 'Success');
+
         return;
     }
 
     let errorMessage = new OverlayError();
-    errorMessage.show(await resp.text(), 'Error');
+    await errorMessage.show(await resp.text(), 'Error');
 }

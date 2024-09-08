@@ -61,7 +61,9 @@
         $(document).ready(function() {
             // Add the saved search trigger to the button
             $('#save-search-button').click(function() {
-                saveSearchPhrase('{{ csrf_token }}');
+                saveSearchPhrase('{{ csrf_token }}', false).then(function() {
+                    location.reload();
+                });
                 return false;
             })
 
