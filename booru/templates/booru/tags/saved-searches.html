@@ -6,36 +6,55 @@
 {% endblock %}
 
 {% block main_content %}
+
     <div class="search-container">
-        <form action="" method="get">
+        <form action="/browse" method="get">
             <span id="save-search-button" class="ui-icon ui-icon-heart" style="color: #aaa; font-size: 25px; padding: 0px 35px 0px 0px; vertical-align: top;" title="Save this search. Check your account page."> </span>
             <span class="search-with-save">
                 <input name="tag" type="text" id="search-input" class="form-control" value="" placeholder="Ex: blue_sky cloud 1girl">
             </span><span class="search-button"><input name="commit" class="secondary_search" type="submit" value="Search"></span>
         </form>
     </div>
-    {% if searches %}
-        {% for search in searches %}
-        <span class="saved-search">
-            <a class="delete" phrase="{{ search.pk }}">
-                <span class="ui-icon ui-icon-trash" 
-                      style="margin: 0px 10px 5px 10px;" 
-                      title="Delete this saved search.">
-                </span>
-            </a>
-            <a href="/tags/savedsearches/{{search.pk}}">
-                {{ search.search_phrase }}
-            </a> 
-            | {{search.date_saved}} - 
-            <a href="/tags/savedsearches/{{search.pk}}">
-                <b>More »</b>
-            </a>
+
+    <div class="saved-searches-info">
+        <h1>Saved Searches</h1>
+        <p>This is the page you can remove some of your favorite searches made on our site. All located in a single area for your convenience.</p>
+    </div>
+
+    <div class="saved-searches">
+        {% if searches %}
+            {% for search in searches %}
+            <span class="saved-search">
+                <a class="delete" phrase="{{ search.pk }}">
+                    <span class="ui-icon ui-icon-trash" 
+                        style="margin: 0px 10px 5px 10px;" 
+                        title="Delete this saved search.">
+                    </span>
+                </a>
+                <a href="/tags/savedsearches/{{search.pk}}">
+                    {{ search.search_phrase }}
+                </a> 
+                | {{search.date_saved}} - 
+                <a href="/tags/savedsearches/{{search.pk}}">
+                    <b>More »</b>
+                </a>
+
+                <div class="thumbnail-container">
+                    {% if search.recent_posts|length == 0 %}
+                        <h4>Nobody here but us chickens!</h4>
+                    {% else %}
+                        {% for post in search.recent_posts %}
+                            {% include "booru/posts/components/thumbnail.html" %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </span>
+            {% endfor %}
         </span>
-        {% endfor %}
-    </span>
-    {% else %}
-        <h1>Nobody here but us chickens!</h1> Looks like you haven't saved any searches yet. Why not try saving a search?
-    {% endif %}
+        {% else %}
+            <h1>Nobody here but us chickens!</h1> Looks like you haven't saved any searches yet. Why not try saving a search?
+        {% endif %}
+    </div>
     <br>
     {% include "booru/components/paginator.html" %}
     <script>
