@@ -1,6 +1,9 @@
 from django.test import TestCase
 
-from booru.models import Tag, TagType, Post
+from django.contrib.auth.models import User
+from django.urls import reverse
+
+from booru.models import Tag, TagType, Post, SearchSave
 import booru.tests.testutils as testutils
 import homebooru.settings
 
@@ -191,3 +194,85 @@ class TagEdit(TestCase):
 
         # Check that the tag type was not changed
         self.assertEqual(self.tag.tag_type.name, 'general')
+
+class SaveSearchTest(TestCase):
+    def setUp(self):
+        # Create a user
+        self.user = User.objects.create_user(username='test', password='test')
+
+        # Login the user
+        self.client.login(username='test', password='test')
+
+    def make_request(self, search_phrase):
+        return self.client.post(reverse('saved_searches'), {
+            'searchPhrase': search_phrase
+        })
+
+    def test_save_search(self):
+        """Correctly saves a search"""
+
+        # Make a request to save a search
+        response = self.make_request('abc def ghi')
+
+        # Check that the response was a redirect
+        self.assertEqual(response.status_code, 302, response.content.decode())
+
+        # Check that the search was saved
+        self.assertEqual(SearchSave.objects.count(), 1)
+
+        # Check that the search was saved correctly
+        search = SearchSave.objects.first()
+
+        self.assertEqual(search.user, self.user)
+        self.assertEqual(search.search_phrase, 'abc def ghi')
+
+    def test_save_empty_search(self):
+        """Does not save an empty search"""
+
+        # Make a request to save a search
+        response = self.make_request('')
+
+        # Check that the response was an error
+        self.assertEqual(response.status_code, 400)
+
+        # Check that the search was not saved
+        self.assertEqual(SearchSave.objects.count(), 0)
+
+        # Check the body of the response to include the word "empty"
+        self.assertIn("empty", response.content.decode())
+
+    def test_save_duplicate_search(self):
+        """Does not save a duplicate search"""
+
+        # Save a search
+        self.make_request('abc def ghi')
+
+        # Make a request to save the same search
+        response = self.make_request('abc def ghi')
+
+        # Check that the response was an error
+        self.assertEqual(response.status_code, 409)
+
+        # Check that the search was not saved
+        self.assertEqual(SearchSave.objects.count(), 1)
+
+        # Check the body of the response to include the word "unique"
+        self.assertIn("matches", response.content.decode())
+
+    def test_unauthenticated(self):
+        """Redirects to login page if not logged in"""
+
+        # Logout the user
+        self.client.logout()
+
+        # Make a request to save a search
+        response = self.make_request('abc def ghi')
+
+        # Check that the response was a redirect
+        self.assertEqual(response.status_code, 302)
+
+        # Check that the user was redirected to the login page
+        self.assertEqual(response.url, '/accounts/login')
+
+        # Make sure that the search was not saved
+        self.assertEqual(SearchSave.objects.count(), 0)

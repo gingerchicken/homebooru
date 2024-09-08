@@ -1,5 +1,6 @@
 /* This CSS is for the tags page, e.g. tags editing and searching */
 
+
 /* Tag searching page */
 /* Tag display */
 .option-title {
@@ -96,4 +97,30 @@
 
 .tag-edit-form > .submit {
     margin: 15px;
+}
+
+.saved-search {
+    width: 100%;
+    display: block;
+    margin-bottom: 35px;
+}
+
+.saved-searches-info {
+    width: 100%;
+    display: block;
+    margin-bottom: 40px;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.saved-searches-info > h1,
+.saved-searches-info > p {
+    padding: 0;
+    margin: 0;
+}
+
+.saved-searches {
+    margin-left: 20px;
+
+    font-size: 14px!important;
 }

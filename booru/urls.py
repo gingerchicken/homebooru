@@ -24,6 +24,8 @@ urlpatterns = [
     path('tags', views.tags, name='tags'),
     path('tags/edit', views.edit_tag, name='edit_tag'),
     path('tags/autocomplete/<str:tag>', views.autocomplete, name='autocomplete'),
+    path('tags/savedsearches', views.saved_searches, name='saved_searches'),
+    path('tags/savedsearches/<int:saved_search_id>', views.saved_search, name='saved_search'),
 
     # Accounts
     path('accounts/login', views.login, name='login'),

@@ -15,6 +15,10 @@ class ScanTest(TestCase):
     temp_storage_folder = booru_testutils.TempStorage()
     
     def setUp(self):
+        if not scanner_testutils.SHOULD_TEST_EXT_BOORU:
+            self.skipTest('Skipping external booru tests')
+            return
+
         self.temp_scan_folder.add_file(booru_testutils.BOORU_IMAGE)
         self.temp_scan_folder.setUp()
         self.temp_storage_folder.setUp()

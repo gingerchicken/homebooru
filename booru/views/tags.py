@@ -1,9 +1,10 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.db import models
+from django.urls import reverse
 
 from booru.pagination import Paginator
-from booru.models.tags import Tag, TagType
+from booru.models.tags import Tag, TagType, SearchSave
 import homebooru.settings
 
 from .filters import *
@@ -44,7 +45,7 @@ def tags(request):
     tags, paginator = Paginator.paginate(tags, page_number, homebooru.settings.BOORU_TAGS_PER_PAGE)
 
     # Configure paginator
-    paginator.page_url = f"{request.path}?tag={search_phrase}&order_by={order_by}&order_direction={order_direction}"
+    paginator.page_url = f"{reverse('tags')}?tag={search_phrase}&order_by={order_by}&order_direction={order_direction}"
 
     # Render the tags.html template with the tags
     return render(request, 'booru/tags/tags.html', {
@@ -121,3 +122,90 @@ def autocomplete(request, tag):
 
     # Return the tags as json
     return HttpResponse(json.dumps(flat), content_type="application/json")
+
+def saved_searches(request):
+    # Get the user
+    user = request.user
+
+    # Check if the user is logged in
+    if not user.is_authenticated:
+        # Redirect to the login page
+        return HttpResponseRedirect('/accounts/login')
+
+    # Post
+    if request.method == 'POST':
+        # Get the search phrase
+        search_phrase = request.POST.get('searchPhrase', '').strip()
+
+        # Check if the search phrase is empty
+        if len(search_phrase) == 0:
+            # Return 400 error
+            return HttpResponse("Search phrase cannot be empty.", status=400)
+        
+        # Check if the search phase is not unique
+        if SearchSave.objects.filter(user=user, search_phrase=search_phrase).exists():
+            # Return 409 error
+            return HttpResponse("A saved search phrase already matches this.", status=409)
+
+        # Save the search
+        search = SearchSave(user=user, search_phrase=search_phrase)
+        search.save()
+
+        # Redirect to the saved searches page
+        return HttpResponseRedirect('/tags/savedsearches')
+
+    # Get the page number url parameter
+    page_number = request.GET.get('pid', '1')
+
+    # Try to convert the page number to an integer
+    try:
+        page_number = int(page_number)
+    except ValueError:
+        page_number = 1
+
+    # Get the saved searches
+    searches = SearchSave.get_latest_searches(user)
+
+    # Paginate the searches
+    searches, paginator = Paginator.paginate(searches, page_number, homebooru.settings.BOORU_SAVED_SEARCHES_PER_PAGE)
+
+    # Configure paginator
+    paginator.page_url = reverse('saved_searches') + "?"
+
+    # Render the saved_searches.html template with the user
+    return render(request, 'booru/tags/saved-searches.html', {
+        'user': user,
+        'searches': searches,
+        'paginator': paginator
+    })
+
+def saved_search(request, saved_search_id):
+    """
+    Single saved search page
+    """
+
+    # Get the user
+    user = request.user
+
+    # Check if the user is logged in
+    if not user.is_authenticated:
+        # Redirect to the login page
+        return HttpResponseRedirect('/accounts/login')
+    
+    # Get the saved search
+    search = None
+    try:
+        search = SearchSave.objects.get(id=saved_search_id)
+    except SearchSave.DoesNotExist:
+        pass
+    
+    # Check if the search belongs to the user or does not exist
+    if search is None or search.user != user:
+        return HttpResponse("This saved search does not belong to you.", status=403)
+    
+    if request.method == 'DELETE':
+        search.delete()
+        return HttpResponse(status=204)
+
+    # Redirect to the results page
+    return HttpResponseRedirect(search.search_url)

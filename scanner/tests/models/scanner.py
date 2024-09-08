@@ -746,6 +746,10 @@ class ScannerScanTest(TestCase):
     fixtures = ['ratings.json']
 
     def setUp(self):
+        if not scanner_testutils.SHOULD_TEST_EXT_BOORU:
+            self.skipTest('Skipping external booru tests')
+            return
+
         self.og_SCANNER_USE_DEFAULT_TAGS = homebooru.settings.SCANNER_USE_DEFAULT_TAGS
         self.og_BOORU_ALLOWED_FILE_EXTENSIONS = [i for i in homebooru.settings.BOORU_ALLOWED_FILE_EXTENSIONS]
 
@@ -758,10 +762,6 @@ class ScannerScanTest(TestCase):
             name='Test Scanner'
         )
         self.scanner.save()
-
-        if not scanner_testutils.SHOULD_TEST_EXT_BOORU:
-            self.skipTest('Skipping external booru tests')
-            return
 
         # Create a booru
         self.booru = Booru(

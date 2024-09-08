@@ -1,9 +1,12 @@
 from django.db import models
 from django.apps import apps
+from django.contrib.auth.models import User
 
 import homebooru.settings
 import booru.boorutils as boorutils
 from booru.pagination import Paginator
+
+import urllib.parse
 
 class TagType(models.Model):
     """Describes what a tag's category is."""
@@ -167,3 +170,56 @@ class Tag(models.Model):
 
         # Return the tags
         return qs
+
+class SearchSave(models.Model):
+    """A saved search phrase for a user"""
+
+    # The user that saved the search
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    # The search phrase
+    search_phrase = models.TextField()
+
+    # The date the search was saved
+    date_saved = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def recent_posts(self, limit=10):
+        """Returns the recent posts for the search"""
+
+        # Get the Post model
+        Post = apps.get_model('booru', 'Post')
+
+        # Begin the search
+        results = Post.search(self.search_phrase)
+
+        # Truncate the results to the limit
+        results = results[:limit]
+
+        # Return the results
+        return results
+
+    @staticmethod
+    def get_latest_searches(user):
+        """Get the latest searches for a user"""
+
+        # Get the searches
+        searches = SearchSave.objects.filter(user=user).order_by('-date_saved')
+
+        # Return the searches
+        return searches
+
+    @property
+    def search_url(self):
+        """Returns the search url for the search"""
+
+        safe_phrase = urllib.parse.quote_plus(self.search_phrase)
+
+        return f"/browse?tags={safe_phrase}"
+
+    def __str__(self):
+        return f"{self.user}'s saved search '{self.search_phrase}'"
+
+    class Meta:
+        # Make sure that only one search save per user can exist
+        unique_together = ('user', 'search_phrase')
