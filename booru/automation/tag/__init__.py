@@ -1,6 +1,7 @@
 from .tag_automation import *
 from .metadata import *
 from .tags import *
+from .joytag import JoytagAutomation
 
 __INITIALISED__ = False
 
@@ -17,6 +18,7 @@ def perform_setup():
     __INITIALISED__ = True
 
     # Register the automations
+    TagAutomationRegistry().register(JoytagAutomation())
     TagAutomationRegistry().register(AnimatedContentTagAutomation())
     TagAutomationRegistry().register(LargeFileSizeTagAutomation())
     

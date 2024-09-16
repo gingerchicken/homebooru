@@ -27,6 +27,14 @@ RUN pip install -r requirements.txt
 # Download opennsfw model
 RUN python3 -c "import opennsfw2; opennsfw2.make_open_nsfw_model()"
 
+# Download joytag model
+RUN apt update && apt install -y git-lfs
+RUN git clone https://huggingface.co/fancyfeast/joytag ~/.joytag/model
+RUN git clone https://github.com/fpgaminer/joytag ~/.joytag/joytag
+
+# Install the joytag requirements
+RUN pip install -r ~/.joytag/joytag/requirements.txt
+
 # Copy all of the current code to the /app/ directory
 COPY . /app/
 
