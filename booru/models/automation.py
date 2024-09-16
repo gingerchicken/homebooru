@@ -192,6 +192,7 @@ class NSFWAutomationRecord(models.Model):
 
 # Hook into the Post save method to re-add the post to be scanned
 from django.db.models.signals import post_save
+import homebooru.settings
 
 def post_save_post(sender, instance, created, **kwargs):
     """Removes the post from the automation records."""
@@ -200,8 +201,9 @@ def post_save_post(sender, instance, created, **kwargs):
     from booru.tasks.tag_automation import perform_automation as perform_tag_automation
     from booru.tasks.rating_automation import perform_rating_automation
 
-    # Remove the post from the automation records
-    TagAutomationRecord.objects.filter(post=instance).delete()
+    if homebooru.settings.BOORU_RERUN_AUTOMATION_ON_UPDATE:
+        # Remove the post from the automation records
+        TagAutomationRecord.objects.filter(post=instance).delete()
 
     # Check if the post was created
     if created:
