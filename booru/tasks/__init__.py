@@ -1,3 +1,4 @@
 from .tag_automation import perform_all_automation, perform_automation
 from .rating_automation import perform_all_rating_automation, perform_rating_automation
 from .pools import create_pool_posts, create_pool_posts_range
+from .impl_automation import perform_all_tag_implications
