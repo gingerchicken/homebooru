@@ -24,8 +24,6 @@ def perform_setup():
     
     TagAutomationRegistry().register(TagmeTagAutomation(order_override=1))
 
-    TagAutomationRegistry().register(ProbableTagDependenceAutomation(order_override=1024))
-
     # Print the state
     import homebooru.settings
     if homebooru.settings.DEBUG:
