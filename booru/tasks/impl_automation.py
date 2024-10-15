@@ -5,7 +5,7 @@ from booru.models.implications import Implication
 
 @shared_task(bind=True)
 @skip_if_running
-def perform_all_tag_implications():
+def perform_all_tag_implications(self):
     """Performs all tag implications."""
     # Get all implications
     implications = Implication.objects.all() # TODO what if there is a change in the implications?
