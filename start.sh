@@ -95,6 +95,9 @@ fi
 if [ "$LOAD_FIXTURES" = "True" ]; then
     # Load the fixtures
     python manage.py loaddata booru/fixtures/*.json
+
+    # Load additional fixtures
+    python manage.py loaddata additional-fixtures/*.json
 fi
 
 export CLEANUP_DATABASE="True"

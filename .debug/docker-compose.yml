@@ -15,6 +15,9 @@ services:
     volumes:
       - ../:/app # Pass the current directory to the container.
       - /tmp/booru_storage:/storage/
+
+      # Fixtures
+      - ../additional-fixtures:/app/additional-fixtures
     environment:
       # Database
       - POSTGRES_NAME=${DB_NAME}

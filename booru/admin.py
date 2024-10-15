@@ -16,6 +16,9 @@ admin.site.register(Rating)
 from .models import Tag
 admin.site.register(Tag)
 
+from .models import Implication
+admin.site.register(Implication)
+
 from .models import TagType
 admin.site.register(TagType)
 

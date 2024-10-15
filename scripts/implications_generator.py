@@ -265,7 +265,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Generate implications by scraping a website")
     parser.add_argument("--clean", action="store_true", help="Clean the implications by removing NSFW implications", default=True)
-    parser.add_argument("--output", type=str, help="Output the implications to a file", default="implications.json")
+    parser.add_argument("--output", type=str, help="Output the implications to a file", default="./additional-fixtures/implications.json")
 
     # Parse the arguments
     args = parser.parse_args()
