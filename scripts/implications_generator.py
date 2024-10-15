@@ -134,9 +134,11 @@ def filter_implications(implications, banned_tags):
 
     return filtered_implications
 
-def clean(implications):
+def clean(implications, additional_banned_words=[]):
     # Get the list of tags
-    words = get_banned_words() # Get the list of banned words 
+    words = get_banned_words() # Get the list of banned words
+    # Add additional banned words
+    words += additional_banned_words
 
     # Get the list of tags
     tags = get_tags(implications)
@@ -273,7 +275,9 @@ if __name__ == "__main__":
 
     # Clean the implications
     if args.clean:
-        implications = clean(implications)
+        implications = clean(implications, additional_banned_words=[
+            "breasts", "breast", "suck", "sucking" # Add some additional banned words since the list is not perfect
+        ])
     
     # Convert to fixtures
     fixtures = []
