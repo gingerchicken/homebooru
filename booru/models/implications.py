@@ -15,7 +15,7 @@ class Implication(models.Model):
     @property
     def is_usable(self):
         """Is this implication usable - i.e., does the parent tag exist?"""
-        return Tag.objects.filter(name=self.parent).exists() 
+        return Tag.objects.filter(tag=self.parent).exists() 
     
     def apply(self) -> int:
         """Applies the implication to all current posts, returning the number of posts affected."""
@@ -37,7 +37,7 @@ class Implication(models.Model):
             return 0
 
         # Create the child tag
-        child_tag = Tag.objects.get_or_create(name=self.child)
+        child_tag = Tag.create_or_get(tag=self.child)
 
         # Add the child tag to all the posts
         for post in posts:
