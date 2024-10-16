@@ -16,6 +16,9 @@ admin.site.register(Rating)
 from .models import Tag
 admin.site.register(Tag)
 
+from .models import Implication
+admin.site.register(Implication)
+
 from .models import TagType
 admin.site.register(TagType)
 
@@ -35,8 +38,7 @@ from .models import PoolPost
 admin.site.register(PoolPost)
 
 # Automation
-from .models import TagSimilarity, TagAutomationRecord, NSFWAutomationRecord, RatingThreshold
-admin.site.register(TagSimilarity)
+from .models import TagAutomationRecord, NSFWAutomationRecord, RatingThreshold
 admin.site.register(TagAutomationRecord)
 admin.site.register(NSFWAutomationRecord)
 admin.site.register(RatingThreshold)

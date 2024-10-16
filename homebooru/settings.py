@@ -289,3 +289,7 @@ if BOORU_AUTOMATIC_RATING_ENABLED:
         'task': 'booru.tasks.rating_automation.perform_all_rating_automation',
         'schedule': 60 * 5, # Every 5 minutes
     }
+CELERY_BEAT_SCHEDULE['implications_all'] = {
+    'task': 'booru.tasks.impl_automation.perform_all_tag_implications',
+    'schedule': 60 * 5, # Every 2 minutes
+}

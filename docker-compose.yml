@@ -18,6 +18,9 @@ services:
       # Migrations
       - ./booru/migrations:/app/booru/migrations
       - ./scanner/migrations:/app/scanner/migrations
+
+      # Fixtures
+      - ./additional-fixtures:/app/additional-fixtures
     environment:
       # Database
       - POSTGRES_NAME=${DB_NAME}

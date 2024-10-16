@@ -93,14 +93,11 @@ fi
 
 # Chcek if the LOAD_FIXTURES variable is set and equal to "True"
 if [ "$LOAD_FIXTURES" = "True" ]; then
-    if [ "$TAG_IMPLICATION_SET" = "True" ] && [ ! -f "booru/fixtures/tagsimilarity.json" ]; then
-
-        # Decompress the tag implication set
-        tar -xzf booru/fixtures/TAGSIMILARITIES.tar.gz -C booru/fixtures
-    fi
-
     # Load the fixtures
     python manage.py loaddata booru/fixtures/*.json
+
+    # Load additional fixtures
+    python manage.py loaddata additional-fixtures/*.json
 fi
 
 export CLEANUP_DATABASE="True"

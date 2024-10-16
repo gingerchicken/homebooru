@@ -1,6 +1,7 @@
 from .tag_automation import *
 from .metadata import *
 from .tags import *
+from .joytag import JoytagAutomation
 
 __INITIALISED__ = False
 
@@ -17,12 +18,11 @@ def perform_setup():
     __INITIALISED__ = True
 
     # Register the automations
+    TagAutomationRegistry().register(JoytagAutomation())
     TagAutomationRegistry().register(AnimatedContentTagAutomation())
     TagAutomationRegistry().register(LargeFileSizeTagAutomation())
     
     TagAutomationRegistry().register(TagmeTagAutomation(order_override=1))
-
-    TagAutomationRegistry().register(ProbableTagDependenceAutomation(order_override=1024))
 
     # Print the state
     import homebooru.settings
